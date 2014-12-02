@@ -33,7 +33,8 @@
     <link href="{{ URL::asset('assets/css/styles.css') }}" rel="stylesheet">
 
     <!-- FontAwesome CSS -->
-    {{ FA::css() }}
+    {{-- FA::css() --}}
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Load scripts -->
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>

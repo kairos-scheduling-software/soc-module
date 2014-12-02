@@ -7,7 +7,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="{{ URL::route('root') }}">
+		<a class="navbar-brand" href="{{ URL::route('home') }}">
 			<img src="{{ URL::asset('assets/images/kairos_cropped.png') }}" id="logo_image"></img>
 		</a>
 	</div>
@@ -18,21 +18,31 @@
 	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
 				<li {{ $page_name == 'HOME' ? 'class="selected_page"' : '' }}>
-					<a href="{{ URL::route('root') }}">Home</a>
-				</li>
-				<li {{ $page_name == 'SCHEDULES' ? 'class="selected_page"' : '' }}>
-					<a href="#projects">Schedules</a>
+					<a href="{{ URL::route('home') }}">{{ FA::icon('dashboard') }} Dashboard</a>
 				</li>
 				<li {{ $page_name == 'DATATOOLS' ? 'class="selected_page"' : '' }}>
-					<a href="#data-tools">Data Tools</a>
+					<a href="#data-tools">{{ FA::icon('database') }} Data Tools</a>
+				</li>
+				<li {{ $page_name == 'HELP' ? 'class="selected_page"' : '' }}>
+					<a href="#help">{{ FA::icon('question-circle') }} Help</a>
 				</li>
 		</ul>
 	
 		<ul class="nav navbar-nav navbar-right">
 			<li {{ $page_name == 'SETTINGS' ? 'class="selected_page"' : '' }}>
-				<a href="#settings">{{ FA::icon('cogs') }} Settings</a>
+				@if(Auth::check())
+					<a href="#manage-account">{{ FA::icon('user') . ' Welcome, ' . Auth::user()->first . '!' }}</a>
+				@else
+					<a>{{ FA::icon('user') }} Welcome, Guest!</a>
+				@endif
 			</li>
-			<li><a href="#logout">Logout</a></li>
+			<li>
+				@if(Auth::check())
+					<a href='{{ URL::route('logout') }}'>{{ FA::icon('sign-out') }} Log Out</a>
+				@else
+					<a href='{{ URL::route('getLogin') }}'>{{ FA::icon('sign-in') }} Login</a>
+				@endif
+			</li>
 		</ul>
 	</div><!-- /.navbar-collapse -->
 </nav>

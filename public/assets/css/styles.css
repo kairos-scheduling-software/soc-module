@@ -22,7 +22,7 @@ html, body {
 
 #custom_navbar a {
 	color: #CECECE;
-	font-size: 18pt;
+	font-size: 16pt;
 	font-family: "Arial";
 }
 
@@ -38,8 +38,8 @@ html, body {
 }
 
 .navbar-brand, .navbar-nav li a {
-    line-height: 90px;
-    height: 90px;
+    line-height: 70px;
+    height: 70px;
     padding-top: 0;
     padding-left: 30px;
 }
@@ -56,7 +56,7 @@ html, body {
 	}
 
 	#custom_navbar a {
-		font-size: 18px;
+		font-size: 14pt;
 	}
 
 	#logo_image {

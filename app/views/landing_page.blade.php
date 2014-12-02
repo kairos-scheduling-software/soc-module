@@ -17,12 +17,12 @@
 		<p>
 			Choose an option to continue:
 		</p>
-		<button class="btn btn-lg">
+		<a class="btn btn-lg">
 			Continue as Guest
-		</button>
-		<button class="btn btn-lg" onClick="window.location.pathname = '/kairos_ui/public/dashboard';">
+		</a>
+		<a class="btn btn-lg" href="{{ URL::route('getLogin') }}">
 			Login
-		</button>
+		</a>
 	</div>
 </div>
 

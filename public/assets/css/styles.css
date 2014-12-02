@@ -248,7 +248,7 @@ footer {
 	font-size: 30pt;
 }
 
-.landing-prompt button {
+.landing-prompt a {
 	background-color: #D85600;
 	color: #002143;
 	width: 260px;
@@ -257,7 +257,7 @@ footer {
 	font-size: 20pt;
 }
 
-.landing-prompt button:hover {
+.landing-prompt a:hover {
 	background-color: #C24D00;
 	color: #002143;
 }

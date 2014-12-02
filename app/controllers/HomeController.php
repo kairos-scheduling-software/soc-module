@@ -4,8 +4,8 @@ class HomeController extends BaseController {
 
 	public function home()
 	{
-		return View::make('home')->with([
-			'page_name'	=>	'HOME'
+		return View::make('landing_page')->with([
+			'page_name'	=>	'LANDING'
 		]);
 	}
 

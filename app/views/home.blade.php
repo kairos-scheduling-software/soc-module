@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.holy-grail')
 
 @section('content')
 

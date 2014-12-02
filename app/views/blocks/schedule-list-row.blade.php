@@ -1,32 +1,14 @@
-<div class="sched-list-row">
-	<hr>
-	<div class="sched-name">
-		{{ $sched_names[$i]["name"] }}
+<a href="#" class="select-sched">
+	<div class="sched-list-row">
+		<hr>		
+		<div class="sched-name-2">
+			{{ $schedule->name }}
+		</div>
+		<div class="last-edited">
+			{{ $schedule->last_edited }}
+		</div>
+		<div class="edited-by">
+			{{ $schedule->edited_by }}
+		</div>		
 	</div>
-	<div class="sched-actions">
-		<div class="sched-action">
-			<button class="btn">
-				{{ FA::lg('eye') }}&nbsp;
-				View
-			</button>
-		</div>
-		<div class="sched-action">
-			<button class="btn">
-				{{ FA::lg('edit') }}&nbsp;
-				Edit
-			</button>
-		</div>
-		<div class="sched-action">
-			<button class="btn">
-				{{ FA::lg('group') }}&nbsp;
-				Users
-			</button>
-		</div>
-		<div class="sched-action">
-			<button class="btn">
-				{{ FA::lg('times') }}&nbsp;
-				Delete
-			</button>
-		</div>
-	</div>
-</div>
+</a>

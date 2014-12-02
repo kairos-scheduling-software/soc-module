@@ -102,7 +102,7 @@ class AccountController extends BaseController {
 
 			if($login)
 			{
-				return Redirect::intended('/');
+				return Redirect::intended('/dashboard');
 			}
 		}
 

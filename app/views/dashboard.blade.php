@@ -45,20 +45,25 @@
 			</div>
 		</div>
 		<div class="sched-list">
-			<div class="sched-name-2 sched-list-col-header">
-				Name
-			</div>
-			<div class="last-edited sched-list-col-header">
-				Last Edited
-			</div>
-			<div class="edited-by sched-list-col-header">
-				Edited By
-			</div>
-			@for($i = 0; $i < 13; $i++)
-				@include('blocks/schedule-list-row-2')
-			@endfor
+			@if($schedules == null)
+				<h2>No schedules have been created</h2>
+				You can create or import a new schedule by clicking the appropriate button on the left column.
+			@else
+				<div class="sched-name-2 sched-list-col-header">
+					Name
+				</div>
+				<div class="last-edited sched-list-col-header">
+					Last Edited
+				</div>
+				<div class="edited-by sched-list-col-header">
+					Edited By
+				</div>			
+				@foreach($schedules as $schedule)
+					@include('blocks/schedule-list-row')
+				@endforeach
+				<hr>
+			@endif
 
-			<hr>
 		</div>
 	@stop
 

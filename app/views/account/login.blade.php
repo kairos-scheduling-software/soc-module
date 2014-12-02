@@ -7,9 +7,9 @@
 
 
 
-<form action="{{ URL::route('postLogin') }}" method='post'>
+<form action="{{ URL::route('postLogin') }}" method='POST'>
 	
-	username: <input type='text' name='username' value = {{Input::old('username')}}></input>
+	username: <input type='text' name='username' value="{{Input::old('username')}}"></input>
 	@if($errors->has('username'))
 		{{$errors->first('username')}}
 	@endif

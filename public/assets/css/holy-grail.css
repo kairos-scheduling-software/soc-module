@@ -1,0 +1,46 @@
+html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	display: table;
+}
+
+.hg-columns {
+	height: 100%;
+	display: table;
+	width: 100%;
+}
+
+.hg-sidebar {
+	width: 20%;
+	background-color: #808080;
+}
+
+.hg-center {
+	width: 60%;
+}
+
+.hg-col {
+	display: table-cell;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 20px;
+}
+
+.wrapper {
+	height: auto;
+}
+
+#page_footer {
+	height: 40px;
+	text-align: center;
+	background-color: #363636;
+	padding-top: 10px;
+	width: 100%;
+	color: #CECECE;
+}
+
+footer {
+	display: table-row;
+	height: 1px;
+}

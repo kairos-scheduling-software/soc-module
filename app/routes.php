@@ -4,6 +4,11 @@ Route::get('/', array(
 		'uses' => 'HomeController@home'
 ));
 
+Route::get('/createSchedule/{scheduleId}', array(
+			'as'=> 'createSchedule',
+			'uses' => 'APIController@create'
+	));
+
 Route::group(array('before'=> 'guest'), function()
 {
 

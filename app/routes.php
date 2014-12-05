@@ -1,7 +1,22 @@
 <?php
-	Route::get('/', array(
-			'as' => 'home',
-			'uses' => 'HomeController@home'
+
+Route::get('/', array(
+		'as' => 'home',
+		'uses' => 'HomeController@home'
+));
+
+Route::get('/createSchedule/{scheduleId}', array(
+			'as'=> 'createSchedule',
+			'uses' => 'APIController@create'
+	));
+
+Route::group(array('before'=> 'guest'), function()
+{
+
+	//used for email account activation
+	Route::get('/activate/{code}', array(
+			'as' => 'activate',
+			'uses' => 'AccountController@activate'
 	));
 
 	Route::group(array('before'=> 'guest'), function()

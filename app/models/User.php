@@ -15,6 +15,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 * @var string
 	 */
 	protected $table = 'users';
+	protected $fillable = array('username', 'email', 'first', 'last', 'password', 'temp_password', 'active_code', 'active', 'remember_token');
 
 	/**
 	 * The attributes excluded from the model's JSON form.
@@ -36,5 +37,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getRememberTokenName()
 	{
     	return 'remember_token';
+	}
+
+	public function schedules()
+	{
+		return $this->belongsToMany('Schedule');
 	}
 }

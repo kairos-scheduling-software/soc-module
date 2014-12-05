@@ -71,6 +71,62 @@ html, body {
 	}
 }
 
+#login-modal {
+	background-color: #CCCCCC;
+	color: #003366;
+	width: 30%;
+	height: 390px;
+	min-width: 500px;
+	margin-right: 35%;
+	margin-left: 35%;
+	margin-top: 100px;
+	border-radius: 10px;
+	font-size: 18pt;
+	text-align: center;
+}
+
+#login-modal a.login-link {
+	color: #003366;
+	background-color: #CCCCCC;
+	font-size: 14pt;
+}
+
+#login-modal .form-control {
+	width: 70%;
+	height: 50px;
+	font-size: 14pt;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.login-footer {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding: 0;
+	height: 50px;
+	text-align: center;
+	font-size: 15pt;
+}
+
+.btn-login {
+	background-color: #D85600;
+	color: #002143;
+	font-size: 16pt;
+	padding-right: 20px;
+	padding-left: 20px;
+}
+
+#btn-register {
+	margin-left: 20px;
+	background-color: #D85600;
+	color: #002143;
+	width: auto;
+	height: auto;
+	font-size: 16pt;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 .navbar-right {
 	padding-right: 30px;
 }

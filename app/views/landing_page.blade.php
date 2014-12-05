@@ -17,12 +17,21 @@
 		<p>
 			Choose an option to continue:
 		</p>
-		<a class="btn btn-lg">
+		<a href="#guest" class="btn btn-lg">
 			Continue as Guest
 		</a>
-		<a class="btn btn-lg" href="{{ URL::route('getLogin') }}">
+		<a class="btn btn-lg" data-toggle="modal" href="#login-modal">
 			Login
 		</a>
+		{{--
+		<div class="modal hide" id="login-modal">
+			<button type="button" class="close" data-dismiss="modal">x</button>
+			<h3>login form</h3>
+		</div>
+		--}}
+		
+		@include('blocks/login-modal')
+		
 	</div>
 </div>
 

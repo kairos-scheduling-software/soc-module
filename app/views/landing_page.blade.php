@@ -23,15 +23,7 @@
 		<a class="btn btn-lg" data-toggle="modal" href="#login-modal">
 			Login
 		</a>
-		{{--
-		<div class="modal hide" id="login-modal">
-			<button type="button" class="close" data-dismiss="modal">x</button>
-			<h3>login form</h3>
-		</div>
-		--}}
-		
-		@include('blocks/login-modal')
-		
+		@include('blocks/login-modal')		
 	</div>
 </div>
 

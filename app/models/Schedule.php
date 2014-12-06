@@ -3,7 +3,7 @@
 class Schedule extends Eloquent 
 {
 	protected $table = 'schedules';
-	protected $fillable = array('name','json_schedule', 'user_id');
+	protected $fillable = array('name','json_schedule', 'description', 'last_edited_by');
 
 	public function users()
 	{

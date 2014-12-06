@@ -40,6 +40,7 @@
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
     <script>
     $(function(){
         $('.tabs').css('background-image', 'url({{ URL::asset("assets/images/tabs_1.png") }})');

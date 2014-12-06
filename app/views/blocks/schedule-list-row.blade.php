@@ -5,10 +5,10 @@
 			{{ $schedule->name }}
 		</div>
 		<div class="last-edited">
-			{{ $schedule->last_edited }}
+			{{ $schedule->updated_at }}
 		</div>
 		<div class="edited-by">
-			{{ $schedule->edited_by }}
+			{{ User::find($schedule->last_edited_by)->full_name() }}
 		</div>		
 	</div>
 </a>

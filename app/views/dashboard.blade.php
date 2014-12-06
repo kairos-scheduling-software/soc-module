@@ -68,6 +68,9 @@
 	@stop
 
 	@section('right-column')
+		<div class="close-panel">
+			<a href="#" id="close-btn">&times;</a>
+		</div>
 		<h2>Spring 2014</h2>
 		<div class="sched-admin-section">
 			<h3>{{ FA::icon('file-text-o')}}&nbsp;Description</h3>

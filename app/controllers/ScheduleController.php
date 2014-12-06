@@ -6,7 +6,7 @@ class ScheduleController extends BaseController {
 	{
 		// TODO: Fetch all of the current user's schedules
 
-		$schedules = null; // $schedules = Auth::user()->schedules;
+		$schedules = Auth::user()->schedules;
 
 		return View::make('dashboard')->with([
 			'page_name'	=>	'DASHBOARD',

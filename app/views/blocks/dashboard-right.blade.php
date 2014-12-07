@@ -23,7 +23,9 @@
 	<button class="btn btn-small">
 		{{ FA::icon('copy')}}&nbsp;COPY
 	</button>
-	<button class="btn btn-small">
+	<button class="btn btn-small" id="delete-sched-btn" 
+			data-url="{{ URL::route('delete-sched', $sched->id) }}" 
+			data-row="#row_{{ $sched->id }}">
 		{{ FA::icon('times')}}&nbsp;DELETE
 	</button>
 </div>

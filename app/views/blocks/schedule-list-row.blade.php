@@ -1,4 +1,4 @@
-<a href="#" class="select-sched">
+<a href="#" class="select-sched" id="{{ 'row_' . $schedule->id }}">
 	<div class="sched-list-row" data-url="{{ URL::route('sched-admin', $schedule->id) }}">
 		<hr>		
 		<div class="sched-name-2">

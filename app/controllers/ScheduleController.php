@@ -38,4 +38,14 @@ class ScheduleController extends BaseController {
 		}
 	}
 
+	public function delete_schedule($id)
+	{
+		$schedule = Schedule::find($id);
+
+		if($schedule->delete())
+			return Response::json(['success' => 'Schedule deleted!'], 200);
+		else
+			return Response::json(['error' => 'Could not delete schedule at this time'], 500);
+	}
+
 }

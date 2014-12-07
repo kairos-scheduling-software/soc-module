@@ -1,7 +1,6 @@
 $(function(){
 	$('.sched-list-row').click(function(e) {
 		e.preventDefault();
-		$('#hg-right-content').html("<h1>Loading...</h1>");
 		var url = $(this).attr('data-url');
 
 		$.ajax({
@@ -26,5 +25,29 @@ $(function(){
 	$('#hg-right-content').on('click', '#view-sched-btn', function(e) {
 		var url = $(this).attr('data-url');
 		window.location.href = url;
+	});
+
+	$('#hg-right-content').on('click', '#delete-sched-btn', function(e) {
+		var url = $(this).attr('data-url');
+		var row = $(this).attr('data-row');
+
+		if (!confirm("Are you sure you want to delete this schedule?"))
+			return;
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			success: 	function(data, textStatus, jqXHR) {
+				// TODO:  show bootstrap success message
+
+				$('#hg-right').css('display', 'none');
+				$(row).remove();
+				alert('Schedule deleted!');
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Could not delete schedule at this time.');
+				// TODO:  show bootstrap error message
+			}
+		});
 	});
 });

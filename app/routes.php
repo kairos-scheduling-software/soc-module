@@ -63,4 +63,9 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'view-sched',
 		'uses'	=>	'ScheduleController@view_schedule'
 	));
+
+	Route::post('/delete-schedule/{id}', array(
+		'as'	=>	'delete-sched',
+		'uses'	=>	'ScheduleController@delete_schedule'
+	));
 });

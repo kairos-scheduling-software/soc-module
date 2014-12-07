@@ -23,4 +23,19 @@ class ScheduleController extends BaseController {
 			return View::make('blocks.dashboard-right')->withSched($sched);
 	}
 
+	public function view_schedule()
+	{
+		$id = Input::get('id');
+
+		if(!$id)
+			return Redirect::route('dashboard');
+		else
+		{
+			$schedule = Schedule::find($id);
+			return View::make('sched_01')->with([
+				'page_name'	=>	'Schedule View'
+			]);
+		}
+	}
+
 }

@@ -58,4 +58,9 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'sched-admin',
 		'uses'	=>	'ScheduleController@load_sched_admin'
 	));
+
+	Route::get('/view-schedule', array(
+		'as'	=>	'view-sched',
+		'uses'	=>	'ScheduleController@view_schedule'
+	));
 });

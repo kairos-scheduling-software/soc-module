@@ -53,4 +53,9 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'dashboard',
 		'uses'	=>	'ScheduleController@dashboard'
 	));
+
+	Route::post('/load-sched-admin/{id}', array(
+		'as'	=>	'sched-admin',
+		'uses'	=>	'ScheduleController@load_sched_admin'
+	));
 });

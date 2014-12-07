@@ -68,42 +68,6 @@
 	@stop
 
 	@section('right-column')
-		<div class="close-panel">
-			<a href="#" id="close-btn">&times;</a>
-		</div>
-		<h2>Spring 2014</h2>
-		<div class="sched-admin-section">
-			<h3>{{ FA::icon('file-text-o')}}&nbsp;Description</h3>
-			<a href="#">Add&nbsp;a&nbsp;description&nbsp;{{ FA::lg('plus')}}</a>
-		</div>
-		<hr>
-		<div class="sched-admin-section">
-			<h3>{{ FA::icon('cog')}}&nbsp;Actions</h3>
-			<button class="btn btn-small">
-				{{ FA::icon('eye')}}&nbsp;VIEW
-			</button>
-			<button class="btn btn-small">
-				{{ FA::icon('download')}}&nbsp;EXPORT
-			</button>
-			<button class="btn btn-small">
-				{{ FA::icon('copy')}}&nbsp;COPY
-			</button>
-			<button class="btn btn-small">
-				{{ FA::icon('times')}}&nbsp;DELETE
-			</button>
-		</div>
-		<hr>
-		<div class="sched-admin-section">
-			<h3>{{ FA::icon('group')}}&nbsp;Users</h3>
-			<p><span class="red-x">{{ FA::icon('times-circle')}}</span>&nbsp;&nbsp;Kelly Olson</p>
-			<p><span class="red-x">{{ FA::icon('times-circle')}}</span>&nbsp;&nbsp;Joe Zachary</p>
-			<p><span class="red-x">{{ FA::icon('times-circle')}}</span>&nbsp;&nbsp;Jim de St. Germain</p>
-			<a href="#">Add&nbsp;a&nbsp;user&nbsp;{{ FA::lg('plus')}}</a>
-		</div>
-		<hr>
-		<div class="sched-admin-section">
-			<h3>{{ FA::icon('flag') }}&nbsp;Proposed Changes</h3>
-		</div>
 	@stop
 	
 @stop

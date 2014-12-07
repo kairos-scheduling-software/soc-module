@@ -13,7 +13,6 @@
 	</div>
 	<div class="hg-col hg-sidebar" id="hg-right">
 		<div id="hg-right-content">
-			<div class="top-buffer"></div>
 			@yield('right-column')	
 		</div>
 	</div>

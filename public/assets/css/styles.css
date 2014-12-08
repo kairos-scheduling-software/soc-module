@@ -127,6 +127,48 @@ html, body {
 	padding-right: 10px;
 }
 
+#create-sched-modal {
+	background-color: #CCCCCC;
+	color: #003366;
+	height: 260px;
+	min-width: 500px;
+	width: 30%;
+	border-radius: 10px;
+	font-size: 18pt;
+	text-align: center;	
+	position: absolute;
+}
+
+#create-sched-modal .form-control {
+	width: 70%;
+	height: 50px;
+	font-size: 14pt;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+#create-sched-modal button {
+	padding-left: 20px;
+	padding-right: 20px;
+	margin-left: 7px;
+	margin-right: 7px;
+	font-size: 16pt;
+	background-color: #D85600;
+	color: #002143;
+	width: 150px;
+}
+
+#create-sched-modal button:hover {
+	background-color: #C24D00;
+	color: #002143;
+}
+
+#create-sched-modal .modal-buttons
+{
+	margin-top: 20px;
+}
+
 .navbar-right {
 	padding-right: 30px;
 }
@@ -265,6 +307,7 @@ html, body {
 }
 
 #page_footer {
+	margin-top: -40px;
 	height: 40px;
 	text-align: center;
 	background-color: #363636;
@@ -274,7 +317,6 @@ html, body {
 }
 
 footer {
-	display: table-row;
 	height: 1px;
 }
 

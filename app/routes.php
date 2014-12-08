@@ -68,4 +68,9 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'delete-sched',
 		'uses'	=>	'ScheduleController@delete_schedule'
 	));
+
+	Route::post('/create-schedule', array(
+		'as'	=>	'create-sched',
+		'uses'	=>	'ScheduleController@create_schedule'
+	));
 });

@@ -1,5 +1,6 @@
 @include('blocks/page_start')
 @include('blocks/header')
+@include('blocks/create-sched-modal')
 <div class="hg-columns">
 	<div class="hg-col hg-sidebar" id="hg-left">
 		<div id="hg-left-content">

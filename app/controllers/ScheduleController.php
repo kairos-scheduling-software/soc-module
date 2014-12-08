@@ -48,4 +48,9 @@ class ScheduleController extends BaseController {
 			return Response::json(['error' => 'Could not delete schedule at this time'], 500);
 	}
 
+	public function create_schedule()
+	{
+		
+	}
+
 }

@@ -8,7 +8,7 @@
 		<hr>
 		<h2>New Schedule</h2>
 		<p>
-			<button class="btn new-sched">
+			<button class="btn new-sched" id="create-sched-btn">
 				{{ FA::icon('plus') }}&nbsp;&nbsp;
 				Create
 			</button>

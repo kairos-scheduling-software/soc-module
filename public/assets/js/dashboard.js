@@ -1,4 +1,18 @@
 $(function(){
+
+	var modal_top = $(window).height() / 2;
+	modal_top -= $('#create-sched-modal').height() / 2;
+	var modal_left = $(window).width() / 2;
+	modal_left -= $('#create-sched-modal').width() / 2;
+
+	$('#create-sched-modal').css('top', modal_top);
+	$('#create-sched-modal').css('left', modal_left);
+
+	$('#create-sched-btn').click(function(e) {
+		$('#create-sched-modal').css('display', 'table-cell');
+		$("#create-sched-modal").modal('show');
+	});
+
 	$('.sched-list-row').click(function(e) {
 		e.preventDefault();
 		var url = $(this).attr('data-url');

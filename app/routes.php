@@ -73,4 +73,14 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'create-sched',
 		'uses'	=>	'ScheduleController@create_schedule'
 	));
+
+	Route::get('/data-entry1/{sched_id}', array(
+		'as'	=>	'data-entry1',
+		'uses'	=>	'ScheduleController@data_entry1'
+	));
+
+	Route::post('/schedule/{id}/add-class', array(
+		'as'	=>	'add-class',
+		'uses'	=>	'ScheduleController@add_class'
+	));
 });

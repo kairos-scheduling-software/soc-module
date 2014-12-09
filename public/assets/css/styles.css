@@ -130,13 +130,18 @@ html, body {
 #create-sched-modal {
 	background-color: #CCCCCC;
 	color: #003366;
-	height: 260px;
+	height: 270px;
 	min-width: 500px;
 	width: 30%;
 	border-radius: 10px;
 	font-size: 18pt;
 	text-align: center;	
 	position: absolute;
+}
+
+#create-sched-modal #modal-errors {
+	color: red;
+	font-size: 12pt;
 }
 
 #create-sched-modal .form-control {
@@ -146,6 +151,7 @@ html, body {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+	box-shadow: .2px .2px 1px #363636, -.2px .2px 1px #363636, .2px -.2px 1px #363636, -.2px -.2px 1px #363636;
 }
 
 #create-sched-modal button {
@@ -501,32 +507,67 @@ footer {
 
 .data-entry-header img {
 	margin-top: 30px;
+	width: 800px;
 }
 
+#prog-label-container {
+	margin-top: -10px;
+	text-align: center;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+}
+
+#progress-labels {
+	width: 850px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#active-prog-label {
+	color: black;
+	font-size: 11pt;
+}
+
+td.prog-label {
+	width: 200px;
+	text-align: center;
+	font-size: 10pt;
+	font-weight: bold;
+	color: #808080;
+}
+
+
+/*
 #prog-label-1 {
+	margin-top: -15px;
 	text-align: left;
 	font-size: 16pt;
 	padding-left: 235px;
 }
 
 #prog-label-2 {
+	margin-top: -15px;
 	text-align: left;
 	font-size: 16pt;
 	padding-left: 415px;
 }
 
 #prog-label-3 {
+	margin-top: -15px;
 	text-align: left;
 	font-size: 16pt;
 	padding-left: 595px;
 }
 
 #prog-label-4 {
+	margin-top: -15px;
 	text-align: left;
 	font-size: 16pt;
 	padding-left: 765px;
 }
-
+*/
 .class-name-input {
 	width: 60%;
 	display: inline;
@@ -579,7 +620,7 @@ footer {
 }
 
 .data-list {
-	width: 95%;
+	width: 850px;
 	max-height: 325px;
 	overflow-y: scroll;
 	margin-bottom: 30px;

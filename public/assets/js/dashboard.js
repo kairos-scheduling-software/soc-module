@@ -9,8 +9,40 @@ $(function(){
 	$('#create-sched-modal').css('left', modal_left);
 
 	$('#create-sched-btn').click(function(e) {
-		$('#create-sched-modal').css('display', 'table-cell');
 		$("#create-sched-modal").modal('show');
+	});
+
+	$('#cancel-create').click(function(e) {
+		// Reset the create-schedule form
+		$('#create-sched-form').find('input').val("");
+		$('#modal-errors').text('');
+	});
+
+	$('#create-schedule').click(function(e) {
+		$('#create-sched-form').submit();
+	});
+
+	$('#create-sched-form').submit(function(e) {
+		e.preventDefault();
+		var form = $(this);
+		var postData = form.serializeArray();
+		var url = form.attr("action");
+		var name = form.find('input').val();
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		postData,
+			success: 	function(data, textStatus, jqXHR) {
+				//console.log(data);
+				window.location.href = data;
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				//alert('Could not add create schedule at this time.');
+				// TODO:  bootstrap error message
+				$('#modal-errors').text('The name "' + name + '" is already in use');
+			}
+		});
 	});
 
 	$('.sched-list-row').click(function(e) {

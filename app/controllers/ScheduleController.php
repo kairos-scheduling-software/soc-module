@@ -50,7 +50,62 @@ class ScheduleController extends BaseController {
 
 	public function create_schedule()
 	{
-		
+		$name = Input::get('sched_name');
+		$user = Auth::user();
+
+		// Make sure the schedule name is unique
+		foreach($user->schedules as $schedule)
+		{
+			if ($schedule->name == $name)
+				return Response::json(['error' => 'Name already in use'], 500);
+		}
+
+		$schedule = new Schedule();
+		$schedule->name = $name;
+		$schedule->last_edited_by = $user->id;
+		$schedule->json_schedule = "NA";
+		$schedule->description = "Just another test schedule";
+
+		if ($schedule->save())
+		{
+			$user->schedules()->attach($schedule->id);
+			return URL::route('data-entry1', $schedule->id);
+		}
+		else
+			return Response::json(['error' => 'Could not create schedule at this time'], 500);
+	}
+
+	public function data_entry1($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+
+		if ($schedule)
+			return View::make('data-entry')->with([
+				'page_name'	=>	'Data Entry',
+				'schedule'	=>	$schedule
+			]);
+		else
+			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
+	}
+
+	public function add_class($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+
+		if($schedule)
+		{
+			$class = new models\Event();
+			$class->name = Input::get('name');
+			$class->professor = 1; // TODO: fix professor foreign key
+			$class->schedule_id = $schedule->id;
+			
+			if($class->save())
+			{
+				return View::make('blocks.class-listing')->withClass($class);	
+			}			
+		}
+		else
+			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
 	}
 
 }

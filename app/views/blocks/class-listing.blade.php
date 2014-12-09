@@ -1,5 +1,5 @@
 <div class="class-listing-name">
-{{ "CS " . $classes[$i] }} 
+{{ $class->name }} 
 </div>
 <div class="class-listing-actions">
 	<button class="btn btn-sm">

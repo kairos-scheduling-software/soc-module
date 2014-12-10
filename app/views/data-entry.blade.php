@@ -13,7 +13,7 @@
 			<tr>
 				<td id="active-prog-label" class="prog-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Classes</td>
 				<td class="prog-label">Resources&nbsp;</td>
-				<td class="prog-label">&nbsp;Class Constraints</td>
+				<td class="prog-label">&nbsp;&nbsp;&nbsp;Class Constraints</td>
 				<td class="prog-label">Resource Constraints&nbsp;&nbsp;&nbsp;</td>
 			</tr>
 		</table>

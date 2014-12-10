@@ -344,6 +344,10 @@ footer {
 	height: 130px;
 }
 
+#bottom-buffer {
+	height: 80px;
+}
+
 #landing-logo {
 	width: 40%;
 }
@@ -539,7 +543,35 @@ td.prog-label {
 	color: #808080;
 }
 
+#next-prev-btns {
+	width: 850px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+}
 
+.prev-btn-container, .next-btn-container{
+	display: inline-block;
+	width: 49%;
+}
+
+.prev-btn-container{
+	text-align: left;
+}
+
+.next-btn-container {
+	text-align: right;
+}
+
+.prev-btn-container a.btn, .next-btn-container a.btn {
+	background-color: #D85600;
+	color: #363636;
+	width: 130px;
+}
+
+.prev-btn-container a.btn:hover, .next-btn-container a.btn:hover {
+	background-color: #C24D00;
+}
 /*
 #prog-label-1 {
 	margin-top: -15px;

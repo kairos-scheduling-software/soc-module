@@ -121,4 +121,17 @@ class ScheduleController extends BaseController {
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
 	}
 
+	public function data_entry3($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+
+		if ($schedule)
+			return View::make('data-entry3')->with([
+				'page_name'	=>	'Data Entry',
+				'schedule'	=>	$schedule
+			]);
+		else
+			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
+	}
+
 }

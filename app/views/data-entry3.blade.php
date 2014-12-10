@@ -1,13 +1,13 @@
 @extends('layouts.data-entry')
 
 @section('prog-bar')
-	<img src="{{ URL::asset('assets/images/prog_02.png') }}"/>
+	<img src="{{ URL::asset('assets/images/prog_03.png') }}"/>
 @stop
 
 @section('prog-bar-labels')
 	<td class="prog-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Classes&nbsp;{{FA::icon('check')}}</td>
-	<td id="active-prog-label" class="prog-label">Resources&nbsp;</td>
-	<td class="prog-label">&nbsp;&nbsp;&nbsp;Class Constraints</td>
+	<td class="prog-label">Resources&nbsp;{{ FA::icon('check') }}</td>
+	<td id="active-prog-label" class="prog-label">&nbsp;&nbsp;&nbsp;Class Constraints</td>
 	<td class="prog-label">Resource Constraints&nbsp;&nbsp;&nbsp;</td>
 @stop
 
@@ -62,8 +62,8 @@
 	</div>
 	<div id="next-prev-btns">
 		<div class="prev-btn-container">
-			<a class="btn" href="{{ URL::route('data-entry1', $schedule->id) }}">
-				{{FA::icon('chevron-left') }}&nbsp;PREVIOUS
+			<a class="btn" href="{{ URL::route('data-entry2', $schedule->id) }}">
+				{{ FA::icon('chevron-left') }}&nbsp;PREVIOUS
 			</a>
 		</div>
 		<div class="next-btn-container">

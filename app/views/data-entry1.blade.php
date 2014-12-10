@@ -30,8 +30,12 @@
 			Add {{ FA::lg('plus')}}
 		</button>
 	</form>
-	<div class="prev-btn-container"></div>
-	<div class="next-btn-container">
-		<a href="{{ URL::route('data-entry2', $schedule->id) }}">NEXT&nbsp;{{FA::icon('chevron-right') }}</a>
+	<div id="next-prev-btns">
+		<div class="prev-btn-container"></div>
+		<div class="next-btn-container">
+			<a class="btn" href="{{ URL::route('data-entry2', $schedule->id) }}">
+				NEXT&nbsp;{{FA::icon('chevron-right') }}
+			</a>
+		</div>
 	</div>
 @stop

@@ -575,7 +575,7 @@ td.prog-label {
 	margin-right: 10px;
 }
 
-.add-class-btn, .add-room-btn {
+.add-class-btn, .add-room-btn, .add-prof-btn {
 	width: 8%;
 	background-color: #7FC9FF;
 	color: #363636;	
@@ -606,6 +606,7 @@ td.prog-label {
 	text-align: right;
 }
 
+.prof-listing-actions button,
 .class-listing-actions button, 
 .room-listing-actions button {
 	width: 100px;
@@ -614,6 +615,7 @@ td.prog-label {
 	color: #EBEBEB;
 }
 
+.prof-listing-actions button:hover,
 .class-listing-actions button:hover,
 .room-listing-actions button:hover {
 	background-color: #858585;
@@ -663,10 +665,9 @@ td.prog-label {
 	font-size: 16pt;
 }
 
-.room-listing-headings {
-	width: 95%;
-	text-align: left;
-	padding-top: 40px;
+.room-listing-headings, .prof-listing-headings {
+	width: 850px;
+	text-align: center;
 	margin-bottom: 0;
 	font-weight: bold;
 	font-size: 16pt;
@@ -674,20 +675,19 @@ td.prog-label {
 	margin-right: auto;
 }
 
-.room-listing-name-heading {
-	padding-left: 20px;
+.prof-listing-headings .prof-listing-name {
+	padding-left: 10px;
 }
 
-.room-listing-capacity-heading {
-	padding-left: 160px;
-	padding-right: 160px;
+.prof-listing-headings .prof-listing-actions {
+	padding-right: 90px;
 }
 
-.room-listing-actions-heading {
-	padding-left: 35px;
+.room-listing-headings h1 {
+	margin-bottom: 20px;
 }
 
-.room-listing-actions, .room-listing-capacity{
+.room-listing-actions, .room-listing-capacity {
 	display: inline-block;
 	width: 38%;
 }
@@ -697,20 +697,44 @@ td.prog-label {
 	width: 20%;
 }
 
+.prof-listing-name {
+	display: inline-block;
+	width: 48%;
+	text-align: left;
+	font-size: 16pt;
+}
+
+.prof-listing-actions {
+	display: inline-block;
+	width: 48%;
+	text-align: right;
+	font-size: 16pt;
+}
+
 .room-number-input, .capacity-input {
-	width: 41%;
+	width: 375px;
 	display: inline;
 	margin-right: 10px;
 }
 
-.add-room-form {
+.prof-name-input {
+	width: 760px;
+	display: inline;
+	margin-right: 10px;
+}
+
+.add-room-form, .add-prof-form {
+	width: 850px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 	padding-bottom: 30px;
 }
 
 #sched_01_img {
 	/*height: 65%; for img 2*/
 	height: 55%;
-	margin-left: 70px;
+	margin-left: 70px;	
 	margin-top: 30px;
 }
 .sched-view-controls {
@@ -841,7 +865,7 @@ td.prog-label {
 	margin-right: auto;
 	margin-top: 30px;
 	padding-top: 25px;
-	width: 80%;
+	width: 850px;
 	background-color: #959595;
 	border-radius: 10px;
 }

@@ -1,10 +1,7 @@
-<div class="room-listing-name">
-WEB L101 
+<div class="prof-listing-name">
+Mr. Fake
 </div>
-<div class="room-listing-capacity">
-	80
-</div>
-<div class="room-listing-actions">
+<div class="prof-listing-actions">
 	<button class="btn btn-sm">
 		{{ FA::icon('edit') }}
 		EDIT

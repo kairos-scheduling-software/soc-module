@@ -45,7 +45,7 @@
 			</div>
 		</div>
 		<div class="sched-list">
-			@if($schedules == null)
+			@if(!$schedules->count())
 				<h2>No schedules have been created</h2>
 				You can create or import a new schedule by clicking the appropriate button on the left column.
 			@else

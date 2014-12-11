@@ -52,11 +52,13 @@ class APIController extends BaseController {
 		
 
 		$result     = curl_exec($curl);
-		$response   = json_decode($result);
+		$schedule->schedule_json = $result;
 		curl_close($curl);
-		
-		//check the response
-		echo $result;
+
+			return View::make('sched_01')->with([
+				'page_name'	=>	'Schedule View',
+				'schedules'	=>	$schedule
+			]);
 	}
 
 }

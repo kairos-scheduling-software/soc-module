@@ -26,14 +26,16 @@ class ScheduleController extends BaseController {
 	public function view_schedule()
 	{
 		$id = Input::get('id');
+		$schedule = Schedule::find($id);
 
-		if(!$id)
+		if(!$id || !$schedule)
 			return Redirect::route('dashboard');
 		else
 		{
 			$schedule = Schedule::find($id);
 			return View::make('sched_01')->with([
-				'page_name'	=>	'Schedule View'
+				'page_name'	=>	'Schedule View',
+				'schedule'	=>	$schedule
 			]);
 		}
 	}
@@ -96,7 +98,8 @@ class ScheduleController extends BaseController {
 		{
 			$class = new models\Event();
 			$class->name = Input::get('name');
-			$class->professor = 1; // TODO: fix professor foreign key
+			$class->professor = Professor::all()->first()->id; // TODO: fix professor foreign key
+			$class->room_id = Room::all()->first()->id;
 			$class->schedule_id = $schedule->id;
 			
 			if($class->save())

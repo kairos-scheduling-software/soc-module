@@ -37,17 +37,25 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Load scripts -->
+    @if($page_name == 'Schedule View')
+    <link href="{{ URL::asset('assets/css/visualization.css') }}" rel="stylesheet">
+    <script src="{{ URL::asset('assets/js/chroma.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/d3.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/d3-tip-0.6.6.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/grid.js') }}"></script>
+    <script>
+    $(function() {
+        var data = {{ $schedule->json_schedule }};
+        load_grid(data);
+    });
+    </script>
+    @endif
+    
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
-    <script>
-    $(function(){
-        $('.tabs').css('background-image', 'url({{ URL::asset("assets/images/tabs_1.png") }})');
-        $('.tabs').css('background-image', 'url({{ URL::asset("assets/images/tabs_1.png") }})');
-        $('.tabs').css('background-size', '100% 100%');
-    });
-    </script>
+
 
     
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

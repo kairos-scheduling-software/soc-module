@@ -273,7 +273,7 @@ function load_grid(data) {
                 .on('mouseover', function (d) {
                     tip.direction(d.tipDir);
                     tip.show(d);
-                    d3.selectAll("." + d.class).style("fill", "#2C75FF");
+                    d3.selectAll("." + d.class).style("fill", "#33FF33");
                     return;
                 })
                 .on('mouseout', function (d) {

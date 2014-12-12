@@ -52,12 +52,13 @@ return array(
 			'prefix'   => '',
 		),
 
+		/******** DO NOT EDIT! Change settings in local config for development ********/
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'kairos',
-			'username'  => 'root',
-			'password'  => getenv('database_password'),
+			'host'      => getenv('DB_HOST'), 
+			'database'  => getenv('DB_NAME'),
+			'username'  => getenv('DB_USER'),
+			'password'  => getenv('DB_PASSWORD'),
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

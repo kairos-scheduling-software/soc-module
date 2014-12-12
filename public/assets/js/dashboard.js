@@ -52,8 +52,15 @@ $(function(){
 		$.ajax({
 			url:		url,
 			type: 		"POST",
+			beforeSend: function() {
+				$('#loading-admin-panel').show();
+				$('#ajax-admin-target').hide();
+				$('#hg-right').css('display', 'table-cell');
+			}, 
 			success: 	function(data, textStatus, jqXHR) {
-				$('#hg-right-content').html(data);
+				$('#loading-admin-panel').hide();
+				$('#ajax-admin-target').show();
+				$('#ajax-admin-target').html(data);
 				$('#hg-right').css('display', 'table-cell');
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {

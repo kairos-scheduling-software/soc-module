@@ -1,4 +1,3 @@
-<div class="top-buffer"></div>
 <div class="close-panel">
 	<a href="#" id="close-btn">&times;</a>
 </div>

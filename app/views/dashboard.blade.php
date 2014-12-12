@@ -68,6 +68,11 @@
 	@stop
 
 	@section('right-column')
+	<div class="top-buffer"></div>
+	<div id="loading-admin-panel">
+		<h2>LOADING&nbsp;{{ FA::spin('spinner') }}</h2>
+	</div>
+	<div id="ajax-admin-target"></div>
 	@stop
 	
 @stop

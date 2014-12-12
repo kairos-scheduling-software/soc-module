@@ -3,7 +3,7 @@ $(function(){
 		e.preventDefault();
 		var name = $(this).attr('data-name');
 		//highlightBlock(name);
-		alert(name);
+		//alert(name);
 		return false;
 	});
 

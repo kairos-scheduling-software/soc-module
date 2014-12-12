@@ -36,7 +36,9 @@
     {{-- FA::css() --}}
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <!-- Load scripts -->
+    <!-- Load scripts -->    
+    <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     @if($page_name == 'Schedule View')
     <link href="{{ URL::asset('assets/css/visualization.css') }}" rel="stylesheet">
     <script src="{{ URL::asset('assets/js/chroma.min.js') }}"></script>
@@ -50,9 +52,6 @@
     });
     </script>
     @endif
-    
-    <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
-    <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
 

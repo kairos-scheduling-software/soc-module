@@ -15,7 +15,7 @@
 			</tr>
 		</table>
 	</div>
-	<div class="data-entry-body">
+	<div class="data-entry-body2">
 		@yield('data-entry-body')
 	</div>
 </div>

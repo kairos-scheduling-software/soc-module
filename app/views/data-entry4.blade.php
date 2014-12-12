@@ -1,29 +1,25 @@
 @extends('layouts.data-entry2')
 
 @section('prog-bar')
-	<img src="{{ URL::asset('assets/images/prog_03.png') }}"/>
+	<img src="{{ URL::asset('assets/images/prog_04.png') }}"/>
 @stop
 
 @section('prog-bar-labels')
 	<td class="prog-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Classes&nbsp;{{FA::icon('check')}}</td>
 	<td class="prog-label">Resources&nbsp;{{ FA::icon('check') }}</td>
-	<td id="active-prog-label" class="prog-label">&nbsp;&nbsp;&nbsp;Class Constraints</td>
-	<td class="prog-label">Resource Constraints&nbsp;&nbsp;&nbsp;</td>
+	<td class="prog-label">&nbsp;&nbsp;&nbsp;Class Constraints&nbsp;{{ FA::icon('check') }}</td>
+	<td id="active-prog-label" class="prog-label">Resource Constraints&nbsp;&nbsp;&nbsp;</td>
 @stop
 
 @section('data-entry-body')
 	<div class="resource-lists">
-		<h3 class="right-h3">Classrooms:</h3>
-		<div class="data-list2">
-				@include('blocks/class-listing-simple')
-		</div>
-		<h3 class="right-h3">Professors:</h3>
-		<div class="data-list2">
-				@include('blocks/prof-listing-simple')
+		<h3 class="right-h3">Classes:</h3>
+		<div class="data-list5">
+			@include('blocks/class-listing-simple')
 		</div>
 	</div>
 	<div class="constraints">
-		<h3 class="large-h3">WEB 1230</h3>
+		<h3 class="large-h3">CS 1400</h3>
 		<h3>Hard Constraints:</h3>
 		<div class="const-list">
 			@for($i = 0; $i < 4; $i++)
@@ -58,7 +54,7 @@
 		</div>
 		<div class="next-btn-container">
 			<a class="btn" href="{{ URL::route('data-entry4', $schedule->id) }}">
-				NEXT&nbsp;{{FA::icon('chevron-right') }}
+				FINISH&nbsp;{{FA::icon('chevron-right') }}
 			</a>
 		</div>
 	</div>

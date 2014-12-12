@@ -127,14 +127,79 @@ class ScheduleController extends BaseController {
 	public function data_entry3($sched_id)
 	{
 		$schedule = Schedule::find($sched_id);
+		$hard_const_keys = [
+			"Minimum Capacity", "Professor", "Block Length", "Avoid Conflict With", "Avoid Conflict With"
+		];
+		
+		$hard_const_vals = [
+			"110", "Joe Zachary", "80 min", "CS 3810", "CS 2100"
+		];
+
+		$soft_const_keys = [
+			"Days", "Avoid Conflict With", "Avoid Conflict With", "Time of Day"
+		];
+		
+		$soft_const_vals = [
+			"Mon, Wed", "CS 3130", "MATH 2100", "Morning"
+		];
+
+		$classes = [
+			1400, 1410, 2420, 3500, 3505, 3810, 4150, 4400, 4540, 4000, 
+			4500, 4480, 4962, 4964, 5650, 6320, 3200, 3100, 3130, 5140, 
+			5610, 6370, 7931, 5460, 5789, 3700, 6963, 3992, 6780, 5470
+		];
 
 		if ($schedule)
 			return View::make('data-entry3')->with([
-				'page_name'	=>	'Data Entry',
+				'page_name'			=>	'Data Entry',
+				'classes'			=>	$classes,
+				'hard_const_keys'	=>	$hard_const_keys,
+				'hard_const_vals'	=>	$hard_const_vals,
+				'soft_const_keys'	=>	$soft_const_keys,
+				'soft_const_vals'	=>	$soft_const_vals,
 				'schedule'	=>	$schedule
 			]);
 		else
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
+	}
+
+	public function data_entry4($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+		$hard_const_keys = [
+			"Minimum Capacity", "Professor", "Block Length", "Avoid Conflict With", "Avoid Conflict With"
+		];
+		
+		$hard_const_vals = [
+			"110", "Joe Zachary", "80 min", "CS 3810", "CS 2100"
+		];
+
+		$soft_const_keys = [
+			"Days", "Avoid Conflict With", "Avoid Conflict With", "Time of Day"
+		];
+		
+		$soft_const_vals = [
+			"Mon, Wed", "CS 3130", "MATH 2100", "Morning"
+		];
+
+		$classes = [
+			1400, 1410, 2420, 3500, 3505, 3810, 4150, 4400, 4540, 4000, 
+			4500, 4480, 4962, 4964, 5650, 6320, 3200, 3100, 3130, 5140, 
+			5610, 6370, 7931, 5460, 5789, 3700, 6963, 3992, 6780, 5470
+		];
+
+		if ($schedule)
+			return View::make('data-entry4')->with([
+				'page_name'			=>	'Data Entry',
+				'classes'			=>	$classes,
+				'hard_const_keys'	=>	$hard_const_keys,
+				'hard_const_vals'	=>	$hard_const_vals,
+				'soft_const_keys'	=>	$soft_const_keys,
+				'soft_const_vals'	=>	$soft_const_vals,
+				'schedule'	=>	$schedule
+			]);
+		else
+			return "<h1>ERROR</h1>"; // TODO: send back a 404 page		
 	}
 
 }

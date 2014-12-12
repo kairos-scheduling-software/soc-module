@@ -8,6 +8,7 @@
 	<select class="form-control view-select">
 		<option>Full Schedule</option>
 	</select>
+	<h3>Classes:</h3>
 	<div id="view-class-list">
 		@foreach($schedule->events as $event)
 			<div class="view-class-list-row">

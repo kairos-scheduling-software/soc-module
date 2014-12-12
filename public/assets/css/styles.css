@@ -673,7 +673,7 @@ td.prog-label {
 
 #view-class-list {
 	width: 300px;
-	max-height: 525px;
+	max-height: 425px;
 	overflow-y: scroll;
 	margin-top: 20px;
 	margin-bottom: 30px;
@@ -827,7 +827,6 @@ td.prog-label {
 	width: 95%;
 }
 .view-select {
-	width: auto;
 	display:inline-block;
 }
 

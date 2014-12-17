@@ -11,4 +11,25 @@ $(function(){
 		$(this).find('a').click();
 		return false;
 	});
+
+	$('#add-class-form').submit(function(e) {
+		e.preventDefault();
+		var form = $(this);
+		var postData = form.serializeArray();
+		var url = form.attr("action");
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		postData,
+			success: 	function(data, textStatus, jqXHR) {
+				$('.data-list').append(data);
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				var message = $.parseJSON(jqXHR.responseText);
+				alert(message.error);
+				// TODO:  bootstrap error message
+			}
+		});
+	});
 });

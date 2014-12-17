@@ -25,7 +25,7 @@
 		</div>
 	@endif
 	<form id="add-class-form" method="post" action="{{ URL::route('add-class', $schedule->id) }}">
-		<input type="text" name="name" class="form-control class-name-input" placeholder="Class Name..."/>
+		<input type="text" name="name" class="form-control class-name-input" placeholder="Class Name..." required/>
 		<button type="submit" class="btn btn-md btn-default add-class-btn">
 			Add {{ FA::lg('plus')}}
 		</button>

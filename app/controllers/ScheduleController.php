@@ -108,7 +108,7 @@ class ScheduleController extends BaseController {
 			}			
 		}
 		else
-			return "<h1>ERROR</h1>"; // TODO: send back a 404 page
+			return Response::json(['error' => 'Could not add class at this time.'], 500);
 	}
 
 	public function data_entry2($sched_id)

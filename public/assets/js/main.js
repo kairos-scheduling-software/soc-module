@@ -24,6 +24,7 @@ $(function(){
 			data: 		postData,
 			success: 	function(data, textStatus, jqXHR) {
 				class_data_count++;
+				form.find('input').val("");
 				$('#empty-data-list').hide();
 				$('#classes-data-list').append("<div class='class-listing-container'>" + data + "</div>");
 				$('#classes-data-list').show();
@@ -36,7 +37,7 @@ $(function(){
 		});
 	});
 
-	$('.edit-class-form').submit(function(e) {
+	$('#classes-data-list').on('submit', '.edit-class-form', function(e) {
 		e.preventDefault();
 		var form = $(this);
 		var postData = form.serializeArray();

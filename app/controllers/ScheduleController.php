@@ -104,14 +104,47 @@ class ScheduleController extends BaseController {
 			
 			if($class->save())
 			{
-				return View::make('blocks.class-listing')->withClass($class);	
+				return View::make('blocks.class-listing')->with([
+					'class'	=>	$class,
+					'schedule'	=>	$schedule
+				]);
 			}			
 		}
 		else
 			return Response::json(['error' => 'Could not add class at this time.'], 500);
 	}
 
-	public function data_entry2($sched_id)
+	public function edit_class($sched_id, $class_id)
+	{
+		$schedule = Schedule::find($sched_id);
+		$class = models\Event::find($class_id);
+		$class->name = Input::get('name');
+
+		if($class->save())
+		{
+			return View::make('blocks.class-listing')->with([
+				'schedule'	=>	$schedule,
+				'class'		=>	$class
+			]);
+		}
+		else
+			return Response::json(['error' => 'Could not edit class at this time.'], 500);
+	}
+
+	public function delete_class($sched_id, $class_id)
+	{
+		$class = models\Event::find($class_id);
+
+		if($class)
+		{
+			$class->delete();
+			return Response::json(['success' => 'Successfully deleted'], 200);	
+		}
+		else
+			return Response::json(['error' => 'Could not remove class at this time.'], 500);		
+	}
+
+	public function data_entry2($sched_id, $class_id)
 	{
 		$schedule = Schedule::find($sched_id);
 

@@ -16,11 +16,16 @@
 		<div id="empty-data-list">
 			<h2>No classes have been added yet</h2>
 		</div>
-		<div class="data-list" style="display:none"></div>
+		<div id="classes-data-list" class="data-list" style="display:none"></div>
 	@else
-		<div class="data-list">
+		<div id="empty-data-list" style="display:none">
+			<h2>No classes have been added yet</h2>
+		</div>
+		<div class="data-list" id="classes-data-list">
 			@foreach($schedule->events as $class)
-				@include('blocks/class-listing')
+				<div class='class-listing-container'>
+					@include('blocks/class-listing')
+				</div>
 			@endforeach
 		</div>
 	@endif

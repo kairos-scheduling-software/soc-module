@@ -84,6 +84,16 @@ Route::group(array('before'=> 'auth'), function()
 		'uses'	=>	'ScheduleController@add_class'
 	));
 
+	Route::post('/schedule/{id}/edit-class/{class_id}', array(
+		'as'	=>	'edit-class',
+		'uses'	=>	'ScheduleController@edit_class'
+	));	
+
+	Route::post('/schedule/{id}/delete-class/{class_id}', array(
+		'as'	=>	'delete-class',
+		'uses'	=>	'ScheduleController@delete_class'
+	));	
+
 	Route::get('/data-entry2/{sched_id}', array(
 		'as'	=>	'data-entry2',
 		'uses'	=>	'ScheduleController@data_entry2'

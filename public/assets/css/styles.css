@@ -623,13 +623,45 @@ td.prog-label {
 	width: 48%;
 }
 
+.edit-class-row {/*
+	background-color: #B2B2B2;*/
+	background-color: #E38445;
+	display:none;
+}
+
+.edit-class-actions {
+	display: inline-block;
+	text-align: right;
+	width: 48%;
+}
+
+.edit-class-actions button {
+	width: 100px;
+	margin-right: 10px;
+	box-shadow: 1.5px 1.5px 2px #363636, 0.4px -0.4px 1px #363636, -0.4px 0.4px 1px #363636, -0.4px -0.4px 1px #363636;
+}
+
+.edit-class-actions button.btn-save {
+	background-color: #4DB870;
+	color: #FFFFFF;
+}
+
+.edit-class-actions button.btn-cancel {
+	background-color: #FF6666;
+	color: #FFFFFF;	
+}
+
 .class-listing-name {
 	text-align: left;
 	font-size: 16pt;
 }
 
+.class-listing-name .form-control {
+	font-size: 16pt;	
+}
+
 .data-list hr {
-	margin: 5px;
+	margin: 0;
 	border-width: 2px;
 	border-color: #666666;
 }
@@ -669,6 +701,11 @@ td.prog-label {
 	padding-top: 5px;
 	border: 1px solid;
 	background-color: white;
+}
+
+.data-list-row {
+	padding-top: 5px;
+	padding-bottom: 5px;
 }
 
 #view-class-list {

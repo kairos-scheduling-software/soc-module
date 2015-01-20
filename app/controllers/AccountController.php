@@ -122,6 +122,17 @@ class AccountController extends BaseController {
 		]);
 	}
 
+	public function toggle_emails($id)
+	{
+		$user = User::find($id);
+		$user->send_email = !($user->send_email);
+
+		if($user->save())
+			return Response::json(['success' => 'Email settings changed'], 200);
+		else
+			return Response::json(['error' => 'Could not update email settings'], 500);
+	}
+
 	public function change_pw($id)
 	{
 		$user = User::find($id);

@@ -2,6 +2,10 @@
 
 @section('content')
 
+<script>
+	var toggle_emails_url = "{{ URL::route('toggle-emails', Auth::user()->id) }}";
+	var change_pw_url = "{{ URL::route('change-pw', Auth::user()->id) }}";
+</script>
 <div class="top-buffer"></div>
 <div class="container">
 	<h1>Manage Account</h1>
@@ -12,7 +16,7 @@
 				Change
 			</button>
 		</h3>
-		<img class="img-circle" width="200" src="http://placehold.it/200X200"/>
+		<img class="img-circle" width="200" src="https://kriticalmass.com/themes/default/img/profile-no-photo.png"/>
 	</div>
 	<div class="col-md-6">
 		<div class="row">
@@ -24,7 +28,7 @@
 				</div>
 				<div class="row" id="email-checkbox-container">
 					<div class="col-md-6">
-						{{ Form::checkbox('send_mail', 1, Auth::user()->send_mail, ['id' => 'send_mail']) }}
+						{{ Form::checkbox('send_mail', 1, Auth::user()->send_email, ['id' => 'send_mail']) }}
 						{{ Form::label('send_mail', 'Send me email notifications') }}
 					</div>
 					<div class="col-md-6 align-right">
@@ -45,7 +49,7 @@
 					<input type="password" class="form-control" placeholder="New Password..." name="new_pw"/>
 				</div>
 				<div class="form-group">
-					<input type="password" class="form-control" placeholder="Confirm Password..." name="new_pw"/>
+					<input type="password" class="form-control" placeholder="Confirm New Password..." name="new_pw"/>
 				</div>
 				<div class="align-right">
 					<button class="btn btn-primary btn-sm" id="change-avatar-btn">

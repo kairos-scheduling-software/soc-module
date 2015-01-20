@@ -57,6 +57,9 @@
     });
     </script>
     @endif
+    @if($page_name == 'SETTINGS')
+    <script src="{{ URL::asset('assets/js/account-settings.js') }}"></script>
+    @endif
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
 

@@ -10,4 +10,9 @@ class Event extends \Eloquent
 	{
 		return $this->hasMany('Constraint');
 	}
+
+	public function etime()
+	{
+		return $this->hasOne('Etime');
+	}
 }

@@ -52,7 +52,7 @@
     <script src="{{ URL::asset('assets/js/grid.js') }}"></script>
     <script>
     $(function() {
-        var data = {{ $schedule->json_schedule }};
+        var data = {{ $schedule->to_json() }};
         load_grid(data);
     });
     </script>

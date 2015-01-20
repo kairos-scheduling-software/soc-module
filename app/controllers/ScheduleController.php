@@ -65,7 +65,6 @@ class ScheduleController extends BaseController {
 		$schedule = new Schedule();
 		$schedule->name = $name;
 		$schedule->last_edited_by = $user->id;
-		$schedule->json_schedule = "NA";
 		$schedule->description = "Just another test schedule";
 
 		if ($schedule->save())

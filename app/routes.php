@@ -108,4 +108,14 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'data-entry4',
 		'uses'	=>	'ScheduleController@data_entry4'
 	));
+
+	Route::get('/account/manage', array(
+		'as'	=>	'manage-account',
+		'uses'	=>	'AccountController@manage'
+	));
+
+	Route::post('/change-password/{id}', array(
+		'as'	=>	'change-pw',
+		'uses'	=>	'AccountController@change_pw'
+	));
 });

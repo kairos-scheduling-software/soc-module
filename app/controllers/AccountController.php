@@ -115,4 +115,30 @@ class AccountController extends BaseController {
 		return Redirect::route('home');
 	}
 
+	public function manage()
+	{
+		return View::make('account.manage')->with([
+			'page_name'	=>	'SETTINGS'
+		]);
+	}
+
+	public function change_pw($id)
+	{
+		$user = User::find($id);
+		$old_pw = Input::get('old_pw');
+		$new_pw = Input::get('new_pw');
+
+		try 
+		{
+			if($user->change_password($old_pw, $new_pw))
+				return Response::json(['success' => 'Password was changed successfully'], 200);
+			else
+				return Response::json(['error' => 'Could not change password'], 500);
+		}
+		catch(Exception $e)
+		{
+			return Response::json(['error' => 'Old password is incorrect'], 400);
+		}
+	}
+
 }

@@ -1084,3 +1084,19 @@ td.prog-label {
 .hidden-link {
 	display: none;
 }
+
+#change-avatar-btn {
+	margin-left: 15px;
+}
+
+#change-pw-container {
+	margin-top: 50px;
+}
+
+.align-right {
+	text-align: right;
+}
+
+#email-checkbox-container {
+	margin-top: 10px;
+}

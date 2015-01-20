@@ -49,4 +49,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 	{
 		return $this->first . ' ' . $this->last;
 	}
+
+	public function change_password($old_pw, $new_pw)
+	{
+		if(Hash::make($old_pw) == $this->password)
+		{
+			$this->password = Hash::make($new_pw);
+			return $this->save();
+		}
+		else
+			throw new Exception("Old password does is not correct.");
+	}
 }

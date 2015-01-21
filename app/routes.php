@@ -128,4 +128,9 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'change-pw',
 		'uses'	=>	'AccountController@change_pw'
 	));
+
+	Route::post('/account/{id}/change-pic', array(
+		'as'	=>	'change-pic',
+		'uses'	=>	'AccountController@change_pic'
+	));
 });

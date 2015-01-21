@@ -12,12 +12,15 @@
 	<div class="col-md-4 row">
 		<h3>
 			Profile Picture
-			<button class="btn btn-primary btn-sm" id="change-avatar-btn">
-				Change
-			</button>
+			<form id="avatar-form" action="{{ URL::route('change-pic', Auth::user()->id) }}">
+				<span class="hide"><input type="file" id="fileInput" name="pic"></span>
+				<button class="btn btn-primary btn-sm" id="change-avatar-btn">
+					Change
+				</button>
+			</form>
 		</h3>
-		<img class="img-circle" width="200" src="{{ Auth::user()->avatar ? 
-												  URL::asset('assets/profile_pics/' . Auth::user()->avatar) : 
+		<img class="img-circle" width="200" id="avatar" src="{{ Auth::user()->avatar ? 
+												  URL::asset('profile_pics/' . Auth::user()->avatar) : 
 												  URL::asset('assets/images/default_user_pic.png') }}" />
 		<div id="update-image-container">
 			<span id="updating-pic">{{ FA::spin('spinner') }} Updating...</span>

@@ -95,5 +95,43 @@ $(function() {
 		});
 	});
 
+	$('#change-avatar-btn').click(function(e) {
+		e.preventDefault();
+		$('#fileInput').click();
+	});
+
+	$('#fileInput').change(function() {
+		var form = $('#avatar-form');
+		var url = form.attr('action');
+		var data = new FormData(form[0]);
+
+		$.ajax({
+			processData: false,
+    		contentType: false,
+			url:		url,
+			type: 		"POST",
+			data: 		data,
+			beforeSend: function() {
+				$('#updating-pic').css('display', 'inline');
+			}, 
+			success: 	function(data, textStatus, jqXHR) {
+				setTimeout(function() {
+					$('#updating-pic').hide();
+					$('#updated-pic').css('display', 'inline');
+					$('#avatar').attr('src', data);
+				}, 700);
+
+				setTimeout(function() {
+					$('#updated-pic').fadeOut();
+				}, 4000);
+
+				console.log("successfully updated profile pic");
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				$('#updating-pic').hide();
+				alert('Could not update profile pic');	
+			}
+		});
+	});
 
 });

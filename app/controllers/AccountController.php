@@ -122,6 +122,31 @@ class AccountController extends BaseController {
 		]);
 	}
 
+	public function change_pic($id)
+	{
+		$user = User::find($id);
+		$img = Input::file('pic');
+		$old_file = $user->avatar;
+
+		$filename = str_random(30) . '.' . $img->getClientOriginalExtension();
+		$upload_success = $img->move(public_path() . '/profile_pics', $filename);
+
+		if ($upload_success)
+			$user->avatar = $filename;
+		else
+			return Response::json(['error' => 'Could not upload picture'], 500);
+
+		if ($user->save())
+		{
+			if($old_file)
+				unlink(public_path() . '/profile_pics/' . $old_file);
+
+			return URL::asset('profile_pics/' . $filename);
+		}
+		else
+			return Response::json(['error' => 'Could not upload picture'], 500);
+	}
+
 	public function toggle_emails($id)
 	{
 		$user = User::find($id);

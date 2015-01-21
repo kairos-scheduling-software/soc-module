@@ -29,9 +29,19 @@
 		</ul>
 	
 		<ul class="nav navbar-nav navbar-right">
-			<li {{ $page_name == 'SETTINGS' ? 'class="selected_page"' : '' }}>
+			<li>
 				@if(Auth::check())
-					<a href="#manage-account">{{ FA::icon('user') . ' Welcome, ' . Auth::user()->first . '!' }}</a>
+					<a href="#manage-account" data-toggle="dropdown" class="dropdown-toggle">
+						{{ FA::icon('user') . ' Welcome, ' . Auth::user()->first . '!' }}
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="{{ URL::route('manage-account') }}">
+								{{ FA::icon('cogs') }}&nbsp;Manage Account
+							</a>
+						</li>
+					</ul>
 				@else
 					<a>{{ FA::icon('user') }} Welcome, Guest!</a>
 				@endif

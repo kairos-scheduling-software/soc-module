@@ -1115,8 +1115,13 @@ td.prog-label {
 }
 
 #update-image-container {
+	position: relative;
+	background-color: #BEBEBE;
 	width: 200px;
+	line-height: 30px;
+	top: -125px;
 	text-align: center;
+	display: none;
 }
 
 #updating-pic {

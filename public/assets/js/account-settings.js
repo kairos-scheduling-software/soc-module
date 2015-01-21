@@ -17,8 +17,8 @@ $(function() {
 				}, 700);
 
 				setTimeout(function() {
-					$('#updated-email').fadeOut();
-				}, 4000);
+					$('#updated-email').fadeOut(600);
+				}, 2500);
 
 				console.log("successfully updated email settings");
 			},
@@ -50,8 +50,8 @@ $(function() {
 				}, 700);
 
 				setTimeout(function() {
-					$('#updated-email').fadeOut();
-				}, 4000);
+					$('#updated-email').fadeOut(600);
+				}, 2500);
 
 				console.log("successfully updated email address");
 			},
@@ -83,8 +83,8 @@ $(function() {
 				}, 700);
 
 				setTimeout(function() {
-					$('#updated-pw').fadeOut();
-				}, 4000);
+					$('#updated-pw').fadeOut(600);
+				}, 2500);
 
 				console.log("successfully updated password");
 			},
@@ -112,6 +112,7 @@ $(function() {
 			type: 		"POST",
 			data: 		data,
 			beforeSend: function() {
+				$('#update-image-container').show();
 				$('#updating-pic').css('display', 'inline');
 			}, 
 			success: 	function(data, textStatus, jqXHR) {
@@ -122,13 +123,15 @@ $(function() {
 				}, 700);
 
 				setTimeout(function() {
-					$('#updated-pic').fadeOut();
-				}, 4000);
+					$('#updated-pic').fadeOut(600);
+					$('#update-image-container').fadeOut(600);
+				}, 2500);
 
 				console.log("successfully updated profile pic");
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				$('#updating-pic').hide();
+				$('#update-image-container').hide();
 				alert('Could not update profile pic');	
 			}
 		});

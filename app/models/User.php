@@ -52,7 +52,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
 	public function change_password($old_pw, $new_pw)
 	{
-		if(Hash::make($old_pw) == $this->password)
+		if (Hash::check($old_pw, $this->getAuthPassword()))
 		{
 			$this->password = Hash::make($new_pw);
 			return $this->save();

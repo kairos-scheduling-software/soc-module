@@ -16,22 +16,32 @@
 				Change
 			</button>
 		</h3>
-		<img class="img-circle" width="200" src="https://kriticalmass.com/themes/default/img/profile-no-photo.png"/>
+		<img class="img-circle" width="200" src="{{ Auth::user()->avatar ? 
+												  URL::asset('assets/profile_pics/' . Auth::user()->avatar) : 
+												  URL::asset('assets/images/default_user_pic.png') }}" />
+		<div id="update-image-container">
+			<span id="updating-pic">{{ FA::spin('spinner') }} Updating...</span>
+			<span id="updated-pic"><big>{{ FA::icon('check') }}</big></span>
+		</div>
 	</div>
 	<div class="col-md-6">
 		<div class="row">
-			<h3>Email Settings</h3>
-			<form>
+			<h3>
+				Email Settings
+				<span id="updating-email"><small>{{ FA::spin('spinner')}} Updating...</small></span>
+				<span id="updated-email"><small>{{ FA::icon('check')}}</small></span>
+			</h3>
+			<form id="update-email-form" action="{{ URL::route('change-email', Auth::user()->id) }}">
 				<div>
-					<input type="email" class="form-control" placeholder="Email Address..." 
+					<input type="email" name="email" class="form-control" placeholder="Email Address..." 
 						   value="{{ Auth::user()->email }}"/>
 				</div>
 				<div class="row" id="email-checkbox-container">
-					<div class="col-md-6">
+					<div class="col-md-8" id="toggle-mails-container">
 						{{ Form::checkbox('send_mail', 1, Auth::user()->send_email, ['id' => 'send_mail']) }}
 						{{ Form::label('send_mail', 'Send me email notifications') }}
 					</div>
-					<div class="col-md-6 align-right">
+					<div class="col-md-4 align-right">
 						<button class="btn btn-primary btn-sm" id="change-avatar-btn">
 							Update Email
 						</button>		
@@ -40,16 +50,23 @@
 			</form>
 		</div>
 		<div class="row" id="change-pw-container">
-			<h3>Change Password</h3>
-			<form>
+			<h3>
+				Change Password
+				<span id="updating-pw"><small>{{ FA::spin('spinner')}} Updating...</small></span>
+				<span id="updated-pw"><small>{{ FA::icon('check')}}</small></span>
+			</h3>
+			<form id="update-pw-form" action="{{ URL::route('change-pw', Auth::user()->id) }}">
 				<div class="form-group">
-					<input type="password" class="form-control" placeholder="Current Password..." name="old_pw"/>
+					<input type="password" class="form-control" 
+						   placeholder="Current Password..." name="old_pw"/>
 				</div>
 				<div class="form-group">
-					<input type="password" class="form-control" placeholder="New Password..." name="new_pw"/>
+					<input type="password" class="form-control" 
+						   placeholder="New Password..." name="new_pw"/>
 				</div>
 				<div class="form-group">
-					<input type="password" class="form-control" placeholder="Confirm New Password..." name="new_pw"/>
+					<input type="password" class="form-control" 
+						   placeholder="Confirm New Password..." name="conf_new_pw"/>
 				</div>
 				<div class="align-right">
 					<button class="btn btn-primary btn-sm" id="change-avatar-btn">

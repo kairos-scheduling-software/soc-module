@@ -114,12 +114,17 @@ Route::group(array('before'=> 'auth'), function()
 		'uses'	=>	'AccountController@manage'
 	));
 
-	Route::post('account/{id}/toggle-emails', array(
+	Route::post('/account/{id}/toggle-emails', array(
 		'as'	=>	'toggle-emails',
 		'uses'	=>	'AccountController@toggle_emails'
 	));
 
-	Route::post('/change-password/{id}', array(
+	Route::post('/account/{id}/change-email', array(
+		'as'	=>	'change-email',
+		'uses'	=>	'AccountController@change_email'
+	));
+
+	Route::post('/account/{id}/change-password', array(
 		'as'	=>	'change-pw',
 		'uses'	=>	'AccountController@change_pw'
 	));

@@ -133,6 +133,17 @@ class AccountController extends BaseController {
 			return Response::json(['error' => 'Could not update email settings'], 500);
 	}
 
+	public function change_email($id)
+	{
+		$user = User::find($id);
+		$user->email = Input::get('email');
+
+		if($user->save())
+			return Response::json(['success' => 'Email settings changed'], 200);
+		else
+			return Response::json(['error' => 'Could not update email settings'], 500);
+	}
+
 	public function change_pw($id)
 	{
 		$user = User::find($id);

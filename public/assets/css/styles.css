@@ -1100,3 +1100,30 @@ td.prog-label {
 #email-checkbox-container {
 	margin-top: 15px;
 }
+
+#toggle-mails-container {
+	display: inline-block;
+}
+
+#updating-email, #updated-email, #updating-pw, #updated-pw {
+	padding-left: 5px;
+	display: none;
+}
+
+#updated-email small, #updated-pw small {
+	color: #33AD5C;
+}
+
+#update-image-container {
+	width: 200px;
+	text-align: center;
+}
+
+#updating-pic {
+	display: none;
+}
+
+#updated-pic {
+	color: #33AD5C;
+	display: none;
+}

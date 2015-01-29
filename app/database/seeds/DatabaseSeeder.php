@@ -87,7 +87,112 @@ class TableSeeder extends Seeder
 		DB::table('events')->delete();
 		DB::table('constraints')->delete();
         DB::table('etimes')->delete();
-		
+
+        Etime::create(array(
+            'id' => 1, 
+            'standard_block' => 0
+        ));
+
+        //create the standard timeblocks leaving only the non standard
+        $mwStimes = array('0805', '1150', '1325', '1500');
+        $tthStimes = array('0730', '0910', '1045', '1225', '1400', '1540');
+        $mwfSTimes = array('0730', '0835', '0940', '1045', '1150', '1255', '1400', '1505', '1610');
+		$labTimes = array('0730',  '0940', '1045', '1255', '1400', '1505', '1610');
+
+        foreach ($mwStimes as $starttm) 
+        {
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '1|3', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '1', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '3', 
+                'standard_block' => 1
+            ));
+        }
+
+        foreach ($tthStimes as $starttm) {
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '2|4', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '2', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>80, 
+                'days' => '4', 
+                'standard_block' => 1
+            ));
+        }
+
+        foreach ($mwfSTimes as $starttm) {
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '1|3|5', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '1', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '3', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '5', 
+                'standard_block' => 1
+            ));
+        }
+
+        foreach ($labTimes as $starttm) 
+        {
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '2', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
+                'days' => '4', 
+                'standard_block' => 1
+            ));
+        }
+
         $json = '[
         {
             "starttm": "0835",
@@ -1118,6 +1223,9 @@ class TableSeeder extends Seeder
 
         $decoded = json_decode($json);
 
+        $events = [];
+        $eventDays = [];
+
         foreach ($decoded as $value) 
         {
             $room = Room::firstOrCreate(
@@ -1133,30 +1241,40 @@ class TableSeeder extends Seeder
                     'schedule_id' => $schedule->id,
                     'room_id' => $room->id,
                     'class_type' => $value->class_type,
-                    'title' => $value->title
+                    'title' => $value->title,
+                    'etime_id' => 1
             ));
 
-            $timeblock = Etime::firstOrCreate(
-            array(
-                'event_id' => $event->id
-            ));
-
-            $timeblock->starttm = $value->starttm;
-            $timeblock->length = $value->length;
-
-
-            $days = $timeblock->days;
-
-            if($days)
+            if(isset($eventDays[$event->name]))
             {
-                $timeblock->days .= "|" . $value->day;
+                $eventDays[$event->name]['day'] .= "|". $value->day;
             }
             else
             {
-                $timeblock->days = $value->day;
+                $eventDays[$event->name]['starttm'] = $value->starttm;
+                $eventDays[$event->name]['day'] = $value->day;
+                $eventDays[$event->name]['length'] = $value->length;
+                $events[] = $event;
+            }   
+        }
+
+        foreach($events as $event)
+        {
+            $timeblock = Etime::firstOrCreate(
+                array(
+                    'starttm' => $eventDays[$event->name]['starttm'],
+                    'length' => $eventDays[$event->name]['length'],
+                    'days' => $eventDays[$event->name]['day']
+            ));
+
+            if($timeblock->standard_block == null)
+            {
+                $timeblock->standard_block = 0;
+                $timeblock->save();
             }
 
-            $timeblock->save();
+            $event->etime_id = $timeblock->id;
+            $event->save();
         }	
 	}
 }

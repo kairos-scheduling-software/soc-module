@@ -4,7 +4,7 @@ namespace models;
 class Event extends \Eloquent 
 {
 	protected $table = 'events';
-	protected $fillable = array('name','professor', 'schedule_id');
+	protected $fillable = array('name','professor', 'schedule_id', 'room_id', 'class_type', 'title', 'etime_id');
 
 	public function constraints()
 	{
@@ -13,6 +13,6 @@ class Event extends \Eloquent
 
 	public function etime()
 	{
-		return $this->hasOne('Etime');
+		return $this->belongsTo('Etime');
 	}
 }

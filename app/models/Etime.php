@@ -3,11 +3,11 @@
 class Etime extends Eloquent 
 {
 	protected $table = 'etimes';
-	protected $fillable = array('starttm','length', 'days', 'event_id');
+	protected $fillable = array('starttm','length', 'days', 'standard_block');
 
 	public function events()
 	{
-		return $this->belongsTo('Event');
+		return $this->hasMany('models\Event');
 	}
 
 }

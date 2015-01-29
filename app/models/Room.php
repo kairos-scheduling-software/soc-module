@@ -7,7 +7,7 @@ class Room extends Eloquent
 
 	public function events()
 	{
-		return $this->hasMany('Event');
+		return $this->hasMany('models\Event');
 	}
 
 }

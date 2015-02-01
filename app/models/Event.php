@@ -15,4 +15,9 @@ class Event extends \Eloquent
 	{
 		return $this->belongsTo('Etime');
 	}
+
+	public function room()
+	{
+		return $this->belongsTo('Room');
+	}
 }

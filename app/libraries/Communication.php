@@ -9,7 +9,7 @@ class Communication
 
     	if(is_null($schedule))
     	{
-    		throw new Exception('The requested schedule could not be found');
+    		throw new Exception('ERROR: The requested schedule could not be found');
     	}
 
     	$json = Communication::create_backEndJson($schedule);
@@ -70,9 +70,10 @@ class Communication
     		$temp->duration = $timeblock->length;
     		$temp->pStarttM = $timeblock->starttm;
     		$temp->days = $timeblock->days;
+            $temp->days_count = substr_count($timeblock->days, '|');
     		$temp->starttm = $timeblock->starttm;
     		$temp->space = $event->room_id;
-    		$temp->max_participants = $event->room;
+    		$temp->max_participants = $event->room->capacity;
     		$temp->persons = $event->professor;
 
 

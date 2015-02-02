@@ -23,9 +23,9 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'kairos_soc',
+			'database'  => 'kairos',
 			'username'  => 'root',
-			'password'  => '',
+			'password'  => 'kairos',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

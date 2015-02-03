@@ -1231,8 +1231,8 @@ class TableSeeder extends Seeder
             $room = Room::firstOrCreate(
                 array(
                     'name' => $value->room,
-                    'schedule_id' => $schedule->id
-                    'capacity' => rand(70, 120);
+                    'schedule_id' => $schedule->id,
+                    'capacity' => rand(70, 120)
                 ));
 
             $event = models\Event::firstOrCreate(

@@ -40,6 +40,19 @@ class ScheduleController extends BaseController {
 		}
 	}
 
+	public function edit_schedule($id)
+	{
+		$schedule = Schedule::find($id);
+
+		if (!$schedule)
+			return Redirect::route('dashboard'); // TODO: redirect to 404
+
+		return View::make('sched-editor')->with([
+			'page_name'	=>	'Schedule Editor',
+			'schedule'	=> $schedule
+		]);
+	}
+
 	public function delete_schedule($id)
 	{
 		$schedule = Schedule::find($id);

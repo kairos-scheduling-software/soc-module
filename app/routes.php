@@ -64,6 +64,11 @@ Route::group(array('before'=> 'auth'), function()
 		'uses'	=>	'ScheduleController@view_schedule'
 	));
 
+	Route::get('/edit-schedule/{id}', array(
+		'as'	=>	'edit-sched',
+		'uses'	=>	'ScheduleController@edit_schedule'
+	));
+
 	Route::post('/delete-schedule/{id}', array(
 		'as'	=>	'delete-sched',
 		'uses'	=>	'ScheduleController@delete_schedule'

@@ -229,6 +229,7 @@ html, body {
 	font-size: 12pt;
 }
 
+/*
 #hg-left button {
 	padding: 0 20px;
 	height: 50px; 
@@ -237,7 +238,7 @@ html, body {
 	background-color: #7FC9FF;
 	color: #363636;	
 }
-
+*/
 #hg-left button:hover {
 	background-color: #66A1CC;
 }

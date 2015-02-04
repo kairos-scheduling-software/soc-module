@@ -75,7 +75,7 @@ $(function(){
 		$('#hg-right').css('display', 'none');
 	});
 
-	$('#hg-right-content').on('click', '#view-sched-btn', function(e) {
+	$('#hg-right-content').on('click', '.sched-action-btn', function(e) {
 		var url = $(this).attr('data-url');
 		window.location.href = url;
 	});

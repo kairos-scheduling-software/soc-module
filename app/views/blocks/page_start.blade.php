@@ -45,21 +45,29 @@
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     @if($page_name == 'Schedule View')
-    <link href="{{ URL::asset('assets/css/visualization.css') }}" rel="stylesheet">
-    <script src="{{ URL::asset('assets/js/chroma.min.js') }}"></script>
-    <script src="{{ URL::asset('assets/js/d3.min.js') }}"></script>
-    <script src="{{ URL::asset('assets/js/d3-tip-0.6.6.js') }}"></script>
-    <script src="{{ URL::asset('assets/js/grid.js') }}"></script>
-    <script>
-    $(function() {
-        var data = {{ $schedule->to_json() }};
-        load_grid(data);
-    });
-    </script>
+        <link href="{{ URL::asset('assets/css/visualization.css') }}" rel="stylesheet">
+        <script src="{{ URL::asset('assets/js/chroma.min.js') }}"></script>
+        <script src="{{ URL::asset('assets/js/d3.min.js') }}"></script>
+        <script src="{{ URL::asset('assets/js/d3-tip-0.6.6.js') }}"></script>
+        <script src="{{ URL::asset('assets/js/grid.js') }}"></script>
+        <script>
+        $(function() {
+            var data = {{ $schedule->to_json() }};
+            load_grid(data);
+        });
+        </script>
     @endif
     @if($page_name == 'SETTINGS')
-    <script src="{{ URL::asset('assets/js/account-settings.js') }}"></script>
+        <script src="{{ URL::asset('assets/js/account-settings.js') }}"></script>
     @endif
+    @if($page_name == 'Schedule Editor')
+        <!-- Editor stylesheet -->
+        <link href="{{ URL::asset('assets/css/sched-editor.css') }}" rel="stylesheet">
+        
+        <!-- Editor script -->
+        <script src="{{ URL::asset('assets/js/sched-editor.js') }}"></script>
+    @endif
+    
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
 

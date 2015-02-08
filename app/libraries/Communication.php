@@ -17,19 +17,21 @@ class Communication
         $result = Communication::sendJsonToCoreService('check', $json, $schedule_id);
 
         //do error checking
-        if(Communication::startsWith($result, 'ERROR:'))
+        $scheduleResults = json_decode($result);
+
+        if(is_object($scheduleResults) && $scheduleResults->Error !== null)
         {
-            throw new Exception($result);
+            throw new Exception('ERROR: ' . $scheduleResults->Error);
         }
 
 
-        return $result;
+        return $scheduleResults;
     }
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)
     {
-        $host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
-        //$host = 'localhost:8080/api/' . $mode;
+        //$host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
+        $host = 'localhost:8080/api/' . $mode;
 
 		//will need to set up
 		$curl = curl_init($host);
@@ -68,10 +70,20 @@ class Communication
     		$temp->id = $event->id;
     		$temp->days_count = substr_count($timeblock->days, '|') + 1;
     		$temp->duration = $timeblock->length;
-    		$temp->pStarttM = $timeblock->starttm;
-    		$temp->days = $timeblock->days;
-            $temp->days_count = substr_count($timeblock->days, '|');
-    		$temp->starttm = $timeblock->starttm;
+
+
+            //create the possible start times as a hard constraint
+            $possibleStart = [];
+            
+            foreach (explode('|', $timeblock->days) as $day)
+            {
+                $startTime = (Communication::convertIntToStringDay($day) . $timeblock->starttm);
+                $possibleStart[] = $startTime; // M1200 should look like this caps important
+            }
+
+            $temp->pStartTm = $possibleStart;
+
+
     		$temp->space = $event->room_id;
     		$temp->max_participants = $event->room->capacity;
     		$temp->persons = $event->professor;
@@ -116,5 +128,38 @@ class Communication
     {
         $length = strlen($starts);
         return (substr($toCheck, 0, $length) === $starts);
+    }
+
+    private static function convertIntToStringDay($day)
+    {
+        $stringDay = 'M';
+        switch ($day) 
+        {
+            case 1:
+                $stringDay = 'M';
+                break;
+            case 2:
+                $stringDay = 'T';
+                break;
+            case 3:
+                $stringDay = 'W';
+                break;
+            case 4:
+                $stringDay = 'H';
+                break;
+            case 5:
+                $stringDay = 'F';
+                break;
+            case 6:
+                $stringDay = 'S';
+                break;
+            case 7:
+                $stringDay = 'U';
+                break;
+            default:
+                $stringDay = 'M';
+        }
+
+        return $stringDay;
     }
 }

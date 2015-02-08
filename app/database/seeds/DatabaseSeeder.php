@@ -39,7 +39,7 @@ class TableSeeder extends Seeder
 		));
 
 		DB::table('schedules')->delete();
-		$schedule = Schedule::create(
+		$schedule1 = Schedule::create(
 			array(
 				'name' => 'Spring 2013',
 				'description' => '',
@@ -48,16 +48,25 @@ class TableSeeder extends Seeder
 
 		DB::table('schedule_user')->delete();
 
-		$user->schedules()->attach($schedule);
+		$user->schedules()->attach($schedule1);
 
-		$schedule = Schedule::create(
+		$schedule2 = Schedule::create(
 			array(
 				'name' => 'Fall 2013',
 				'description' => '',
 				'last_edited_by' => $user->id
 		));
 
-		$user->schedules()->attach($schedule);
+		$user->schedules()->attach($schedule2);
+
+        $schedule3 = Schedule::create(
+            array(
+                'name' => 'Fall 2012',
+                'description' => '',
+                'last_edited_by' => $user->id
+        ));
+
+        $user->schedules()->attach($schedule3);
 
 		$schedule = Schedule::create(
 			array(
@@ -84,9 +93,10 @@ class TableSeeder extends Seeder
 				'schedule_id' => $schedule->id,
 		));
 
+        DB::table('etimes')->delete();
 		DB::table('events')->delete();
 		DB::table('constraints')->delete();
-        DB::table('etimes')->delete();
+        
 
         Etime::create(array(
             'id' => 1, 
@@ -1223,6 +1233,114 @@ class TableSeeder extends Seeder
 
         $decoded = json_decode($json);
 
+
+
+        $room = Room::firstOrCreate(
+                array(
+                    'name' => 'WEB L101',
+                    'schedule_id' => $schedule1->id,
+                    'capacity' => rand(70, 120)
+                ));
+
+         $room1 = Room::firstOrCreate(
+                array(
+                    'name' => 'WEB L101',
+                    'schedule_id' => $schedule2->id,
+                    'capacity' => rand(70, 120)
+                ));
+
+          $room2 = Room::firstOrCreate(
+                array(
+                    'name' => 'WEB L101',
+                    'schedule_id' => $schedule3->id,
+                    'capacity' => rand(70, 120)
+                ));
+
+          $room3 = Room::firstOrCreate(
+                array(
+                    'name' => 'WEB L102',
+                    'schedule_id' => $schedule3->id,
+                    'capacity' => rand(70, 120)
+                ));
+
+
+        $timeblock = Etime::firstOrCreate(
+                array(
+                    'starttm' => '0730',
+                    'length' => 80,
+                    'days' => '2|4'
+            ));
+
+        $timeblock2 = Etime::firstOrCreate(
+                array(
+                    'starttm' => '0910',
+                    'length' => 80,
+                    'days' => '2|4'
+            ));
+        $professor2 = Professor::create(
+            array(
+                'name' => 'Zero'
+            ));
+
+        $event = models\Event::create(
+                array(
+                    'name' => 'class1',
+                    'professor' => $professor->id,
+                    'schedule_id' => $schedule1->id,
+                    'room_id' => $room->id,
+                    'class_type' => 'Laboratory',
+                    'title' => 'Really Fun Class',
+                    'etime_id' => $timeblock->id
+                ));
+
+        $event = models\Event::create(
+                array(
+                    'name' => 'class1',
+                    'professor' => $professor->id,
+                    'schedule_id' => $schedule2->id,
+                    'room_id' => $room1->id,
+                    'class_type' => 'Laboratory',
+                    'title' => 'Really Fun Class',
+                    'etime_id' => $timeblock->id
+                ));
+
+        $event = models\Event::create(
+                array(
+                    'name' => 'class2',
+                    'professor' => $professor->id,
+                    'schedule_id' => $schedule2->id,
+                    'room_id' => $room1->id,
+                    'class_type' => 'Laboratory',
+                    'title' => 'Really Fun Class',
+                    'etime_id' => $timeblock2->id
+                ));
+
+
+        $event = models\Event::create(
+                array(
+                    'name' => 'class1',
+                    'professor' => $professor->id,
+                    'schedule_id' => $schedule3->id,
+                    'room_id' => $room2->id,
+                    'class_type' => 'Laboratory',
+                    'title' => 'Really Fun Class',
+                    'etime_id' => $timeblock->id
+                ));
+
+        $event = models\Event::create(
+                array(
+                    'name' => 'class2',
+                    'professor' => $professor2->id,
+                    'schedule_id' => $schedule3->id,
+                    'room_id' => $room2->id,
+                    'class_type' => 'Laboratory',
+                    'title' => 'Really Fun Class2',
+                    'etime_id' => $timeblock->id
+                ));
+
+
+
+
         $events = [];
         $eventDays = [];
 
@@ -1231,20 +1349,27 @@ class TableSeeder extends Seeder
             $room = Room::firstOrCreate(
                 array(
                     'name' => $value->room,
-                    'schedule_id' => $schedule->id,
-                    'capacity' => rand(70, 120)
+                    'schedule_id' => $schedule->id
                 ));
 
-            $event = models\Event::firstOrCreate(
+            $room->capacity = rand(70, 120);
+            $room->save();
+
+            $event = models\Event::firstOrNew(
                  array(
                     'name' => $value->name,
                     'professor' => $professor->id,
                     'schedule_id' => $schedule->id,
                     'room_id' => $room->id,
                     'class_type' => $value->class_type,
-                    'title' => $value->title,
-                    'etime_id' => 1
+                    'title' => $value->title
             ));
+
+            if($event->etime_id == null)
+            {
+                $event->etime_id = 1;
+                $event->save();
+            }
 
             if(isset($eventDays[$event->name]))
             {

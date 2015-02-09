@@ -25,7 +25,7 @@ class Communication
         }
 
 
-        return $scheduleResults;
+        return json_encode($scheduleResults);
     }
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)

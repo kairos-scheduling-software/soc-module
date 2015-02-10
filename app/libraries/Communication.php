@@ -30,8 +30,8 @@ class Communication
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)
     {
-        //$host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
-        $host = 'localhost:8080/api/' . $mode;
+        $host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
+        //$host = 'localhost:8080/api/' . $mode;
 
 		//will need to set up
 		$curl = curl_init($host);
@@ -79,6 +79,7 @@ class Communication
             {
                 $startTime = (Communication::convertIntToStringDay($day) . $timeblock->starttm);
                 $possibleStart[] = $startTime; // M1200 should look like this caps important
+                break;//****WILL BE REMOVED****
             }
 
             $temp->pStartTm = $possibleStart;

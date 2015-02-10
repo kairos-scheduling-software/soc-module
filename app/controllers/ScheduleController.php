@@ -264,7 +264,7 @@ class ScheduleController extends BaseController {
 			$room->schedule_id = $schedule->id;
 			$room->save();
 		}
-		
+
 		// Add & save the class
 		$class = new models\Event();
 		$class->name = Input::get('class_name');
@@ -283,7 +283,11 @@ class ScheduleController extends BaseController {
 		}
 		catch (Exception $e)
 		{
-			return Response::json(['error' => 'Conflicts found in schedule'], 500);
+			if ($e->getMessage == "The schedule is in conflict")
+				return Response::json(['error' => 'Conflicts found in schedule'], 500);
+			else
+				return Response::json(['error' => 'An API error occurred'], 500);
+
 			exit();
 		}
 	}

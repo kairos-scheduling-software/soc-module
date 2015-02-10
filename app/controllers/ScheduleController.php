@@ -43,13 +43,15 @@ class ScheduleController extends BaseController {
 	public function edit_schedule($id)
 	{
 		$schedule = Schedule::find($id);
+		$time_blocks = Etime::where('standard_block', '=', 1)->where('starttm', '!=', '0730')->get();
 
 		if (!$schedule)
 			return Redirect::route('dashboard'); // TODO: redirect to 404
 
 		return View::make('sched-editor')->with([
-			'page_name'	=>	'Schedule Editor',
-			'schedule'	=> $schedule
+			'page_name'		=>	'Schedule Editor',
+			'schedule'		=>	$schedule,
+			'time_blocks'	=>	$time_blocks
 		]);
 	}
 
@@ -245,6 +247,50 @@ class ScheduleController extends BaseController {
 			]);
 		else
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page		
+	}
+
+	public function e_add_class()
+	{
+		// TODO: add error checking!!
+		$schedule = Schedule::find(Input::get('sched_id'));
+
+		// Add & save the room
+		$room = Room::where('name', '=', Input::get('room_name'))->get();
+		if (!$room)
+		{
+			$room = new Room();
+			$room->name = Input::get('room_name');
+			$room->capacity = 80;
+			$room->schedule_id = $schedule->id;
+			$room->save();
+		}
+		
+		// Add & save the class
+		$class = new models\Event();
+		$class->name = Input::get('class_name');
+		$class->professor = 1;
+		$class->schedule_id = $schedule->id;
+		$class->room_id = $room->id;
+		$class->class_type = "Lecture";
+		$class->etime_id = Input::get('block_id');
+		$class->save();
+
+		// Call check on comm library
+		try {
+			$result = Communication::sendCheck($schedule->id);
+
+			return Response::json(['success' => 'No conflicts detected'], 200);
+		}
+		catch (Exception $e)
+		{
+			return Response::json(['error' => 'Conflicts found in schedule'], 500);
+			exit();
+		}
+	}
+
+	public function e_remove_class()
+	{
+
 	}
 
 }

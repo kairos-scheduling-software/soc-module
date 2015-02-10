@@ -28,6 +28,10 @@
 			data-row="#row_{{ $sched->id }}">
 		{{ FA::icon('times')}}&nbsp;DELETE
 	</button>
+	{{--
+	<br><br>
+	<a href="#">More {{FA::icon('chevron-right')}}</a>
+	--}}
 </div>
 <hr>
 <div class="sched-admin-section">

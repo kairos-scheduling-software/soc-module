@@ -24,7 +24,16 @@
 			</div>
 			<div id="collapse-one" class="panel-collapse collapse">
 				<div class="panel-body">
-					Class options...
+					<table class="toolbox-blocks">
+						<tr>
+							<td>50 min:</td>
+							<td>80 min:</td>
+						</tr>
+						<tr>
+							<td><div class="fifty-min-blk draggable one-fifty"></div></td>
+							<td><div class="eighty-min-blk draggable one-eighty"></div></td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -47,7 +56,16 @@
 			</div>
 			<div id="collapse-two" class="panel-collapse collapse">
 				<div class="panel-body">
-					Class options...
+					<table class="toolbox-blocks">
+						<tr>
+							<td>50 min:</td>
+							<td>80 min:</td>
+						</tr>
+						<tr>
+							<td><div class="fifty-min-blk draggable two-fifty"></div></td>
+							<td><div class="eighty-min-blk draggable two-eighty"></div></td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -70,13 +88,22 @@
 			</div>
 			<div id="collapse-three" class="panel-collapse collapse">
 				<div class="panel-body">
-					Class options...
+					<table class="toolbox-blocks">
+						<tr>
+							<td>50 min:</td>
+							<td>80 min:</td>
+						</tr>
+						<tr>
+							<td><div class="fifty-min-blk draggable three-fifty"></div></td>
+							<td><div class="eighty-min-blk draggable three-eighty"></div></td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
 		{{-- End accordion section --}}
 
-		{{-- Begin accordion section --}}
+		{{-- Begin accordion section 
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4>
@@ -97,7 +124,7 @@
 				</div>
 			</div>
 		</div>
-		{{-- End accordion section --}}
+		 End accordion section --}}
 
 		{{-- Begin accordion section --}}
 		<div class="panel panel-default">
@@ -144,6 +171,10 @@
 		</div>
 		{{-- End accordion section --}}
 		
+	</div><!-- end div id=accordion -->
+	<h3>Scratch Pad:</h3>
+	<div id="scratch-pad">
+		Drag classes here to be rescheduled later
 	</div>
 </div>
 
@@ -151,22 +182,24 @@
 
 @section('center-column')
 
-<h1>{{ $schedule->name }}</h1>
+<h1 id="sched-name">{{ $schedule->name }}
+	<a href="#"><span>{{FA::icon('edit')}}</span></a>
+</h1>
 
 <div id="sched-col-headers">
-	<div class="sched-col-header">
+	<div class="sched-col-header" id="mon-col-header">
 		<h3>MONDAY</h3>
 	</div>
-	<div class="sched-col-header">
+	<div class="sched-col-header" id="tue-col-header">
 		<h3>TUESDAY</h3>
 	</div>
-	<div class="sched-col-header">
+	<div class="sched-col-header" id="wed-col-header">
 		<h3>WEDNESDAY</h3>
 	</div>
-	<div class="sched-col-header">
+	<div class="sched-col-header" id="thu-col-header">
 		<h3>THURSDAY</h3>
 	</div>
-	<div class="sched-col-header">
+	<div class="sched-col-header" id="fri-col-header">
 		<h3>FRIDAY</h3>
 	</div>
 </div>
@@ -196,6 +229,16 @@
 	</div>
 	<div class="sched-day-column" id="fri-col">
 	</div>
+</div>
+<div id="trash-container">
+	<div id="drop-trash">
+		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">
+	</div>
+</div>
+<div id="hidden-data" class="hide"
+	 data-addurl="{{ URL::route('e-add-class') }}"
+	 data-removeurl= "{{ URL::route('e-remove-class') }}"
+	 data-schedid="{{ $schedule->id }}">
 </div>
 
 @stop

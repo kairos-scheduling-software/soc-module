@@ -1,8 +1,12 @@
+h1 span {
+	font-size: 12pt;
+}
+
 span.accordion-open {
 	display:none;
 }
 
-a:hover {
+a:hover, a:focus {
 	text-decoration: none;
 }
 
@@ -58,6 +62,18 @@ a:hover {
 	font-size: 12pt;
 }
 
+#scratch-pad {
+	background-color: #B3B3B3;
+	border-radius: 10px;
+	border: 2px dashed #363636;
+	min-height: 200px;
+	width: 100%;
+	text-align: center;
+	color: #5E5E5E;
+	padding: 15% 10%;
+	font-size: 25px;
+}
+
 #hg-center {
 	text-align: center;
 }
@@ -70,7 +86,7 @@ a:hover {
 }
 
 #time-labels p {
-	height: 49px;
+	height: 8.1%;
 	margin: 0;
 }
 
@@ -80,7 +96,8 @@ a:hover {
 	border-top: 4px solid black;
 	height: 600px;
 	max-height: 600px;
-	max-width: 1500px;
+	min-width: 1400px;
+	min-height: 500px;
 	background-color: black;
 	margin-left: auto;
 	margin-right: auto;
@@ -92,6 +109,7 @@ a:hover {
 
 #sched-col-headers {
 	padding-left: 50px;
+	overflow-x: auto;
 }
 
 .sched-col-header {
@@ -102,27 +120,103 @@ a:hover {
 
 .sched-day-column {
 	display: inline-block;
-	height: 591px;
-	width: 275px;
+	width: 273px;
 	margin: 0;
 	background-color: white;
+	height: 100%;
+}
+
+.test-grid {
+	position: relative;
+	left: 40px;
+	background-color: red;
+	height: 50px;
+	width: 40px;
+	color: white;
+	font-size: 6pt;
+}
+
+.scheduled-class {
+	position: absolute;
+	border: 1px solid white;
+	background-color: #0099FF;
+	color: white;
+	font-size: 9pt;
+	text-align: center;
+}
+
+.time-block-active {
+	position: absolute;
+	background: rgba(0,0,0,0.2);
+	border: 1px solid white;
+}
+
+.time-block-hover {
+	position: absolute;
+	background: rgba(0,110,0,0.2);
+	border: 1px solid white;
+}
+
+.toolbox-blocks td {
+	vertical-align: top;
+	width: 60px;
+}
+
+#drag-helper {
+	z-index: 10;
+	color: #0099FF;
+	font-size: 20pt;
+	text-shadow: 0px 0.5px 1px black;
+}
+
+#toolbox .fifty-min-blk {
+	background-color: orange;
+	height: 50px;
+	width: 40px;
+}
+
+#toolbox .eighty-min-blk {
+	background-color: orange;
+	height: 80px;
+	width: 40px;
+}
+
+.sched-day-column .fifty-min-blk {
+	height: 50px;
+	width: 40px;
+}
+
+.sched-day-column .eighty-min-blk {
+	height: 80px;
+	width: 40px;
+}
+
+.5-min-row {
+	color: white;
+	font-size: 10pt;
+	padding: 0;
+	margin: 0;
+}
+
+.day-slot {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
 }
 
 
 ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background-color:#e5e5e5}::-webkit-scrollbar-thumb{background-color:#cdcdcd}::-webkit-scrollbar-thumb:hover{background-color:#030303}
 /*
 #mon-col {
-	background-color: green;
+	width: 340px;
 }
 
 #tue-col {
 	background-color: blue;
 }
-
 #wed-col {
-	background-color: green;
+	width: 470px;
 }
-
 #thu-col {
 	background-color: blue;
 }
@@ -131,6 +225,20 @@ a:hover {
 	background-color: green;
 }*/
 
+#drop-trash {
+	font-size: 60pt;
+	text-align: right;
+	margin-right:0;
+	margin-top: 5px;
+}
+
+.trash-hover{
+	-ms-transform: scale(1.5,1.5); /* IE 9 */
+    -webkit-transform: scale(1.5,1.5); /* Chrome, Safari, Opera */
+    transform: scale(1.5,1.5); /* Standard syntax */
+    z-index: 0;
+    opacity: 0.5;
+}
 
 
 
@@ -149,7 +257,6 @@ a:hover {
   width: 1%;
   vertical-align: middle;
   display: table-cell;
-  z-index: 999;
 }
 .input-group-btn-vertical > .btn {
   display: block;
@@ -160,6 +267,7 @@ a:hover {
   margin-left: -1px;
   position: relative;
   border-radius: 0;
+  z-index: 999;
 }
 .input-group-btn-vertical > .btn:first-child {
   border-top-right-radius: 4px;

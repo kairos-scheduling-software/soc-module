@@ -138,4 +138,15 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'change-pic',
 		'uses'	=>	'AccountController@change_pic'
 	));
+
+	// Editor routes
+	Route::post('add-class', array(
+		'as'	=>	'e-add-class',
+		'uses'	=>	'ScheduleController@e_add_class'
+	));
+
+	Route::post('remove-class', array(
+		'as'	=>	'e-remove-class',
+		'uses'	=>	'ScheduleController@e_remove_class'
+	));
 });

@@ -1,4 +1,27 @@
+var five_min_height;
+var time_block_w;
+var all_blocks = {};
+var day_columns = [];
+var blocks_to_update = [];
+var group_counter = 1;
+var add_class_url;
+var remove_class_url;
+var sched_id;
+
 $(function(){
+
+	initialize_column_matrix();
+
+	add_class_url = $('#hidden-data').attr('data-addurl');
+	remove_class_url = $('#hidden-data').attr('data-removeurl');
+	sched_id = $('#hidden-data').attr('data-schedid');
+
+	resize_all();
+	$(window).resize(function(){
+		setTimeout(function() {
+			resize_all();
+		}, 500);		
+	});
 
 	$('.panel-collapse').on('show.bs.collapse', function() {
 		$(this).closest('div.panel').find('span.accordion-open').show();
@@ -19,11 +42,108 @@ $(function(){
 		$(this).closest('div.panel').find('.panel-collapse').first().collapse('toggle');
 	});
 
-	$('.panel-heading').mouseenter(function() {
+	$('.panel-heading').mouseenter(function(e) {
 		$(this).addClass('cursor-link');
-	}).mouseleave(function() {
+	}).mouseleave(function(e) {
 		$(this).removeClass('cursor-link');
 	});
+
+	$('.draggable').draggable({
+		cursorAt: { bottom: 0, left: 20 },
+      	helper: function( event ) 
+      	{
+        	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+    	},
+    	start: function(event, ui)
+    	{
+    		var dragged_block = $(this);
+    		
+    		if (dragged_block.hasClass('one-fifty'))
+    			setup_dropzones('one-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('one-eighty'))
+    			setup_dropzones('one-eighty', 'eighty-min-blk');
+    		else if (dragged_block.hasClass('two-fifty'))
+    			setup_dropzones('two-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('two-eighty'))
+    			setup_dropzones('two-eighty', 'eighty-min-blk');
+    		else if (dragged_block.hasClass('three-fifty'))
+    			setup_dropzones('three-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('three-eighty'))
+    			setup_dropzones('three-eighty', 'eighty-min-blk');
+
+    		$('.drop-zone').droppable({
+		    	hoverClass: "time-block-hover",
+		    	activeClass: "time-block-active",
+		    	drop: function(event, ui) {
+		    		group_counter++;
+		    		var group_id = $(this).attr('data-group');
+		    		$('.drop-zone').droppable("destroy");
+		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover time-block-active drop-zone ui-droppable');
+		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class');
+		    		$("div[data-group=" + group_id + "]").attr('data-content', get_popover_content(group_id));
+
+		    		// TODO show popover
+		    		$(this).popover({
+		    			trigger: "manual",
+		    			html: true
+		    		}).popover('show');
+
+		    		$("div[data-group=" + group_id + "]").html('CS<br>4500');
+
+		    		$('.drop-zone').remove();
+
+		    		var col = parseInt($(this).attr('data-col'));
+		    		var day_string = $(this).attr('data-days');
+		    		var v_offset = parseInt($(this).attr('data-start'));
+		    		var b_length = parseInt($(this).attr('data-length'));
+		    		var days = [];
+
+		    		if (day_string.indexOf("mon") >=0)
+		    			days.push('mon');
+		    		if (day_string.indexOf("tue") >=0)
+		    			days.push('tue');
+		    		if (day_string.indexOf("wed") >=0)
+		    			days.push('wed');
+		    		if (day_string.indexOf("thu") >=0)
+		    			days.push('thu');
+		    		if (day_string.indexOf("fri") >=0)
+		    			days.push('fri');
+
+		    		for (i = v_offset; i < (v_offset + b_length); i++)
+		    		{
+		    			$.each(days, function(k, d) {
+		    				var col_idx = d + "" + col;
+		    				day_columns[col_idx][i] = "busy";
+		    			});
+		    		}
+
+		    		refresh_scheduled_class_draggables();
+		    	},
+		    	over: function(event, ui) {
+		    		var group_id = $(this).attr('data-group');
+		    		$("div[data-group=" + group_id + "]").each(function() {
+		    			if (!$(this).hasClass('scheduled-class'))
+		    				$(this).addClass('time-block-hover');
+		    		});
+		    		//console.log($(this).attr('data-days'));
+		    		//console.log($(this).attr('data-time'));
+		    	},
+		    	out: function(event, ui) {
+		    		var group_id = $(this).attr('data-group');
+		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover');
+		    	}
+		    });
+    	},
+    	stop: function(event, ui)
+    	{
+    		$('.drop-zone').remove();
+    	},
+    	revert: 'invalid'
+    });    
+
+    $('.trash-can').droppable({
+    	hoverClass: "trash-hover"
+    });
 
 	$('#add-time-btn').click(function(e){
 		var input = $('#custom-duration-input');
@@ -45,3 +165,361 @@ $(function(){
 			return;
 	});
 });
+
+/**
+ * Dynamically resizes all elements on the page
+ */
+function resize_all()
+{
+	// Schedule container
+	var sched_container_w = $('#hg-center').width() - 50 - $('#time-labels').width();
+	var sched_container_h = $(window).height() 
+							- $('.top-buffer').outerHeight(true) 
+							- $('#sched-name').outerHeight(true) 
+							- $('#sched-col-headers').outerHeight(true)
+							- $('#trash-container').outerHeight(true)
+							- parseInt($('#page_footer').css('height'));
+
+	five_min_height = sched_container_h / 144;
+
+	$('#sched-container').css('max-width', sched_container_w + 'px');
+	$('#sched-container').css('min-width', sched_container_w + 'px');
+	$('#sched-container').css('width', sched_container_w + 'px');
+	$('#sched-container').css('max-height', sched_container_h + 'px');
+	$('#sched-container').css('min-height', sched_container_h + 'px');
+	$('#sched-container').css('height', sched_container_h + 'px');
+
+	// Time Labels
+	$('#time-labels').css('height', sched_container_h + 8 + 'px');
+
+	// Day Columns
+	var col_height = ($('#sched-container').innerHeight() - 5);
+	$('.sched-day-column').css('height', col_height + 'px');
+	var col_width = $('#sched-container').innerWidth() / 5;
+	col_width -= 5;
+	$('.sched-day-column').css('width', col_width + 'px');
+	//$('.sched-col-header').css('width', col_width + 'px');
+	time_block_w = parseInt(col_width / 6);
+
+	// Toolbox blocks
+	$('.fifty-min-blk').css('height', (10 * five_min_height));
+	$('.eighty-min-blk').css('height', (16 * five_min_height));
+
+}
+
+function parse_days(json_days)
+{
+	var days = [];
+
+	if (json_days.indexOf("1") >= 0)
+		days.push("#mon-col");
+	if (json_days.indexOf("2") >= 0)
+		days.push("#tue-col");
+	if (json_days.indexOf("3") >= 0)
+		days.push("#wed-col");
+	if (json_days.indexOf("4") >= 0)
+		days.push("#thu-col");
+	if (json_days.indexOf("5") >= 0)
+		days.push("#fri-col");
+
+	return days;
+}
+
+function get_vertical_offset(time_string)
+{
+	var hr_str = time_string.substring(0,2);
+	var min_str = time_string.substring(2);
+	var hr = parseInt(hr_str);
+	var min = parseInt(min_str);
+
+	//console.log("Time String: " + time_string + "  =>  HOUR: " + hr + ", MIN: " + min);
+	var offset_factor = ((hr - 8) * 12) + (min / 5);
+
+	return offset_factor;
+}
+
+function get_horizontal_offset(vertical, length, day)
+{
+	var col_index = day + "1";
+	var col_num = 1;
+
+	for(var i = vertical; i < vertical + (length/5); i++)
+	{
+		if (day_columns[col_index][i] == "busy")
+		{
+			console.log("Location " + col_index + "[" + i + "] is in use.");
+			col_num++;
+			col_index = day + "" + col_num;
+			i = vertical;
+			if (col_num > 6)
+				return -1;
+		}
+	}
+
+	//console.log("Col Num: " + col_num);
+	return col_num - 1;
+}
+
+function process_time_blocks(blocks)
+{
+	var one_fifty = all_blocks["one-fifty"] = [];
+	var one_eighty = all_blocks["one-eighty"] = [];
+
+	var two_fifty = all_blocks["two-fifty"] = [];
+	var two_eighty = all_blocks["two-eighty"] = [];
+
+	var three_fifty = all_blocks["three-fifty"] = [];
+	var three_eighty = all_blocks["three-eighty"] = [];
+
+	$.each(blocks, function(i, block){
+		var new_block = {};
+		new_block["id"] = block["id"];
+		new_block["days"] = parse_days(block["days"]);
+		new_block["offset"] = get_vertical_offset(block["starttm"]);
+		new_block["etime"] = block;
+		new_block["length"] = block["length"];
+
+		if (new_block["days"].length == 1)
+		{
+			if (block["length"] == 50)
+				one_fifty.push(new_block);
+			else if (block["length"] == 80)
+				one_eighty.push(new_block);
+		}
+		else if (new_block["days"].length == 2)
+		{
+			if (block["length"] == 50)
+				two_fifty.push(new_block);
+			else if (block["length"] == 80)
+				two_eighty.push(new_block);
+		}
+		else if (new_block["days"].length == 3)
+		{
+			if (block["length"] == 50)
+				three_fifty.push(new_block);
+			else if (block["length"] == 80)
+				three_eighty.push(new_block);
+		}
+	});
+}
+
+function setup_dropzones(key, block_class)
+{
+	$.each(all_blocks[key], function(i, block)
+	{		
+		$.each(block["days"], function(j, day) {
+			var html_block = "<div class='drop-zone " + block_class + "'";
+			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
+			var id = day.substring(1) + "-" + block["id"];
+			var ddd = id.substring(0,3); // three char day abbreviation
+			html_block += "id='" + id + "'";
+
+			// Set offsets of the dropzone
+			var left = $(day).offset()["left"];
+			var top = $(day).offset()["top"];
+			top += (block["offset"] * five_min_height);
+			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd);
+			
+			if (horiz == -1)
+			{
+				console.log("Horizontal failed");
+				return;
+			}
+			left += horiz * time_block_w;
+
+			html_block += " style='left: " + left + "px; top: " + top + "px;' ";
+			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
+			html_block += "' data-length='" + (block["length"] / 5) + "'";
+			html_block += " data-days='" + block["days"] + "'";
+			html_block += "></div>";
+			$(day).append(html_block);
+		});
+	});
+
+	switch(block_class)
+	{
+		case "fifty-min-blk":
+			$('.fifty-min-blk').css('height', (10 * five_min_height));
+			break;
+		case "eighty-min-blk":
+			$('.eighty-min-blk').css('height', (16 * five_min_height));
+			break;
+	}
+}
+
+function refresh_scheduled_class_draggables()
+{
+	$('.scheduled-class').draggable({
+		cursorAt: { bottom: 0, left: 20 },
+      	helper: function( event ) 
+      	{
+        	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+    	},
+    	start: function(event, ui)
+    	{
+    		var group_id = $(this).attr('data-group');
+    		var id = $(this).attr('id');
+    		//$("div[data-group=" + group_id + "]:not('#"+id+"')").hide();
+
+    		$('#trash-img').droppable({
+    			hoverClass: "trash-hover",
+		    	drop: function(event, ui) {
+		    		var confirmed = confirm("Are you sure you want to delete this class from the schedule?");
+		    		if(confirmed)
+		    		{
+		    			// TODO: update column matrix
+		    			// TODO: send ajax to delete class
+		    			$("div[data-group=" + group_id + "]").remove();
+		    		}
+		    	}
+    		});
+    	},
+    	stop: function(event, ui)
+    	{
+
+    	},
+    	revert: 'invalid'
+	});
+
+	$('body').on('click', '#new-class-btn', function(e) {
+		e.preventDefault();
+		var group_id = $(this).attr('data-group');
+		$("div[data-group=" + group_id + "]").popover('destroy');
+
+		var form = $('#new-class-form');
+		var data = form.serializeArray();
+		var url = form.attr('action');
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		data,
+			success: 	function(data, textStatus, jqXHR) {
+				alert('added!');
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('error!');
+			}
+		});
+
+		return true;
+	});
+}
+
+function get_popover_content(group_id)
+{
+	var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
+
+	var html = "<div style='text-align:center'><h4>New Class</h4></div>";
+	html += "<b>Days:</b><br>";
+	html += "<b>Times:</b><br>";
+	html += "<div><form action='"+add_class_url+"' id='new-class-form'>";
+	html += "<input type='hidden' name='block_id' value='"+blk_id+"'>";
+	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
+	html += "<small><b>Class Name:</b></small><br>";
+	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name'>";
+	html += "<small><b>Room:</b></small><br>";
+	html += "<input type='text' class='form-control' name='room_name' placeholder='Room'>";
+	html += "<small><b>Professor:</b></small><br>";
+	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'></div>";
+	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form>";
+
+	return html;
+}
+
+function initialize_column_matrix()
+{
+	day_columns["mon1"] = [];
+	day_columns["tue1"] = [];
+	day_columns["wed1"] = [];
+	day_columns["thu1"] = [];
+	day_columns["fri1"] = [];
+	day_columns["mon2"] = [];
+	day_columns["tue2"] = [];
+	day_columns["wed2"] = [];
+	day_columns["thu2"] = [];
+	day_columns["fri2"] = [];
+	day_columns["mon3"] = [];
+	day_columns["tue3"] = [];
+	day_columns["wed3"] = [];
+	day_columns["thu3"] = [];
+	day_columns["fri3"] = [];
+	day_columns["mon4"] = [];
+	day_columns["tue4"] = [];
+	day_columns["wed4"] = [];
+	day_columns["thu4"] = [];
+	day_columns["fri4"] = [];
+	day_columns["mon5"] = [];
+	day_columns["tue5"] = [];
+	day_columns["wed5"] = [];
+	day_columns["thu5"] = [];
+	day_columns["fri5"] = [];
+	day_columns["mon6"] = [];
+	day_columns["tue6"] = [];
+	day_columns["wed6"] = [];
+	day_columns["thu6"] = [];
+	day_columns["fri6"] = [];
+
+	for (var j = 0; j < 144; j++)
+		day_columns["mon1"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue1"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed1"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu1"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri1"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["mon2"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue2"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed2"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu2"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri2"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["mon3"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue3"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed3"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu3"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri3"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["mon4"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue4"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed4"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu4"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri4"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["mon5"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue5"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed5"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu5"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri5"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["mon6"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue6"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed6"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu6"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri6"].push("empty");
+	
+	console.log(day_columns);
+}

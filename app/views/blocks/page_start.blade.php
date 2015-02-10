@@ -65,7 +65,14 @@
         <link href="{{ URL::asset('assets/css/sched-editor.css') }}" rel="stylesheet">
         
         <!-- Editor script -->
+        <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
         <script src="{{ URL::asset('assets/js/sched-editor.js') }}"></script>
+        <script>
+        $(function() {
+            time_blocks = {{ $time_blocks }};
+            process_time_blocks(time_blocks);
+        });
+        </script>
     @endif
     
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>

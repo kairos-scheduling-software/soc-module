@@ -199,10 +199,12 @@ html, body {
 #hg-left {
 	width: 380px;
 	background-color: #808080;
+	min-width: 380px;
 }
 
 #hg-left-content {
 	width: 360px;
+	min-width: 360px;
 	padding-left: 10px;
 	padding-right: 30px;
 	position: fixed;
@@ -321,6 +323,7 @@ html, body {
 	padding-top: 10px;
 	width: 100%;
 	color: #CECECE;
+	z-index: 999;
 }
 
 footer {
@@ -342,7 +345,7 @@ footer {
 }
 
 .top-buffer {
-	height: 130px;
+	height: 100px;
 }
 
 #bottom-buffer {

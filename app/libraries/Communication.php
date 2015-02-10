@@ -24,6 +24,14 @@ class Communication
             throw new Exception('ERROR: ' . $scheduleResults->Error);
         }
 
+        foreach ($scheduleResults as $value) 
+        {
+            if($value->wasFailure)
+            {
+                throw new Exception("The schedule is in conflict");
+            }
+        }
+
 
         return json_encode($scheduleResults);
     }

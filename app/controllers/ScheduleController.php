@@ -297,4 +297,220 @@ class ScheduleController extends BaseController {
 
 	}
 
+	public function import_schedule()
+	{
+		return View::make('import-schedule')->with([
+				'page_name'	=>	'Import Schdule'
+			]);
+	}
+
+	public function import_post()
+	{
+		ini_set('auto_detect_line_endings', true);
+
+		$scheduleName = Input::get('ScheduleName');
+		$user = Auth::user();
+		$inUse = false;
+
+		// Make sure the schedule name is unique
+		foreach($user->schedules as $schedule)
+		{
+			if ($schedule->name == $scheduleName)
+				return Redirect::route('import-schedule')->withErrors(array('scheduleName' => "The schedule name is already in use")) -> withInput();
+			
+		}
+
+		$importFile = Input::file('import');
+
+		//eventually add mimes:csv when I get a chance to find the correct php configuration
+		$rules = array(
+			'uploadfile' => 'required',
+			'scheduleName' => 'required'
+		);
+  		$validator = Validator::make(array('uploadfile'=> $importFile, 'scheduleName' => $scheduleName), $rules);
+
+  		if($validator->passes())
+  		{
+			//Start parsing the file
+			$file = fopen($importFile, "r");
+
+			$schedule = Schedule::create(
+			array(
+				'name' => $scheduleName,
+				'last_edited_by' => $user->id,
+				'description' => "Just another test schedule"
+			));
+
+			$user->schedules()->attach($schedule->id);
+			
+			$column_headers = array();
+			$row_count = 0;
+			while (!feof($file)) 
+			{
+				$row = fgetcsv($file, 1000);
+				
+  				if ($row_count==0)
+  				{
+    				$column_headers = $row;
+    				$row_count += 1;
+    				continue;
+  				}
+
+  				//if the row doesn't have enough columns skip it
+  				//eventually use this as part of the % bad data
+				if(count($row) < 7)
+				{
+					continue;
+				}
+
+  				//check if the data is in the correct format using regex and other such methods
+
+  				$room = Room::firstOrCreate(
+  				array(
+  					'name' => $row[0],
+  					'schedule_id' => $schedule->id,
+  					'capacity' => $row[1]
+  				));
+
+  				$professor = Professor::firstOrCreate(
+  				array(
+  					'name' => $row[2]
+  				));
+
+  				
+  				$days = '';
+  				$time = '';
+
+  				foreach (explode('|', $row[5]) as $value) 
+  				{
+  					if(strlen($days) > 0)
+  					{
+  						$days .= '|';
+  					}
+
+  					$days .= DataConvertUtils::convertStringToIntDay(substr($value, 0, 1));
+  					$time = substr($value, 1);
+  				}
+
+  				if(strlen($days) > 0 && strlen($time) == 4)
+  				{
+  					$timeblock = Etime::firstOrCreate(
+                	array(
+                    	'starttm' => $time,
+                    	'length' => $row[6],
+                    	'days' => $days
+            		));
+
+            		if($timeblock->standard_block == null)
+            		{
+                		$timeblock->standard_block = 0;
+                		$timeblock->save();
+            		}
+            	}
+
+            	$event = models\Event::create(
+                array(
+                    'name' => $row[3],
+                    'professor' => $professor->id,
+                    'schedule_id' => $schedule->id,
+                    'room_id' => $room->id,
+                    'class_type' => '',
+                    'title' => $row[4],
+                    'etime_id' => $timeblock ? $timeblock->id : 1
+                ));
+
+                $row_count += 1; 
+  			}
+
+			fclose($file);
+
+			return Redirect::route('dashboard');
+  		}
+  		else
+  		{
+  			return Redirect::route('import-schedule')->withErrors($validator) -> withInput();
+  		}
+
+		
+	}
+
+	public function branch_schedule($idToCopy)
+	{
+
+		$scheduleToCopy = Schedule::find($idToCopy);
+
+		if($scheduleToCopy === NULL)
+		{
+			return Resonse::json(['error' => 'could not find the schedule to copy'], 500);
+		}
+
+		$name = Input::get('sched_name');
+		$user = Auth::user();
+
+		// Make sure the schedule name is unique
+		foreach($user->schedules as $schedule)
+		{
+			if ($schedule->name == $name)
+				return Response::json(['error' => 'Name already in use'], 500);
+		}
+
+		$schedule = new Schedule();
+		$schedule->name = $name;
+		$schedule->last_edited_by = $user->id;
+		$schedule->description = $scheduleToCopy->description;
+
+		if ($schedule->save())
+		{
+			//TODO additional Error Checking
+			$user->schedules()->attach($schedule->id);
+
+			foreach ($scheduleToCopy->rooms as $value) 
+			{
+				$room = Room::create(
+				array(
+					'name' => $value->name,
+                    'schedule_id' => $schedule->id,
+                    'capacity' => $value->capacity
+				));
+			}
+
+			foreach ($scheduleToCopy->events as $event) 
+			{
+				$theRoomName = Room::find($event->room_id);
+				
+				$room = Room::firstOrCreate(
+				array(
+					'name' => $theRoomName->name,
+                    'schedule_id' => $schedule->id,
+				));
+
+				$event = models\Event::firstOrNew(
+                 array(
+                    'name' => $event->name,
+                    'professor' => $event->id,
+                    'schedule_id' => $schedule->id,
+                    'room_id' => $room->id,
+                    'class_type' => $event->class_type,
+                    'title' => $event->title,
+                    'etime_id' => $event->etime_id
+            	));
+
+            	foreach ($event->constraints as $constraint) 
+            	{
+            		$constraint = Constraint::make(
+            		array(
+            			'key' => $constraint->key,
+            			'value' => $constraint->value,
+            			'event_id' => $event->id
+            		));
+            	}
+			}
+
+			return URL::route('dashboard');
+		}
+		else
+			return Response::json(['error' => 'Could not create schedule at this time'], 500);
+
+	}
+
 }

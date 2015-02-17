@@ -12,7 +12,7 @@
 				{{ FA::icon('plus') }}&nbsp;&nbsp;
 				Create
 			</button>
-			<button class="btn new-sched">
+			<button class="btn new-sched" onclick="window.location='{{ url("import-schedule") }}'">
 				{{ FA::icon('cloud-upload') }}&nbsp;&nbsp;
 				Import
 			</button>

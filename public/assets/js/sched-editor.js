@@ -88,7 +88,7 @@ $(function(){
 		    			html: true
 		    		}).popover('show');
 
-		    		$("div[data-group=" + group_id + "]").html('CS<br>4500');
+		    		$("div[data-group=" + group_id + "]").html();
 
 		    		$('.drop-zone').remove();
 
@@ -384,9 +384,13 @@ function refresh_scheduled_class_draggables()
 	$('body').on('click', '#new-class-btn', function(e) {
 		e.preventDefault();
 		var group_id = $(this).attr('data-group');
+		var form = $('#new-class-form');
+		var class_name = $('input[name="class_name"').val();
+
+		$("div[data-group=" + group_id + "]").text(class_name);
 		$("div[data-group=" + group_id + "]").popover('destroy');
 
-		var form = $('#new-class-form');
+		
 		var data = form.serializeArray();
 		var url = form.attr('action');
 
@@ -395,10 +399,9 @@ function refresh_scheduled_class_draggables()
 			type: 		"POST",
 			data: 		data,
 			success: 	function(data, textStatus, jqXHR) {
-				alert('added!');
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
-				alert('error!');
+				alert('Conflicts detected in schedule!');
 			}
 		});
 

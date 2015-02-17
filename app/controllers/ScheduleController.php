@@ -255,7 +255,9 @@ class ScheduleController extends BaseController {
 		$schedule = Schedule::find(Input::get('sched_id'));
 
 		// Add & save the room
-		$room = Room::where('name', '=', Input::get('room_name'))->get();
+		$room = Room::firstOrCreate(['name' => Input::get('room_name'), 'schedule_id' => $schedule->id]);
+		$room->capacity = 80;
+		$room->save();/*
 		if (!$room)
 		{
 			$room = new Room();
@@ -263,7 +265,7 @@ class ScheduleController extends BaseController {
 			$room->capacity = 80;
 			$room->schedule_id = $schedule->id;
 			$room->save();
-		}
+		}*/
 
 		// Add & save the class
 		$class = new models\Event();
@@ -283,12 +285,12 @@ class ScheduleController extends BaseController {
 		}
 		catch (Exception $e)
 		{
-			if ($e->getMessage == "The schedule is in conflict")
+			//if ($e->getMessage() == "The schedule is in conflict")
 				return Response::json(['error' => 'Conflicts found in schedule'], 500);
-			else
-				return Response::json(['error' => 'An API error occurred'], 500);
+			//else
+			//	return Response::json(['error' => 'An API error occurred'], 500);
 
-			exit();
+			//exit();
 		}
 	}
 

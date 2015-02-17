@@ -104,7 +104,7 @@ a:hover, a:focus {
 	padding-left: 4px;
 	padding-right: 4px;
 	overflow-x: auto;
-	white-space: nowrap;
+	/*white-space: nowrap;*/
 }
 
 #sched-col-headers {
@@ -143,6 +143,7 @@ a:hover, a:focus {
 	color: white;
 	font-size: 9pt;
 	text-align: center;
+	word-wrap: break-word;
 }
 
 .time-block-active {
@@ -173,22 +174,26 @@ a:hover, a:focus {
 	background-color: orange;
 	height: 50px;
 	width: 40px;
+	word-wrap: break-word;
 }
 
 #toolbox .eighty-min-blk {
 	background-color: orange;
 	height: 80px;
 	width: 40px;
+	word-wrap: break-word;
 }
 
 .sched-day-column .fifty-min-blk {
 	height: 50px;
 	width: 40px;
+	word-wrap: break-word;
 }
 
 .sched-day-column .eighty-min-blk {
 	height: 80px;
 	width: 40px;
+	word-wrap: break-word;
 }
 
 .5-min-row {

@@ -1,4 +1,4 @@
-<div class="modal" id="login-modal">
+<div class="modal fade" id="login-modal">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h2>Login to Kairos</h2>

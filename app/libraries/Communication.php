@@ -38,8 +38,8 @@ class Communication
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)
     {
-        $host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
-        //$host = 'localhost:8080/api/' . $mode;
+        //$host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
+        $host = 'localhost:8080/api/' . $mode;
 
 		//will need to set up
 		$curl = curl_init($host);
@@ -82,16 +82,23 @@ class Communication
 
             //create the possible start times as a hard constraint
             $possibleStart = [];
+            $startTime = [];
+            $starttmArray = [];
+
+            $possibleDays = "";
             
             foreach (explode('|', $timeblock->days) as $day)
             {
-                $startTime = (Communication::convertIntToStringDay($day) . $timeblock->starttm);
-                $possibleStart[] = $startTime; // M1200 should look like this caps important
-                break;//****WILL BE REMOVED****
+                $possibleDays .= Communication::convertIntToStringDay($day);
             }
+            
+            $starttmArray[] = $timeblock->starttm;
+            $startTime[$possibleDays] = $starttmArray;
 
+            $possibleStart = $startTime; // [[M, W], [1200]] should look like this caps important
             $temp->pStartTm = $possibleStart;
 
+            //start moving on to the spaces
 
     		$temp->space = $event->room_id;
     		$temp->max_participants = $event->room->capacity;

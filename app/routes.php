@@ -79,6 +79,21 @@ Route::group(array('before'=> 'auth'), function()
 		'uses'	=>	'ScheduleController@create_schedule'
 	));
 
+	Route::get('/import-schedule', array(
+		'as' => 'import-schedule',
+		'uses' => 'ScheduleController@import_schedule'
+	));
+
+	Route::post('/import-schedule', array(
+		'as' => 'import-post',
+		'uses' => 'ScheduleController@import_post'
+	));
+
+	Route::post('/branch-schedule', array(
+		'as' => 'branch-schedule',
+		'uses' => 'ScheduleController@branch_schedule' 
+	));
+
 	Route::get('/data-entry1/{sched_id}', array(
 		'as'	=>	'data-entry1',
 		'uses'	=>	'ScheduleController@data_entry1'

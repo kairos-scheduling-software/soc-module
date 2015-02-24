@@ -20,6 +20,16 @@ class Schedule extends Eloquent
 		return $this->hasMany('Room');
 	}
 
+	public function tickets()
+	{
+		return DB::table('events')
+			->join('tickets', 'events.id', '=', 'tickets.event_id')
+			->select('events.id', 'events.name', 'tickets.message')
+			->where('events.schedule_id', '=', $this->id)
+			->orderBy('events.name')
+			->get();
+	}
+
 	public function to_json()
 	{
 		$events = $this->events;

@@ -164,4 +164,20 @@ Route::group(array('before'=> 'auth'), function()
 		'as'	=>	'e-remove-class',
 		'uses'	=>	'ScheduleController@e_remove_class'
 	));
+
+	//ticket manager routes
+	Route::get('/tickets/{schedule_id}', array(
+		'as'	=> 'ticket-manager',
+		'uses' 	=> 'TicketController@load_ticket_manager'
+	));
+
+	Route::post('/tickets/pullschedule/{schedule_id}', array(
+		'as' 	=> 'ticket-pull-schedule',
+		'uses'	=> 'TicketController@load_schedule'
+	));
+
+	Route::post('/tickets/add-ticket', array(
+		'as' 	=> 'ticket-add',
+		'uses'	=> 'TicketController@add_ticket'
+	));
 });

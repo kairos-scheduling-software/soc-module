@@ -20,4 +20,9 @@ class Event extends \Eloquent
 	{
 		return $this->belongsTo('Room');
 	}
+
+	public function tickets()
+	{
+		return $this->hasMany('Ticket');
+	}
 }

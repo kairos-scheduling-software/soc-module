@@ -21,11 +21,19 @@ class TicketController extends BaseController
 		]);
 	}
 
-	public function resolve($ticket)
+	public function resolve()
 	{
-		$resolve = Ticket::find($ticket);
+		$ticket_id  = Input::get('ticket_id');
+		$ticket = Ticket::find($ticket_id);
 
-		if(!$resolve)
+		if(!$ticket)
+		{
+			return Response::json(['error' => 'Could not resolve the ticket at this time'], 500);
+		}
+
+		$ticket->resolve = 1;
+
+		if(!$ticket->save())
 		{
 			return Response::json(['error' => 'Could not resolve the ticket at this time'], 500);
 		}
@@ -33,9 +41,28 @@ class TicketController extends BaseController
 		return Response::json(['success' => 'Ticket resolve!'], 200);
 	}
 
-	public function resolve_all_for_event($event_id)
+	public function resolve_all_for_event()
 	{
+		$event_id = Input::get('event_id');
+		$event = models\Event::find($event_id);
 
+		if(!$event)
+		{
+			return Response::json(['error' => $event], 500);
+		}
+
+		$tickets_to_resolve = $event->tickets;
+
+		foreach ($tickets_to_resolve as $ticket) 
+		{
+			$ticket->resolve = 1;
+			if(!$ticket->save())
+			{
+				return Response::json(['error' => 'Could not resolve all tickets'], 500);
+			}
+		}
+
+		return Response::json(['success' => 'All Tickets resolved!'], 200);
 	}
 
 	public function load_schedule($schedule_id)
@@ -56,16 +83,18 @@ class TicketController extends BaseController
 		$event_id = Input::get('event_id');
 		$message = Input::get('message');
 
-		$event = Event::find($event_id);
+		$event = models\Event::find($event_id);
 
 		if(!$event)
 		{
 			return Response::json(['error' => 'Could not find the class requested'], 500);
 		}
 
-		$ticket = Ticket::create(array(
+		$ticket = Ticket::firstOrCreate(array(
 			'event_id' => $event->id,
-			'message' => $message
+			'message'  => $message,
+			'resolve'  => 0,
+			'user'	   => Auth::user()->id ? Auth::user()->id : -1
 		));
 
 		if(!$ticket)

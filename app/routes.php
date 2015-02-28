@@ -180,4 +180,14 @@ Route::group(array('before'=> 'auth'), function()
 		'as' 	=> 'ticket-add',
 		'uses'	=> 'TicketController@add_ticket'
 	));
+
+	Route::post('/tickets/resolve-all', array(
+		'as'	=> 'ticket-resolve-all',
+		'uses'	=> 'TicketController@resolve_all_for_event'
+	));
+
+	Route::post('/tickets/resolve', array(
+		'as'	=> 'ticket-resolve',
+		'uses'	=> 'TicketController@resolve'
+	));
 });

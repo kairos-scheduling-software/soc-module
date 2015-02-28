@@ -36,13 +36,7 @@
 	<div id='ticketsTable'>
 	</div>
 </div>
-	
 
-
-<script>
-	$( document ).ready(function() 
-	{
-		createTable({{ $tickets }});
-	});
-</script>
+<div id="resolve_all" class="hide" data-url="{{URL::route('ticket-resolve-all')}}"></div>
+<div id="resolve" class="hide" data-url="{{URL::route('ticket-resolve')}}"></div>
 @stop

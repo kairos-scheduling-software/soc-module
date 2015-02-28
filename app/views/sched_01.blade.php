@@ -36,48 +36,22 @@
 	            </div>
 	            <div class="popover-content">
 	                <div class="container-fluid">
-	                    <form role="form" class="form-horizontal">
+	                    <form action="{{URL::route('ticket-add')}}" role="form" class="form-horizontal" id="log_ticket">
 	                        <div class="row">
 	                            <b>Day/Time:</b> <span class="pull-right" id='po-dtm'></span>
 	                            <br/>
 	                            <b>Room:</b> <span class="pull-right" id='po-room'></span>
 	                        </div>
 	                        <br/>
-	                        <div class="row">
-	                            <label for="hConst">Hard Constraints</label>
-	                            <select id="hConst" multiple class="form-control"></select>
-	                        </div>
-	                        <br/>
-	                        <div class="row">
-	                            <label for="sConst">Soft Constraints</label>
-	                            <select id="sConst" multiple class="form-control"></select>
-	                        </div>
-	                        <br/>
-	                        <div class="row">
-	                            <label>Add Constraint(s)</label><br/>
-	                            <div class="col-md-6">
-	                                <div class="form-group">
-	                                    <select class="form-control" id="addConst">
-	                                        <option>Avoid Time Conflict</option>
-	                                    </select>
-	                                </div>
-	                            </div>
-	                            <div class="col-md-4">
-	                                <div class="form-group">
-	                                    <select class="form-control" id="addClass"></select>
-	                                </div> 
-	                            </div>
-	                            <div class="col-md-1 pull-right">
-	                                <div class="form-group">
-	                                    <button class="btn btn-default" id="po-add" type="button">+</button>
-	                                </div> 
-	                            </div>
-	                            <div class="col-md-12">
-	                                <div class="form-group">
-	                                    <label><input type="checkbox" id="hsCb">Hard Constraint</label>
-	                                </div>
-	                            </div>
-	                            <button id='po-d3-ok' type="button" class="btn btn-default" data-container="body">OK</button>
+	                        <div>
+	                        	<input id="event_id" class="hide" value="555"></input>
+	                        	<div>
+	                        		Message: 
+	                        		<textarea id="message" class="messageBox" value=""></textarea>
+	                        		<button id="submit" name="submit" type="submit" class="btn btn-default">
+	                        			Submit Ticket
+	                        		</button>
+	                        	</div>
 	                        </div>
 	                    </form>
 	                </div>

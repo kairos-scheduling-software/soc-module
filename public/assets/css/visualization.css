@@ -72,3 +72,9 @@
 .popover {
     max-width: 400px;
 }
+
+.messageBox {
+    width: 350px;
+    height: 300px;
+    resize: none;
+}

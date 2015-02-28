@@ -1,3 +1,6 @@
+var event_counts = {};
+var hiddenRows = 0;
+
 function createTable(tickets)
 {
 	var dynamic = '';
@@ -13,39 +16,36 @@ function createTable(tickets)
 		return;
 	}
 
-	for(i = 0; i < tickets.length; i++)
+	for(i = 0; i <= tickets.length; i++)
 	{
-		if(i != 0 && prevName != tickets[i]['name'])
+		isSameElement = (i == tickets.length ? true : prevName != tickets[i]['name']);
+		if(i != 0 && isSameElement)
 		{
-			dynamic = dynamic + '<div class=\'ticket-list-row\' onclick="toggleHidden(\'hidden_' + hiddenRows + '\');">'
-					+ '<div class=\'ticket-event\'>' + prevName
-					+ '</div><div class=\'ticket-event\'>' + count + '</div>'
+			dynamic = dynamic + '<div id="row_' + hiddenRows + '" class="ticket-list-row" onclick="toggleHidden(\'hidden_' + hiddenRows + '\');">'
+					+ '<div class="ticket-event">' + prevName
+					+ '</div><div id="ticketCount_' + hiddenRows + '" class="ticket-event">' + count + '</div>'
 					+ '<div class=\'ticket-event\'>'
-					+ '<input type="button" onclick="event.cancelBubble=true;alert(\'input\');" value=\'resolve all\'/>'
+					+ '<input type="button" onclick="event.cancelBubble=true;resolveAll(this, \'' + hiddenRows + '\' ,  \'' + tickets[i - 1]['id'] + '\');" value=\'resolve all\'/>'
 					+ '</div></div>'
 					+ hiddenBuilder + '</div>';
 
+			event_counts[hiddenRows] = count;
 			hiddenRows++;
 			hiddenBuilder = '<div class="ticket-list-hidden-row hidden" id="hidden_' + hiddenRows + '">';
 			count = 0;
+
+			if(i == tickets.length)
+				break;
 		}
 
-		hiddenBuilder = hiddenBuilder + '<div class="ticket-message-row">' + tickets[i]['message'] + '</div>' 
+		hiddenBuilder = hiddenBuilder + '<div><div class="ticket-message-row">' + tickets[i]['message'] + '</div>' 
 						+ '<div class="ticket-resolve-row">' 
-						+ '<input type="button" onclick="event.cancelBubble=true;alert(\'input\');" value="resolve ticket"/>' 
-						+ '</div>';
+						+ '<input type="button" onclick="event.cancelBubble=true;resolve(this, \'' + hiddenRows + '\' , \''+ tickets[i]['ticket_id'] +'\');" value="resolve ticket"/>' 
+						+ '</div></div>';
 
 		count++;
 		prevName = tickets[i]['name'];
 	}
-
-	dynamic = dynamic + '<div class=\'ticket-list-row\' onclick="toggleHidden(\'hidden_' + hiddenRows + '\');">'
-					+ '<div class=\'ticket-event\'>' + prevName
-					+ '</div><div class=\'ticket-event\'>' + count + '</div>'
-					+ '<div class=\'ticket-event\'>'
-					+ '<input type="button" onclick="event.cancelBubble=true;alert(\'input\');" value=\'resolve all\'></input>'
-					+ '</div></div>'
-					+ hiddenBuilder + '</div>';
 
 	$('#ticketsTable').append(dynamic);
 }
@@ -76,12 +76,64 @@ function requestSchedule()
 	});
 }
 
-function resolve(ticket)
+function resolve(element, rows ,ticket_id)
 {
+	var url = $('#resolve').attr('data-url');
 
+	$.ajax({
+		url:		url,
+		type: 		"POST",
+		data: { ticket_id: ticket_id },  
+		success: 	function(data, textStatus, jqXHR) 
+		{
+			event_counts[rows] -= 1;
+			$(element).parent().parent().remove();
+			$("#ticketCount_" + rows).html(event_counts[rows]);
+
+
+			if(event_counts[rows] == 0)
+			{
+				hiddenRows--;
+				$('#row_' + rows).remove();
+
+				if(hiddenRows == -1)
+				{
+					$('#ticketsTable').html("<h2>There are no outstanding tickets for this schedule.</h2>");
+				}
+			}
+			
+		},
+		error: 		function(jqXHR, textStatus, errorThrown) 
+		{
+			alert(errorThrown);
+		}
+	});
 }
 
-function resolveAll(event)
+function resolveAll(element, rows , event_id)
 {
+	var url = $('#resolve_all').attr('data-url');
 
+	$.ajax({
+		url:		url,
+		type: 		"POST",
+		data: { event_id: event_id },  
+		success: 	function(data, textStatus, jqXHR) 
+		{
+			event_counts[rows] = 0;
+			$(element).parent().parent().remove();
+			$("#hidden_" + rows).remove();
+			hiddenRows--;
+
+			if(hiddenRows == -1)
+			{
+				$('#ticketsTable').append("<h2>There are no outstanding tickets for this schedule.</h2>");
+			}
+			
+		},
+		error: 		function(jqXHR, textStatus, errorThrown) 
+		{
+			alert(errorThrown);
+		}
+	});
 }

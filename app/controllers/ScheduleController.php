@@ -340,7 +340,7 @@ class ScheduleController extends BaseController {
 			array(
 				'name' => $scheduleName,
 				'last_edited_by' => $user->id,
-				'description' => "Just another test schedule"
+				'description' => ""
 			));
 
 			$user->schedules()->attach($schedule->id);

@@ -19,19 +19,10 @@ class Communication
         //do error checking
         $scheduleResults = json_decode($result);
 
-        if(is_object($scheduleResults) && $scheduleResults->Error !== null)
+        if(property_exists($scheduleResults, 'Error'))
         {
             throw new Exception('ERROR: ' . $scheduleResults->Error);
         }
-
-        foreach ($scheduleResults as $value) 
-        {
-            if($value->wasFailure)
-            {
-                throw new Exception("The schedule is in conflict");
-            }
-        }
-
 
         return json_encode($scheduleResults);
     }

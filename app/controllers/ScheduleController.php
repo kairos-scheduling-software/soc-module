@@ -310,7 +310,7 @@ class ScheduleController extends BaseController {
 	{
 		ini_set('auto_detect_line_endings', true);
 
-		$scheduleName = Input::get('ScheduleName');
+		$scheduleName = Input::get('ScheduleName-text');
 		$user = Auth::user();
 		$inUse = false;
 
@@ -333,8 +333,7 @@ class ScheduleController extends BaseController {
 
   		if($validator->passes())
   		{
-			//Start parsing the file
-			$file = fopen($importFile, "r");
+			
 
 			$schedule = Schedule::create(
 			array(
@@ -345,86 +344,7 @@ class ScheduleController extends BaseController {
 
 			$user->schedules()->attach($schedule->id);
 			
-			$column_headers = array();
-			$row_count = 0;
-			while (!feof($file)) 
-			{
-				$row = fgetcsv($file, 1000);
-				
-  				if ($row_count==0)
-  				{
-    				$column_headers = $row;
-    				$row_count += 1;
-    				continue;
-  				}
-
-  				//if the row doesn't have enough columns skip it
-  				//eventually use this as part of the % bad data
-				if(count($row) < 7)
-				{
-					continue;
-				}
-
-  				//check if the data is in the correct format using regex and other such methods
-
-  				$room = Room::firstOrCreate(
-  				array(
-  					'name' => $row[0],
-  					'schedule_id' => $schedule->id,
-  					'capacity' => $row[1]
-  				));
-
-  				$professor = Professor::firstOrCreate(
-  				array(
-  					'name' => $row[2]
-  				));
-
-  				
-  				$days = '';
-  				$time = '';
-
-  				foreach (explode('|', $row[5]) as $value) 
-  				{
-  					if(strlen($days) > 0)
-  					{
-  						$days .= '|';
-  					}
-
-  					$days .= DataConvertUtils::convertStringToIntDay(substr($value, 0, 1));
-  					$time = substr($value, 1);
-  				}
-
-  				if(strlen($days) > 0 && strlen($time) == 4)
-  				{
-  					$timeblock = Etime::firstOrCreate(
-                	array(
-                    	'starttm' => $time,
-                    	'length' => $row[6],
-                    	'days' => $days
-            		));
-
-            		if($timeblock->standard_block == null)
-            		{
-                		$timeblock->standard_block = 0;
-                		$timeblock->save();
-            		}
-            	}
-
-            	$event = models\Event::create(
-                array(
-                    'name' => $row[3],
-                    'professor' => $professor->id,
-                    'schedule_id' => $schedule->id,
-                    'room_id' => $room->id,
-                    'class_type' => '',
-                    'title' => $row[4],
-                    'etime_id' => $timeblock ? $timeblock->id : 1
-                ));
-
-                $row_count += 1; 
-  			}
-
-			fclose($file);
+			DataConvertUtils::importFullSchedule($schedule, $importFile);
 
 			return Redirect::route('dashboard');
   		}
@@ -441,7 +361,7 @@ class ScheduleController extends BaseController {
 
 		$scheduleToCopy = Schedule::find($idToCopy);
 
-		if($scheduleToCopy === NULL)
+		if(!$scheduleToCopy)
 		{
 			return Resonse::json(['error' => 'could not find the schedule to copy'], 500);
 		}
@@ -508,7 +428,7 @@ class ScheduleController extends BaseController {
             	}
 			}
 
-			return URL::route('dashboard');
+			return Response::json(['sucess' => 'schedule copy complete'], 200);
 		}
 		else
 			return Response::json(['error' => 'Could not create schedule at this time'], 500);

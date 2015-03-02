@@ -3,11 +3,13 @@ var hiddenRows = 0;
 
 function createTable(tickets)
 {
+	event_counts = {}
+	hiddenRows = 0
+
 	var dynamic = '';
 	var prevName = '';
 	var count = 0;
 
-	var hiddenRows = 0;
 	var hiddenBuilder = '<div class="ticket-list-hidden-row hidden" id="hidden_' + hiddenRows + '">';
 
 	if(tickets.length == 0)
@@ -21,11 +23,11 @@ function createTable(tickets)
 		isSameElement = (i == tickets.length ? true : prevName != tickets[i]['name']);
 		if(i != 0 && isSameElement)
 		{
-			dynamic = dynamic + '<div id="row_' + hiddenRows + '" class="ticket-list-row" onclick="toggleHidden(\'hidden_' + hiddenRows + '\');">'
+			dynamic = dynamic + '<div id="row_' + hiddenRows + '" class="ticket-list-row" onclick="toggleHidden(\'' + hiddenRows + '\');">'
 					+ '<div class="ticket-event">' + prevName
 					+ '</div><div id="ticketCount_' + hiddenRows + '" class="ticket-event">' + count + '</div>'
-					+ '<div class=\'ticket-event\'>'
-					+ '<input type="button" onclick="event.cancelBubble=true;resolveAll(this, \'' + hiddenRows + '\' ,  \'' + tickets[i - 1]['id'] + '\');" value=\'resolve all\'/>'
+					+ '<div class="ticket-event resolve-button-element">'
+					+ '<i class="fa fa-check" onclick="event.cancelBubble=true;resolveAll(this, \'' + hiddenRows + '\' ,  \'' + tickets[i - 1]['id'] + '\');" value=\'resolve all\'/>'
 					+ '</div></div>'
 					+ hiddenBuilder + '</div>';
 
@@ -38,9 +40,16 @@ function createTable(tickets)
 				break;
 		}
 
-		hiddenBuilder = hiddenBuilder + '<div><div class="ticket-message-row">' + tickets[i]['message'] + '</div>' 
-						+ '<div class="ticket-resolve-row">' 
-						+ '<input type="button" onclick="event.cancelBubble=true;resolve(this, \'' + hiddenRows + '\' , \''+ tickets[i]['ticket_id'] +'\');" value="resolve ticket"/>' 
+		var message = tickets[i]['message'];
+		if(message.length >= 50)
+		{
+			message = message.substring(0, 49) + "...";
+
+		}
+
+		hiddenBuilder = hiddenBuilder + '<div class="container-row-hidden"><div class="ticket-message-row">' + message + '</div>' 
+						+ '<div class="ticket-resolve-row resolve-button-element">' 
+						+ '<i class="fa fa-check" onclick="event.cancelBubble=true;resolve(this, \'' + hiddenRows + '\' , \''+ tickets[i]['ticket_id'] +'\');" value="resolve ticket"/>' 
 						+ '</div></div>';
 
 		count++;
@@ -50,9 +59,10 @@ function createTable(tickets)
 	$('#ticketsTable').append(dynamic);
 }
 
-function toggleHidden(rowToToggle)
+function toggleHidden(row)
 {
-	$('#' + rowToToggle).toggleClass('hidden');
+	$('#hidden_' + row).toggleClass('hidden');
+	$('#row_' + row).toggleClass('highlight');
 }
 
 function requestSchedule()

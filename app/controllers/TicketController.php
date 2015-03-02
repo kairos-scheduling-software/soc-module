@@ -83,6 +83,11 @@ class TicketController extends BaseController
 		$event_id = Input::get('event_id');
 		$message = Input::get('message');
 
+		if(strlen($message) < 5)
+		{
+			return Response::json(['error' => 'message must be at least 5 characters'], 500);
+		}
+
 		$event = models\Event::find($event_id);
 
 		if(!$event)

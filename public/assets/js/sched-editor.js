@@ -393,10 +393,10 @@ function refresh_scheduled_class_draggables()
     	revert: 'invalid'
 	});
 
-	$('body').on('click', '#new-class-btn', function(e) {
+	$('body').on('submit', '#new-class-form', function(e) {
 		e.preventDefault();
-		var group_id = $(this).attr('data-group');
-		var form = $('#new-class-form');
+		var group_id = $('#new-class-btn').attr('data-group');
+		var form = $(this);
 		var class_name = $('input[name="class_name"').val();
 
 		$("div[data-group=" + group_id + "]").text(class_name);
@@ -436,8 +436,8 @@ function get_popover_content(group_id)
 	html += "<small><b>Room:</b></small><br>";
 	html += "<input type='text' class='form-control' name='room_name' placeholder='Room'>";
 	html += "<small><b>Professor:</b></small><br>";
-	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'></div>";
-	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form>";
+	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'>";
+	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form></div>";
 
 	return html;
 }

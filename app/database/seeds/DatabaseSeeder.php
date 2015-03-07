@@ -24,6 +24,7 @@ class TableSeeder extends Seeder
 	
 	public function run()
 	{
+        DB::table('tickets')->delete();
 		DB::table('users')->delete();
 		$user = User::create(
 			array(

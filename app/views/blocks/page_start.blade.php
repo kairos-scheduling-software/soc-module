@@ -76,6 +76,19 @@
         });
         </script>
     @endif
+    @if($page_name == 'Ticket Manager')
+        <!--Ticket manger script-->
+        <script src="{{URL::asset('assets/js/ticket-manager.js')}}"></script>
+        <script>
+            $(function() 
+            {
+                createTable({{ $tickets }});
+            });
+        </script>
+
+        <!--Ticket manager css-->
+        <link href="{{URL::asset('assets/css/ticket-manager.css')}}" rel="stylesheet">
+    @endif
     
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>

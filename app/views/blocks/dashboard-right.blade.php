@@ -43,5 +43,5 @@
 </div>
 <hr>
 <div class="sched-admin-section">
-	<h3>{{ FA::icon('flag') }}&nbsp;Proposed Changes</h3>
+	<h3>{{ FA::icon('flag') }}&nbsp;<a href="{{URL::route('ticket-manager', $sched->id)}}">Proposed Changes</a></h3>
 </div>

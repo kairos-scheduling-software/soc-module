@@ -3,7 +3,7 @@
 class Professor extends Eloquent 
 {
 	protected $table = 'professors';
-	protected $fillable = array('name');
+	protected $fillable = array('name', 'uid');
 
 	public function events()
 	{

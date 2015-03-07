@@ -167,6 +167,13 @@ class TableSeeder extends Seeder
             Etime::create(array(
                 'starttm' => $starttm, 
                 'length' =>50, 
+                'days' => '1|3', 
+                'standard_block' => 1
+            ));
+
+            Etime::create(array(
+                'starttm' => $starttm, 
+                'length' =>50, 
                 'days' => '1', 
                 'standard_block' => 1
             ));

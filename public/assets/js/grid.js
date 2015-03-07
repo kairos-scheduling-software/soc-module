@@ -108,6 +108,7 @@ function load_grid(data) {
             val['x'] = (((val.day * dayBoxes) + val['col']) * boxWidth) - (daysSkip * boxWidth * dayBoxes);
             val['y'] = ((timeToNumber(val.starttm) - firstTimeOfDay) * boxHeight);
             val['height'] = (minutesToNumber(val.length) * boxHeight);
+            val['id'] = val.id;
 
             if (val.day == 0) {
                 val['tipDir'] = 'w';
@@ -309,6 +310,8 @@ function load_grid(data) {
                     $('#po-d3-title').html(d.title);
                     $('#po-room').html(d.room);
                     $('#po-dtm').html(days[d.name] + ", " + makeTimePretty(d.starttm) + ", " + d.length + " min");
+                    $('#message').val("");
+                    $('#event_id').val(d.id);
 
                     $('#po-d3').show();
 
@@ -318,15 +321,6 @@ function load_grid(data) {
 
                     // Put arrow in correct spot
                     $('#po-d3-arrow').css('top', (d.height / 2) + yOffset + 'px');
-
-                    // Clear constraints
-                    $('#hConst').html('');
-                    $('#sConst').html('');
-
-                    // Re-populate
-                    $.each(constraints[selectedName], function (i, val) {
-                        $('#' + (val.constType == 'hard' ? "hConst" : "sConst")).append('<option data-value="' + (i - 1) + '">' + val.const + " : " + val.constVal + '</option>');
-                    });
                 });
 //    });
 
@@ -414,4 +408,29 @@ function load_grid(data) {
         // data-value gives us the index of the item to be removed
         $('#' + (type == 'hard' ? "hConst" : "sConst")).append('<option data-value="' + (i - 1) + '">' + addConst + " : " + addClass + '</option>');
     });
+
+     //set up the ticket submit button
+     $('#log_ticket').submit(function(e) {
+        e.preventDefault();
+            var form = $(this);
+            var postData = {event_id: $('#event_id').val(), message: $('#message').val() };
+            var url = form.attr("action");
+
+            $.ajax({
+                url:        url,
+                type:       "POST",
+                data:       postData,
+                success:    function(data, textStatus, jqXHR) 
+                {
+                    $('#po-d3').hide();
+                },
+                error:      function(jqXHR, textStatus, errorThrown) {
+                    var message = $.parseJSON(jqXHR.responseText);
+                    alert(message.error);
+                    // TODO:  bootstrap error message
+                }
+            });
+
+            return false;
+        });
 }

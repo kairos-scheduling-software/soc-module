@@ -23,6 +23,8 @@ $(function(){
 		}, 500);		
 	});
 
+	load_schedule();
+
 	$('.panel-collapse').on('show.bs.collapse', function() {
 		$(this).closest('div.panel').find('span.accordion-open').show();
 		$(this).closest('div.panel').find('span.accordion-closed').hide();
@@ -232,6 +234,7 @@ function parse_days(json_days)
  */
 function get_vertical_offset(time_string)
 {
+	time_string = "" + time_string;
 	var hr_str = time_string.substring(0,2);
 	var min_str = time_string.substring(2);
 	var hr = parseInt(hr_str);
@@ -254,11 +257,13 @@ function get_horizontal_offset(vertical, length, day)
 {
 	var col_index = day + "1";
 	var col_num = 1;
+	var update = [];
 
 	for(var i = vertical; i < vertical + (length/5); i++)
 	{
 		if (day_columns[col_index][i] == "busy")
 		{
+			update = [];
 			console.log("Location " + col_index + "[" + i + "] is in use.");
 			col_num++;
 			col_index = day + "" + col_num;
@@ -266,7 +271,11 @@ function get_horizontal_offset(vertical, length, day)
 			if (col_num > 6)
 				return -1;
 		}
+		else
+			update.push(i);
 	}
+
+	update_column_matrix(col_index, update, "busy");
 
 	//console.log("Col Num: " + col_num);
 	return col_num - 1;
@@ -442,28 +451,56 @@ function get_popover_content(group_id)
 	return html;
 }
 
-function load_schedule(json_data)
+
+function load_schedule()
 {
-	var day_map = [];
-	day_map.push("mon");
-	day_map.push("tue");
-	day_map.push("wed");
-	day_map.push("thu");
-	day_map.push("fri");
+	// Move the staged classes to their appropriate place in the grid
+	$('#class-staging > div.scheduled-class').each(function() {
+		var course = $(this);
+		var days = parse_days("" + course.data('days'));
+		var start = course.data('start');
+		var col = course.data('col');
+		var length = course.data('length');
+		var offsets = compute_offsets(start, col, length);
 
-	$.each(json_data, function(i, course) {
+		//console.log("{left: " + offsets["left"] + ", top: " + offsets["top"]);
 
-		// If the class doesn't use a standard time block we'll ignore it for now
-		if(course["day"] == 0)
-			return true;
+		course.css({
+			left: offsets["left"],
+			top: offsets["top"]
+		});
 
-		// Get the 3 char day abbreviation
-		var ddd = (day_map[(course["day"] - 1)]);
-		var vertical = get_vertical_offset(course["starttm"]);
-		var horizontal = get_horizontal_offset(vertical, course["length"], ddd);
+		$(col).append(course);
+	});
+}
 
-		console.log("V: " + vertical + " H: " + horizontal);
+function compute_offsets(start, day, length)
+{
+	var left = $(day).offset()["left"];
+	var top = $(day).offset()["top"];
+	var vert = get_vertical_offset(start);
+	top += (vert * five_min_height);
+	var horiz = get_horizontal_offset(vert, length, day.substring(1,4));
 
+	//console.log("Horizontal: " + horiz);
+	
+	if (horiz == -1)
+	{
+		console.log("Horizontal failed");
+		return;
+	}
+	left += horiz * time_block_w;
+
+	return {
+		left: left + "px",
+		top: top + "px"
+	};
+}
+
+function update_column_matrix(col, indices, mode)
+{
+	$.each(indices, function(i, index) {
+		day_columns[col][index] = mode;
 	});
 }
 

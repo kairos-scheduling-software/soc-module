@@ -20,8 +20,8 @@
 ?>
 
 @foreach($days as $day)
-	<div class="{{ $block_class }} scheduled-class" data-col="{{ $day }}" 
-		 data-group="{{ $group_count . '-' . $etime->id }}" data-days="{{$etime->days}}">
+	<div class="{{ $block_class }} scheduled-class" data-col="{{ $day }}" data-days="{{$etime->days}}"
+		 data-group="{{ $group_count . '-' . $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
 		{{ $class->name }}
 	</div>
 @endforeach

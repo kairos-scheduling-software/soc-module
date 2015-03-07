@@ -487,7 +487,8 @@ function compute_offsets(start, day, length)
 	if (horiz == -1)
 	{
 		console.log("Horizontal failed");
-		return;
+		//return;
+		horiz = 7;
 	}
 	left += horiz * time_block_w;
 

@@ -230,6 +230,14 @@
 	<div class="sched-day-column" id="fri-col">
 	</div>
 </div>
+<div id="class-staging">
+	<?php $group_count = 1; ?>
+	@foreach($schedule->events as $class)
+		@include('editor/staged-class')
+		<?php $group_count++; ?>
+	@endforeach
+	<script>group_counter = {{ $group_count }};</script>
+</div>
 <div id="trash-container">
 	<div id="drop-trash">
 		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">

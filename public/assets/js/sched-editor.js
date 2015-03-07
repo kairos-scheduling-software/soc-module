@@ -225,6 +225,11 @@ function parse_days(json_days)
 	return days;
 }
 
+/**
+ * Returns the proper value for the CSS "top" property for a give time block
+ * 
+ * @param time_string: A start-time string of the form hhmm (e.g. 0805 means 8:05 AM)
+ */
 function get_vertical_offset(time_string)
 {
 	var hr_str = time_string.substring(0,2);
@@ -238,6 +243,13 @@ function get_vertical_offset(time_string)
 	return offset_factor;
 }
 
+/**
+ * Returns the correct column to append a given time-block to
+ *
+ * @param vertical: The previously computed vertical offset of this block (See 'get_vertical_offset()')
+ * @param length: The duration, in minutes, of this time block
+ * @param day: The 3 character day abbreviation (e.g. mon, tue, etc.)
+ */
 function get_horizontal_offset(vertical, length, day)
 {
 	var col_index = day + "1";
@@ -430,6 +442,31 @@ function get_popover_content(group_id)
 	return html;
 }
 
+function load_schedule(json_data)
+{
+	var day_map = [];
+	day_map.push("mon");
+	day_map.push("tue");
+	day_map.push("wed");
+	day_map.push("thu");
+	day_map.push("fri");
+
+	$.each(json_data, function(i, course) {
+
+		// If the class doesn't use a standard time block we'll ignore it for now
+		if(course["day"] == 0)
+			return true;
+
+		// Get the 3 char day abbreviation
+		var ddd = (day_map[(course["day"] - 1)]);
+		var vertical = get_vertical_offset(course["starttm"]);
+		var horizontal = get_horizontal_offset(vertical, course["length"], ddd);
+
+		console.log("V: " + vertical + " H: " + horizontal);
+
+	});
+}
+
 function initialize_column_matrix()
 {
 	day_columns["mon1"] = [];
@@ -523,6 +560,4 @@ function initialize_column_matrix()
 		day_columns["thu6"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri6"].push("empty");
-	
-	console.log(day_columns);
 }

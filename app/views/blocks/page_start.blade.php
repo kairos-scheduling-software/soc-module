@@ -71,6 +71,8 @@
         $(function() {
             time_blocks = {{ $time_blocks }};
             process_time_blocks(time_blocks);
+            // schedule_json = {{ $schedule->to_json() }};
+            // load_schedule(schedule_json);
         });
         </script>
     @endif

@@ -48,7 +48,7 @@ class ScheduleController extends BaseController {
 		if (!$schedule)
 			return Redirect::route('dashboard'); // TODO: redirect to 404
 
-		return View::make('sched-editor')->with([
+		return View::make('editor.sched-editor')->with([
 			'page_name'		=>	'Schedule Editor',
 			'schedule'		=>	$schedule,
 			'time_blocks'	=>	$time_blocks

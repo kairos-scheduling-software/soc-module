@@ -7,6 +7,7 @@ var group_counter = 1;
 var add_class_url;
 var remove_class_url;
 var sched_id;
+var col_counts = [];
 
 $(function(){
 
@@ -73,6 +74,17 @@ $(function(){
     		else if (dragged_block.hasClass('three-eighty'))
     			setup_dropzones('three-eighty', 'eighty-min-blk');
 
+    		/*
+    		var z = Math.max($('#sched-container').zIndex(),
+    						 $('.sched-day-column').zIndex(), 
+    						 $('.scheduled-class').zIndex(),
+    						 $('.time-block-active').zIndex());
+
+    		$('#drag-helper').zIndex($('#sched-container').zIndex() + 1);
+    		*/
+
+    		$('#sched-container').css('opacity', 0.5);
+
     		$('.drop-zone').droppable({
 		    	hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
@@ -84,10 +96,17 @@ $(function(){
 		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class');
 		    		$("div[data-group=" + group_id + "]").attr('data-content', get_popover_content(group_id));
 
-		    		// TODO show popover
+		    		// Show popover
+		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
 		    		$(this).popover({
 		    			trigger: "manual",
 		    			html: true
+		    		}).on('shown.bs.popover', function() {
+		    			if(parseInt($('.popover').css('top')) < 0)
+	    				{
+	    					$('.popover').css('top', 0);
+	    					$('.arrow').css('top', pos + 'px');
+	    				}
 		    		}).popover('show');
 
 		    		$("div[data-group=" + group_id + "]").html();
@@ -139,6 +158,7 @@ $(function(){
     	stop: function(event, ui)
     	{
     		$('.drop-zone').remove();
+    		$('#sched-container').css('opacity', 1);
     	},
     	revert: 'invalid'
     });    
@@ -256,6 +276,7 @@ function get_vertical_offset(time_string)
 function get_horizontal_offset(vertical, length, day)
 {
 	var col_index = day + "1";
+	var col_count = col_counts[day];
 	var col_num = 1;
 	var update = [];
 
@@ -264,12 +285,16 @@ function get_horizontal_offset(vertical, length, day)
 		if (day_columns[col_index][i] == "busy")
 		{
 			update = [];
-			console.log("Location " + col_index + "[" + i + "] is in use.");
+			//console.log("Location " + col_index + "[" + i + "] is in use.");
 			col_num++;
 			col_index = day + "" + col_num;
 			i = vertical;
-			if (col_num > 6)
-				return -1;
+
+			if (col_num > col_count)
+			{
+				add_matrix_col(day);
+				col_count = col_counts[day];
+			}
 		}
 		else
 			update.push(i);
@@ -336,8 +361,27 @@ function setup_dropzones(key, block_class)
 			html_block += "id='" + id + "'";
 
 			// Set offsets of the dropzone
-			var left = $(day).offset()["left"];
-			var top = $(day).offset()["top"];
+			var left = 0;//$(day).offset()["left"];
+			/*
+			switch(ddd)
+			{
+				case 'mon':
+					left = 5;
+					break;
+				case 'tue':
+					left = 10 + $('#mon-col').width();
+					break;
+				case 'wed':
+					left = 15 + $('#mon-col').width() + $('#tue-col').width();
+					break;
+				case 'thu':
+					left = 20 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width();
+					break;
+				case 'fri':
+					left = 25 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width() + $('#thu-col').width();
+					break;
+			}*/
+			var top = 0;//$(day).offset()["top"];
 			top += (block["offset"] * five_min_height);
 			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd);
 			
@@ -371,6 +415,7 @@ function setup_dropzones(key, block_class)
 function refresh_scheduled_class_draggables()
 {
 	$('.scheduled-class').draggable({
+		stack: '#sched-container',
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
@@ -476,8 +521,28 @@ function load_schedule()
 
 function compute_offsets(start, day, length)
 {
-	var left = $(day).offset()["left"];
-	var top = $(day).offset()["top"];
+	var left = 0;//$(day).offset()["left"];
+	/*
+	var ddd = day.substring(1, 4);
+	switch(ddd)
+	{
+		case 'mon':
+			left = 5;
+			break;
+		case 'tue':
+			left = 10 + $('#mon-col').width();
+			break;
+		case 'wed':
+			left = 15 + $('#mon-col').width() + $('#tue-col').width();
+			break;
+		case 'thu':
+			left = 20 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width();
+			break;
+		case 'fri':
+			left = 25 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width() + $('#thu-col').width();
+			break;
+	}*/
+	var top = 0;//$(day).offset()["top"];
 	var vert = get_vertical_offset(start);
 	top += (vert * five_min_height);
 	var horiz = get_horizontal_offset(vert, length, day.substring(1,4));
@@ -488,7 +553,7 @@ function compute_offsets(start, day, length)
 	{
 		console.log("Horizontal failed");
 		//return;
-		horiz = 7;
+		horiz = 6;
 	}
 	left += horiz * time_block_w;
 
@@ -503,6 +568,36 @@ function update_column_matrix(col, indices, mode)
 	$.each(indices, function(i, index) {
 		day_columns[col][index] = mode;
 	});
+}
+
+function add_matrix_col(day)
+{
+	var index = day + (col_counts[day] + 1);
+	day_columns[index] = [];
+
+	for (var j = 0; j < 144; j++)
+		day_columns[index].push("empty");
+
+	col_counts[day] = col_counts[day] + 1;
+
+	switch(day)
+	{
+		case 'mon':
+			$('#mon-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			break;
+		case 'tue':
+			$('#tue-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			break;
+		case 'wed':
+			$('#wed-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			break;
+		case 'thu':
+			$('#thu-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			break;
+		case 'fri':
+			$('#fri-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			break;
+	}
 }
 
 function initialize_column_matrix()
@@ -537,6 +632,12 @@ function initialize_column_matrix()
 	day_columns["wed6"] = [];
 	day_columns["thu6"] = [];
 	day_columns["fri6"] = [];
+
+	col_counts["mon"] = 6;
+	col_counts["tue"] = 6;
+	col_counts["wed"] = 6;
+	col_counts["thu"] = 6;
+	col_counts["fri"] = 6;
 
 	for (var j = 0; j < 144; j++)
 		day_columns["mon1"].push("empty");

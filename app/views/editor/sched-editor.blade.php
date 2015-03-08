@@ -2,6 +2,11 @@
 
 @section('left-column')
 <script src="{{ URL::asset('assets/js/jquery.panelslider.min.js') }}"></script>
+<style>
+	.drag-cursor {
+		cursor: url('{{ URL::asset("assets/images/drag-cursor-sm.png") }}'), auto;
+	}
+</style>
 <div id="toolbox">
 	<h1>{{ FA::icon('wrench') }}&nbsp;&nbsp;Toolbox</h1>
 	<h3>Classes:</h3>
@@ -209,7 +214,11 @@
 	$('#toggle-toolbox').panelslider({
 		onOpen: function() {
 			var z = Math.min($('#custom_navbar').zIndex(), $('page_footer').zIndex());
-			$('#left-side-bar').zIndex(z - 1);
+			$('#left-side-bar').zIndex(10);
+			//$('#left-side-bar').css('position', 'absolute');
+			//$('#main-column').zIndex(z-2);
+			$('#page_footer').zIndex(11);
+			$('#toggle-container').zIndex(11);
 			$('#toggle-toolbox').html('<i class="fa fa-chevron-left"></i>');
 		},
 		clickClose: false
@@ -286,7 +295,8 @@
 <div id="hidden-data" class="hide"
 	 data-addurl="{{ URL::route('e-add-class') }}"
 	 data-removeurl= "{{ URL::route('e-remove-class') }}"
-	 data-schedid="{{ $schedule->id }}">
+	 data-schedid="{{ $schedule->id }}"
+	 data-cursor="{{ URL::asset('assets/images/drag-cursor-sm.png') }}">
 </div>
 
 @stop

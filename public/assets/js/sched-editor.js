@@ -16,6 +16,7 @@ $(function(){
 	add_class_url = $('#hidden-data').attr('data-addurl');
 	remove_class_url = $('#hidden-data').attr('data-removeurl');
 	sched_id = $('#hidden-data').attr('data-schedid');
+	var cursor_img = $('#hidden-data').data('cursor');
 
 	resize_all();
 	$(window).resize(function(){
@@ -52,7 +53,8 @@ $(function(){
 	});
 
 	$('.draggable').draggable({
-		cursorAt: { bottom: 0, left: 20 },
+		cursorAt: { bottom: 25, left: 0 },
+		cursor: "url(" + cursor_img + "), auto",
       	helper: function( event ) 
       	{
         	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );

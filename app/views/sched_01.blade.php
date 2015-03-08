@@ -1,63 +1,56 @@
-@extends('layouts.holy-grail-2col')
-
-@section('left-column')
-
-<h2>{{ $schedule->name }}</h2>
-<div class="sched-view-controls">
-	<h3>View:</h3>
-	<select class="form-control view-select">
-		<option>Full Schedule</option>
-	</select>
-	<h3>Classes:</h3>
-	<div id="view-class-list">
-		@foreach($schedule->events as $event)
-			<div class="view-class-list-row">
-				<a href="#" class="event-view-link" data-name="{{ $event->name }}">{{ $event->name }}</a><br>
-			</div>
-			<hr>
-		@endforeach
-	</div>
-</div>
-@stop
+@extends('layouts.holy-grail-1col')
 
 @section('center-column')
-	<div id="vis-wrapper">
-		<h1>{{ $schedule->name }}</h1>
-		<div id="vis-container">
-		<div id="d3-vis">
-	        <div id='d3'></div>
+<div id="vis-wrapper">
+    <div id="vis-container">
 
-	        <!-- Reusable fake popover for all d3 elements -->
-	        <div id='po-d3' class="popover right">
-	            <div id='po-d3-arrow' class="arrow"></div>
-	            <div class="popover-title">
-	                <b><span id='po-d3-name'></span> - <span id='po-d3-title'></span></b>
-	                <button id='po-d3-close' type="button" class="close" aria-hidden="true">×</button>
-	            </div>
-	            <div class="popover-content">
-	                <div class="container-fluid">
-	                    <form action="{{URL::route('ticket-add')}}" role="form" class="form-horizontal" id="log_ticket">
-	                        <div class="row">
-	                            <b>Day/Time:</b> <span class="pull-right" id='po-dtm'></span>
-	                            <br/>
-	                            <b>Room:</b> <span class="pull-right" id='po-room'></span>
-	                        </div>
-	                        <br/>
-	                        <div>
-	                        	<input id="event_id" class="hide" value="555"></input>
-	                        	<div>
-	                        		Message: 
-	                        		<textarea id="message" class="messageBox" value=""></textarea>
-	                        		<button id="submit" name="submit" type="submit" class="btn btn-default">
-	                        			Submit Ticket
-	                        		</button>
-	                        	</div>
-	                        </div>
-	                    </form>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+        <div id="d3-vis">
+            <div id="left-nav">
+                <div class="title">Visualizations</div>
+                <ul class="list">
+                    <li class="list-item">
+                        <div class="item-content" data-href="#dashboard/1">
+                            <i class="glyphicon glyphicon-align-right gly-rotate-90"></i>
+                            <h3>Class Counts</h3>
+                            <p>Year/Semester</p>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="item-content" data-href="#dashboard/2">
+                            <i class="glyphicon glyphicon-fire"></i>
+                            <h3>Heat Maps</h3>
+                            <p>Year/Semester</p>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="item-content" data-href="#dashboard/3">
+                            <i class=" glyphicon glyphicon-align-center gly-rotate-90"></i>
+                            <h3>Schedule Explorer</h3>
+                            <p>Year/Semester</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="content"></div>
+        </div>
+
+        <div id='d3'></div>
+    </div>
+    <script src="assets/vis/js/bootstrap-multiselect.js" type="text/javascript"></script>
+    <script src="assets/vis/js/fastclick.js" type="text/javascript"></script>
+    <script src="assets/vis/js/d3.v3.min.js" type="text/javascript"></script>
+    <script src="assets/vis/js/d3-tip-0.6.6.js" type="text/javascript"></script>
+    <script src="assets/vis/js/xcharts.js"></script>
+    <script src="assets/vis/js/dimple.v2.1.2.min.js" type="text/javascript"></script>
+    <script src="assets/vis/data/class-data.js" type="text/javascript"></script>
+    <script src="assets/vis/data/data.js" type="text/javascript"></script>
+    <script src="assets/vis/data/summary.js" type="text/javascript"></script>
+    <script src="assets/vis/js/chroma.min.js" type="text/javascript"></script>
+    <script src="assets/vis/js/dashboard1.js" type="text/javascript"></script>
+    <script src="assets/vis/js/dashboard2.js" type="text/javascript"></script>
+    <script src="assets/vis/js/dashboard3.js" type="text/javascript"></script>
+    <script src="assets/vis/js/grid.js" type="text/javascript"></script>
+
 </div>
 @stop

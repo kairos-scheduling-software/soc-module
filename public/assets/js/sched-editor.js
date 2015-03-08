@@ -74,15 +74,6 @@ $(function(){
     		else if (dragged_block.hasClass('three-eighty'))
     			setup_dropzones('three-eighty', 'eighty-min-blk');
 
-    		/*
-    		var z = Math.max($('#sched-container').zIndex(),
-    						 $('.sched-day-column').zIndex(), 
-    						 $('.scheduled-class').zIndex(),
-    						 $('.time-block-active').zIndex());
-
-    		$('#drag-helper').zIndex($('#sched-container').zIndex() + 1);
-    		*/
-
     		$('#sched-container').css('opacity', 0.5);
 
     		$('.drop-zone').droppable({
@@ -192,7 +183,7 @@ $(function(){
  * Dynamically resizes all elements on the page
  */
 function resize_all()
-{
+{/*
 	// Schedule container
 	var sched_container_w = $('#hg-center').width() - 50 - $('#time-labels').width();
 	var sched_container_h = $(window).height() 
@@ -226,7 +217,22 @@ function resize_all()
 	// Toolbox blocks
 	$('.fifty-min-blk').css('height', (10 * five_min_height));
 	$('.eighty-min-blk').css('height', (16 * five_min_height));
+	*/
 
+	var sched_height = $(window).height() 
+							- $('.top-buffer').outerHeight(true) 
+							- $('#sched-name').outerHeight(true) 
+							- $('#sched-col-headers').outerHeight(true)
+							- $('#trash-container').outerHeight(true)
+							- parseInt($('#page_footer').css('height'))
+							+ 20;
+
+	$('#time-labels').css('height', sched_height + 'px');
+	five_min_height = $('#inner-container').height() / 144;
+	time_block_w = $('.sched-day-column').width() / 7;
+	$('body').css('max-height', $(window).height() + 'px');
+
+	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
 }
 
 function parse_days(json_days)
@@ -292,6 +298,8 @@ function get_horizontal_offset(vertical, length, day)
 
 			if (col_num > col_count)
 			{
+				var w = $('#outer-container').width();
+				$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
 				add_matrix_col(day);
 				col_count = col_counts[day];
 			}
@@ -415,6 +423,7 @@ function setup_dropzones(key, block_class)
 function refresh_scheduled_class_draggables()
 {
 	$('.scheduled-class').draggable({
+		scroll: false,
 		stack: '#sched-container',
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
@@ -517,6 +526,8 @@ function load_schedule()
 
 		$(col).append(course);
 	});
+
+	refresh_scheduled_class_draggables();
 }
 
 function compute_offsets(start, day, length)
@@ -572,6 +583,8 @@ function update_column_matrix(col, indices, mode)
 
 function add_matrix_col(day)
 {
+	//var w = $('#outer-container').width();
+	//$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
 	var index = day + (col_counts[day] + 1);
 	day_columns[index] = [];
 

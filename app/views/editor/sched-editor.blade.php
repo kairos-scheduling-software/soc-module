@@ -1,7 +1,7 @@
-@extends('layouts.holy-grail-2col')
+@extends('layouts.2col-fixed')
 
 @section('left-column')
-
+<script src="{{ URL::asset('assets/js/jquery.panelslider.min.js') }}"></script>
 <div id="toolbox">
 	<h1>{{ FA::icon('wrench') }}&nbsp;&nbsp;Toolbox</h1>
 	<h3>Classes:</h3>
@@ -180,54 +180,94 @@
 
 @stop
 
-@section('center-column')
+@section('main-column')
+
+<div id="toggle-container">
+	<a id="toggle-toolbox" href="#left-side-bar">{{ FA::icon('chevron-right') }}</a>
+</div>
+
+<script>
+	var panel_is_open = false;
+	$('#toggle-toolbox').click(function(e) {
+		e.preventDefault();
+
+		if (panel_is_open)
+		{
+			$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+			$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
+			panel_is_open = false;
+		}
+		else
+		{
+			//$('#toggle-container').zIndex($('#left-side-bar').zIndex() - 1);
+			$('#toggle-container').animate({marginLeft: +350}, {duration: 200});
+			panel_is_open = true;
+		}
+		
+		return false;
+	});
+	$('#toggle-toolbox').panelslider({
+		onOpen: function() {
+			var z = Math.min($('#custom_navbar').zIndex(), $('page_footer').zIndex());
+			$('#left-side-bar').zIndex(z - 1);
+			$('#toggle-toolbox').html('<i class="fa fa-chevron-left"></i>');
+		},
+		clickClose: false
+	});
+
+</script>
 
 <h1 id="sched-name">{{ $schedule->name }}
 	<a href="#"><span>{{FA::icon('edit')}}</span></a>
 </h1>
 
-<div id="sched-col-headers">
-	<div class="sched-col-header" id="mon-col-header">
-		<h3>MONDAY</h3>
+<div id="outer-container">
+	<div id="sched-col-headers">
+		<div class="sched-col-header" id="empty-cell"></div>
+		<div class="sched-col-header" id="mon-col-header">
+			<h3>MONDAY</h3>
+		</div>
+		<div class="sched-col-header" id="tue-col-header">
+			<h3>TUESDAY</h3>
+		</div>
+		<div class="sched-col-header" id="wed-col-header">
+			<h3>WEDNESDAY</h3>
+		</div>
+		<div class="sched-col-header" id="thu-col-header">
+			<h3>THURSDAY</h3>
+		</div>
+		<div class="sched-col-header" id="fri-col-header">
+			<h3>FRIDAY</h3>
+		</div>
 	</div>
-	<div class="sched-col-header" id="tue-col-header">
-		<h3>TUESDAY</h3>
-	</div>
-	<div class="sched-col-header" id="wed-col-header">
-		<h3>WEDNESDAY</h3>
-	</div>
-	<div class="sched-col-header" id="thu-col-header">
-		<h3>THURSDAY</h3>
-	</div>
-	<div class="sched-col-header" id="fri-col-header">
-		<h3>FRIDAY</h3>
-	</div>
-</div>
-<div id="time-labels">
-	<p>8:00</p>
-	<p>9:00</p>
-	<p>10:00</p>
-	<p>11:00</p>
-	<p>12:00</p>
-	<p>1:00</p>
-	<p>2:00</p>
-	<p>3:00</p>
-	<p>4:00</p>
-	<p>5:00</p>
-	<p>6:00</p>
-	<p>7:00</p>
-	<p>8:00</P>
-</div>
-<div id="sched-container">
-	<div class="sched-day-column" id="mon-col">
-	</div>
-	<div class="sched-day-column" id="tue-col">
-	</div>
-	<div class="sched-day-column" id="wed-col">
-	</div>
-	<div class="sched-day-column" id="thu-col">
-	</div>
-	<div class="sched-day-column" id="fri-col">
+	<div id="inner-container">
+		<div id="time-labels">
+			<p>8:00</p>
+			<p>9:00</p>
+			<p>10:00</p>
+			<p>11:00</p>
+			<p>12:00</p>
+			<p>1:00</p>
+			<p>2:00</p>
+			<p>3:00</p>
+			<p>4:00</p>
+			<p>5:00</p>
+			<p>6:00</p>
+			<p>7:00</p>
+			<p>8:00</P>
+		</div>
+		{{--<div id="sched-container">--}}
+			<div class="sched-day-column" id="mon-col">
+			</div>
+			<div class="sched-day-column" id="tue-col">
+			</div>
+			<div class="sched-day-column" id="wed-col">
+			</div>
+			<div class="sched-day-column" id="thu-col">
+			</div>
+			<div class="sched-day-column" id="fri-col">
+			</div>
+		{{--</div>--}}
 	</div>
 </div>
 <div id="class-staging">

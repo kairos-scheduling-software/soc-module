@@ -1,3 +1,43 @@
+.top-buffer {
+	height: 70px;
+}
+
+#left-side-bar {
+	display: none;
+	float: left;
+	padding-left: 15px;
+	padding-right: 15px;
+	background-color: #808080;
+}
+
+#toggle-container {
+	background-color: #808080;
+	color: white;
+	border-top-right-radius: 15%;
+	border-bottom-right-radius: 15%;
+	position: absolute;
+	top: 200px;
+	left: -3px;
+	width: 60px;
+	text-align: right;
+	font-size: 20pt;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-right: 15px;
+	box-shadow: 2px 2px 3px #363636, 2px -2px 3px #363636;
+}
+
+#toggle-container a {
+	color: white;
+}
+
+#main-container {
+	display: inline-block;
+	float: left;
+	overflow-x: hidden;
+	margin-left: 50px;
+}
+
 h1 span {
 	font-size: 12pt;
 }
@@ -74,25 +114,37 @@ a:hover, a:focus {
 	font-size: 25px;
 }
 
-#hg-center {
-	text-align: center;
+#outer-container {
+	display: table;
+}
+
+#inner-container {
+	display: table-row;
+}
+
+#time-and-days {
+	display: table-row;
+}
+
+#empty-cell {
+	width: 70px;
 }
 
 #time-labels {
-	display: inline-block;
+	display: table-cell;
 	text-align: right;
-	margin-right: 10px;
-	height: 600px;
+	padding-right: 10px;
+	/* height: 600px; */
 }
 
 #time-labels p {
 	height: 8.1%;
-	margin: 0;
+	margin-top: -7px;
+	margin-bottom: 8px;
 }
 
 #sched-container {
 	/*border: 1px solid black;*/
-	display: inline-block;
 	border-top: 4px solid black;
 	height: 600px;
 	max-height: 600px;
@@ -104,27 +156,31 @@ a:hover, a:focus {
 	padding-left: 4px;
 	padding-right: 4px;
 	overflow-x: auto;
-	white-space: nowrap;
+	/*white-space: nowrap;*/
 }
 
 #sched-col-headers {
+	display: table-row;
 	padding-left: 50px;
 	overflow-x: auto;
 }
 
 .sched-col-header {
-	display: inline-block;
+	display: table-cell;
 	width: 275px;
 	margin: 0;
+	text-align: center;
 }
 
 .sched-day-column {
 	position: relative;
-	display: inline-block;
+	display: table-cell;/*inline-block;*/
 	width: 273px;
 	margin: 0;
+	padding-right: 1.5px;
 	background-color: white;
 	height: 100%;
+	border: 1px solid black;
 }
 
 .test-grid {
@@ -149,13 +205,13 @@ a:hover, a:focus {
 
 .time-block-active {
 	position: absolute;
-	background: rgba(0,0,0,0.6);
+	background: rgba(0,0,0,0.2);
 	border: 1px solid white;
 }
 
 .time-block-hover {
 	position: absolute;
-	background: rgba(0,110,0,0.8);
+	background: rgba(0,110,0,0.2);
 	border: 1px solid white;
 }
 
@@ -170,6 +226,10 @@ a:hover, a:focus {
 	font-size: 20pt;
 	text-shadow: 0px 0.5px 1px black;
 	opacity: 2;
+}
+
+#toolbox {
+	width: 320px;
 }
 
 #toolbox .fifty-min-blk {

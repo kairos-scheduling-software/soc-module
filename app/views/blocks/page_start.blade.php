@@ -66,6 +66,7 @@
         
         <!-- Editor script -->
         <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
+        
         <script src="{{ URL::asset('assets/js/sched-editor.js') }}"></script>
         <script>
         $(function() {

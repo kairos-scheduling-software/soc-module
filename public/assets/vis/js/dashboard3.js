@@ -229,6 +229,7 @@ var dashboard3 = (function () {
             val['x'] = (((val.day * dayBoxes) + val['col']) * boxWidth) - (daysSkip * boxWidth * dayBoxes);
             val['y'] = ((timeToNumber(val.starttm) - firstTimeOfDay) * boxHeight);
             val['height'] = (minutesToNumber(val.length) * boxHeight);
+            //val['id'] = val.id; // <-- this does nothing val['id'] and val.id are the same field in the same object
 
             if (val.day == 0) {
                 val['tipDir'] = 'w';
@@ -517,6 +518,8 @@ var dashboard3 = (function () {
                     $('#po-d3-title').html(d.title);
                     $('#po-room').html(d.room);
                     $('#po-dtm').html('[' + d.days + "], " + makeTimePretty(d.starttm) + ", " + d.length + " min");
+                    $('#message').val("");
+                    $('#event_id').val(d.id);
 
                     $('#po-d3').show();
 
@@ -583,6 +586,31 @@ var dashboard3 = (function () {
         // Click close button
         $('#po-d3-close').click(function (e) {
             $('#po-d3').hide();
+        });
+
+     //set up the ticket submit button
+     $('#log_ticket').submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var postData = {event_id: $('#event_id').val(), message: $('#message').val() };
+        var url = form.attr("action");
+
+        $.ajax({
+            url:        url,
+            type:       "POST",
+            data:       postData,
+            success:    function(data, textStatus, jqXHR)
+            {
+                $('#po-d3').hide();
+            },
+            error:      function(jqXHR, textStatus, errorThrown) {
+                var message = $.parseJSON(jqXHR.responseText);
+                alert(message.error);
+                // TODO:  bootstrap error message
+            }
+        });
+
+        return false;
         });
     }
 

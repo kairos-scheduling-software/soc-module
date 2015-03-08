@@ -263,3 +263,9 @@
 svg {
     position: relative !important;
 }
+
+.messageBox {
+    width: 350px;
+    height: 300px;
+    resize: none;
+}

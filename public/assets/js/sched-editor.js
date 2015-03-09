@@ -13,6 +13,33 @@ $(function(){
 
 	initialize_column_matrix();
 
+	$('body').on('submit', '#new-class-form', function(e) {
+		e.preventDefault();
+		var group_id = $('#new-class-btn').attr('data-group');
+		var form = $(this);
+		var class_name = $('input[name="class_name"').val();
+
+		$("div[data-group=" + group_id + "]").text(class_name);
+		$("div[data-group=" + group_id + "]").popover('destroy');
+
+		
+		var data = form.serializeArray();
+		var url = form.attr('action');
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		data,
+			success: 	function(data, textStatus, jqXHR) {
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Conflicts detected in schedule!');
+			}
+		});
+
+		return true;
+	});
+
 	add_class_url = $('#hidden-data').attr('data-addurl');
 	remove_class_url = $('#hidden-data').attr('data-removeurl');
 	sched_id = $('#hidden-data').attr('data-schedid');
@@ -441,33 +468,6 @@ function refresh_scheduled_class_draggables()
 
     	},
     	revert: 'invalid'
-	});
-
-	$('body').on('submit', '#new-class-form', function(e) {
-		e.preventDefault();
-		var group_id = $('#new-class-btn').attr('data-group');
-		var form = $(this);
-		var class_name = $('input[name="class_name"').val();
-
-		$("div[data-group=" + group_id + "]").text(class_name);
-		$("div[data-group=" + group_id + "]").popover('destroy');
-
-		
-		var data = form.serializeArray();
-		var url = form.attr('action');
-
-		$.ajax({
-			url:		url,
-			type: 		"POST",
-			data: 		data,
-			success: 	function(data, textStatus, jqXHR) {
-			},
-			error: 		function(jqXHR, textStatus, errorThrown) {
-				alert('Conflicts detected in schedule!');
-			}
-		});
-
-		return true;
 	});
 }
 

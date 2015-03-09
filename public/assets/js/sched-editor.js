@@ -406,7 +406,8 @@ function setup_dropzones(key, block_class)
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
 			html_block += "' data-length='" + (block["length"] / 5) + "'";
 			html_block += " data-days='" + block["days"] + "'";
-			html_block += "></div>";
+			html_block += " title='Days: " + block["days"] + ", Time: " + block["etime"]["starttm"] + "'";
+			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
 	});

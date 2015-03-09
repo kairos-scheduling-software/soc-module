@@ -197,12 +197,13 @@ a:hover, a:focus {
 
 .scheduled-class {
 	position: absolute;
-	border: 1px solid white;
+	border: 1px solid black;
 	background-color: #0099FF;
 	color: white;
 	font-size: 9pt;
 	text-align: center;
 	word-wrap: break-word;
+	text-shadow: 0.5px 0.5px 1px black;
 }
 
 .time-block-active {

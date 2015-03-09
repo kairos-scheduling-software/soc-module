@@ -281,7 +281,7 @@ function get_vertical_offset(time_string)
  * @param length: The duration, in minutes, of this time block
  * @param day: The 3 character day abbreviation (e.g. mon, tue, etc.)
  */
-function get_horizontal_offset(vertical, length, day)
+function get_horizontal_offset(vertical, length, day, loading_mode)
 {
 	var col_index = day + "1";
 	var col_count = col_counts[day];
@@ -310,7 +310,8 @@ function get_horizontal_offset(vertical, length, day)
 			update.push(i);
 	}
 
-	update_column_matrix(col_index, update, "busy");
+	if(loading_mode)
+		update_column_matrix(col_index, update, "busy");
 
 	//console.log("Col Num: " + col_num);
 	return col_num - 1;
@@ -371,29 +372,10 @@ function setup_dropzones(key, block_class)
 			html_block += "id='" + id + "'";
 
 			// Set offsets of the dropzone
-			var left = 0;//$(day).offset()["left"];
-			/*
-			switch(ddd)
-			{
-				case 'mon':
-					left = 5;
-					break;
-				case 'tue':
-					left = 10 + $('#mon-col').width();
-					break;
-				case 'wed':
-					left = 15 + $('#mon-col').width() + $('#tue-col').width();
-					break;
-				case 'thu':
-					left = 20 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width();
-					break;
-				case 'fri':
-					left = 25 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width() + $('#thu-col').width();
-					break;
-			}*/
-			var top = 0;//$(day).offset()["top"];
+			var left = 0;
+			var top = 0;
 			top += (block["offset"] * five_min_height);
-			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd);
+			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd, false);
 			
 			if (horiz == -1)
 			{
@@ -451,6 +433,8 @@ function refresh_scheduled_class_draggables()
 		    		}
 		    	}
     		});
+
+    		// TODO: set up other drop zones
     	},
     	stop: function(event, ui)
     	{
@@ -536,37 +520,14 @@ function load_schedule()
 function compute_offsets(start, day, length)
 {
 	var left = 0;//$(day).offset()["left"];
-	/*
-	var ddd = day.substring(1, 4);
-	switch(ddd)
-	{
-		case 'mon':
-			left = 5;
-			break;
-		case 'tue':
-			left = 10 + $('#mon-col').width();
-			break;
-		case 'wed':
-			left = 15 + $('#mon-col').width() + $('#tue-col').width();
-			break;
-		case 'thu':
-			left = 20 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width();
-			break;
-		case 'fri':
-			left = 25 + $('#mon-col').width() + $('#tue-col').width() + $('#wed-col').width() + $('#thu-col').width();
-			break;
-	}*/
 	var top = 0;//$(day).offset()["top"];
 	var vert = get_vertical_offset(start);
 	top += (vert * five_min_height);
-	var horiz = get_horizontal_offset(vert, length, day.substring(1,4));
+	var horiz = get_horizontal_offset(vert, length, day.substring(1,4), true);
 
-	//console.log("Horizontal: " + horiz);
-	
 	if (horiz == -1)
 	{
 		console.log("Horizontal failed");
-		//return;
 		horiz = 6;
 	}
 	left += horiz * time_block_w;
@@ -591,29 +552,34 @@ function add_matrix_col(day)
 	var index = day + (col_counts[day] + 1);
 	day_columns[index] = [];
 
-	for (var j = 0; j < 144; j++)
-		day_columns[index].push("empty");
+	if (typeof day_columns[index] === 'undefined')
+	{
+		for (var j = 0; j < 144; j++)
+			day_columns[index].push("empty");
+	}
 
-	col_counts[day] = col_counts[day] + 1;
+	var num_cols = (col_counts[day] + 1);
 
 	switch(day)
 	{
 		case 'mon':
-			$('#mon-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			$('#mon-col').css('width', (num_cols * time_block_w) + 'px');
 			break;
 		case 'tue':
-			$('#tue-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			$('#tue-col').css('width', (num_cols * time_block_w) + 'px');
 			break;
 		case 'wed':
-			$('#wed-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			$('#wed-col').css('width', (num_cols * time_block_w) + 'px');
 			break;
 		case 'thu':
-			$('#thu-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			$('#thu-col').css('width', (num_cols * time_block_w) + 'px');
 			break;
 		case 'fri':
-			$('#fri-col').css('width', (col_counts[day] * time_block_w) + 'px');
+			$('#fri-col').css('width', (num_cols * time_block_w) + 'px');
 			break;
 	}
+
+	col_counts[day] = num_cols;
 }
 
 function initialize_column_matrix()
@@ -648,12 +614,32 @@ function initialize_column_matrix()
 	day_columns["wed6"] = [];
 	day_columns["thu6"] = [];
 	day_columns["fri6"] = [];
+	day_columns["mon7"] = [];
+	day_columns["tue7"] = [];
+	day_columns["wed7"] = [];
+	day_columns["thu7"] = [];
+	day_columns["fri7"] = [];
+	day_columns["mon8"] = [];
+	day_columns["tue8"] = [];
+	day_columns["wed8"] = [];
+	day_columns["thu8"] = [];
+	day_columns["fri8"] = [];
+	day_columns["mon9"] = [];
+	day_columns["tue9"] = [];
+	day_columns["wed9"] = [];
+	day_columns["thu9"] = [];
+	day_columns["fri9"] = [];
+	day_columns["mon10"] = [];
+	day_columns["tue10"] = [];
+	day_columns["wed10"] = [];
+	day_columns["thu10"] = [];
+	day_columns["fri10"] = [];
 
-	col_counts["mon"] = 6;
-	col_counts["tue"] = 6;
-	col_counts["wed"] = 6;
-	col_counts["thu"] = 6;
-	col_counts["fri"] = 6;
+	col_counts["mon"] = 7;
+	col_counts["tue"] = 7;
+	col_counts["wed"] = 7;
+	col_counts["thu"] = 7;
+	col_counts["fri"] = 7;
 
 	for (var j = 0; j < 144; j++)
 		day_columns["mon1"].push("empty");
@@ -665,6 +651,7 @@ function initialize_column_matrix()
 		day_columns["thu1"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri1"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon2"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -675,6 +662,7 @@ function initialize_column_matrix()
 		day_columns["thu2"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri2"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon3"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -685,6 +673,7 @@ function initialize_column_matrix()
 		day_columns["thu3"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri3"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon4"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -695,6 +684,7 @@ function initialize_column_matrix()
 		day_columns["thu4"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri4"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon5"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -705,6 +695,7 @@ function initialize_column_matrix()
 		day_columns["thu5"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri5"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon6"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -715,4 +706,48 @@ function initialize_column_matrix()
 		day_columns["thu6"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri6"].push("empty");
+
+	for (var j = 0; j < 144; j++)
+		day_columns["mon7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri7"].push("empty");
+	
+	for (var j = 0; j < 144; j++)
+		day_columns["mon8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri8"].push("empty");
+	
+	for (var j = 0; j < 144; j++)
+		day_columns["mon9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri9"].push("empty");
+	
+	for (var j = 0; j < 144; j++)
+		day_columns["mon10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri10"].push("empty");
 }

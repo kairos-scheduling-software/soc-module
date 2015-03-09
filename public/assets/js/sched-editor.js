@@ -252,16 +252,20 @@ function resize_all()
 							- $('.top-buffer').outerHeight(true) 
 							- $('#sched-name').outerHeight(true) 
 							- $('#sched-col-headers').outerHeight(true)
-							- $('#trash-container').outerHeight(true)
-							- parseInt($('#page_footer').css('height'))
-							+ 20;
+							- $('#bottom-container').outerHeight(true)
+							- parseInt($('#page_footer').css('height'));
 
 	$('#time-labels').css('height', sched_height + 'px');
 	five_min_height = $('#inner-container').height() / 144;
+
+	$('.fifty-min-blk').css('height', (10 * five_min_height));
+	$('.eighty-min-blk').css('height', (16 * five_min_height));
+
 	time_block_w = $('.sched-day-column').width() / 7;
-	$('body').css('max-height', $(window).height() + 'px');
 
 	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
+
+	$('#outer-container').css('min-width', ($(window).width() - 200) + 'px')
 }
 
 function parse_days(json_days)

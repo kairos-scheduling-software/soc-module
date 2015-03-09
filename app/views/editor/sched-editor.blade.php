@@ -177,10 +177,6 @@
 		{{-- End accordion section --}}
 		
 	</div><!-- end div id=accordion -->
-	<h3>Scratch Pad:</h3>
-	<div id="scratch-pad">
-		Drag classes here to be rescheduled later
-	</div>
 </div>
 
 @stop
@@ -287,9 +283,12 @@
 	@endforeach
 	<script>group_counter = {{ $group_count }};</script>
 </div>
-<div id="trash-container">
+<div id="bottom-container">
 	<div id="drop-trash">
 		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">
+	</div>
+	<div id="scratch-pad">
+		Drag classes here to be rescheduled later
 	</div>
 </div>
 <div id="hidden-data" class="hide"

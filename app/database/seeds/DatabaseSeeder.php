@@ -24,6 +24,7 @@ class TableSeeder extends Seeder
 	
 	public function run()
 	{
+        DB::table('tickets')->delete();
 		DB::table('users')->delete();
 		$user = User::create(
 			array(
@@ -81,7 +82,8 @@ class TableSeeder extends Seeder
 
 		$professor = Professor::create(
 			array(
-				'name' => 'Unassigned'
+				'name' => 'Unassigned',
+                'uid' => 'U0000000'
 			));
 
 		DB::table('rooms')->delete();
@@ -1286,7 +1288,8 @@ class TableSeeder extends Seeder
             ));
         $professor2 = Professor::create(
             array(
-                'name' => 'Zero'
+                'name' => 'Zero',
+                'uid' => 'U0000001'
             ));
 
         $event = models\Event::create(

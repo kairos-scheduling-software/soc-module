@@ -27,7 +27,7 @@
     </title>
 
     <link rel="shortcut icon" href=" {{ URL::asset('assets/ico/favicon.png') }}">
-    
+
     <!-- Bootstrap -->
     <link href="{{ URL::asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ URL::asset('assets/css/styles.css') }}" rel="stylesheet">
@@ -41,21 +41,13 @@
     <script>
         var class_data_count = {{ $schedule->events->count() }};
     </script>
-    @endif    
+    @endif
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     @if($page_name == 'Schedule View')
-        <link href="{{ URL::asset('assets/css/visualization.css') }}" rel="stylesheet">
-        <script src="{{ URL::asset('assets/js/chroma.min.js') }}"></script>
-        <script src="{{ URL::asset('assets/js/d3.min.js') }}"></script>
-        <script src="{{ URL::asset('assets/js/d3-tip-0.6.6.js') }}"></script>
-        <script src="{{ URL::asset('assets/js/grid.js') }}"></script>
-        <script>
-        $(function() {
-            var data = {{ $schedule->to_json() }};
-            load_grid(data);
-        });
-        </script>
+        <link href="{{ URL::asset('assets/vis/css/xcharts.css') }}" rel="stylesheet">
+        <link href="{{ URL::asset('assets/vis/css/bootstrap-multiselect.css') }}" rel="stylesheet">
+        <link href="{{ URL::asset('assets/vis/css/visualization.css') }}" rel="stylesheet">
     @endif
     @if($page_name == 'SETTINGS')
         <script src="{{ URL::asset('assets/js/account-settings.js') }}"></script>
@@ -63,7 +55,7 @@
     @if($page_name == 'Schedule Editor')
         <!-- Editor stylesheet -->
         <link href="{{ URL::asset('assets/css/sched-editor.css') }}" rel="stylesheet">
-        
+
         <!-- Editor script -->
         <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
         
@@ -81,7 +73,7 @@
         <!--Ticket manger script-->
         <script src="{{URL::asset('assets/js/ticket-manager.js')}}"></script>
         <script>
-            $(function() 
+            $(function()
             {
                 createTable({{ $tickets }});
             });
@@ -90,12 +82,12 @@
         <!--Ticket manager css-->
         <link href="{{URL::asset('assets/css/ticket-manager.css')}}" rel="stylesheet">
     @endif
-    
+
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>
 
 
-    
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

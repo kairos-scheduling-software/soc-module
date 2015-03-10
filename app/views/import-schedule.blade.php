@@ -1,11 +1,18 @@
 @extends('layouts.holy-grail-2col')
 
 @section('left-column')
-<h2 id="import-selected">Schedule Admin</h2>
-	
-<select id="import-mode">
-	<option selected>
-		Import Schedule
+<select id="import-mode" name="import-mode">
+	<option data-url="{{URL::route('import-post')}}" value="Import Full" 
+		@if($selected == "Import Full")
+			selected
+		@endif>
+		Import Full Schedule
+	</option>
+	<option data-url="{{URL::route('import-constraint')}}" value="Import Constraint" 
+		@if($selected == "Import Constraint")
+			selected
+		@endif>
+		Import Constraints
 	</option>
 </select>
 <hr>
@@ -33,8 +40,9 @@
 @stop
 
 @section('center-column')
-<h1>Import Schedule</h1>
-	<form method="post" id="import" action="{{ URL::route('import-post') }}" enctype="multipart/form-data">
+<form method="post" id="import" action="{{ URL::route('import-post') }}" enctype="multipart/form-data">
+	<h1 id="Import-Selected">Import Full Schedule</h1>
+
 	<h3>
 		Schedule Name
 		<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName')}}"/>
@@ -44,6 +52,19 @@
 				@endif
 			</span>
 		</div>
+
+		<select id='schedules' name='schedules'>
+		@foreach($schedules as $schedule)
+			<option value="{{ htmlspecialchars($schedule->name) }}">
+				{{ htmlspecialchars($schedule->name) }} 
+			</option>
+		@endforeach
+		</select> 
+		<span>
+			@if($errors->has('select schedule'))
+				{{$errors->first('select schedule')}}
+			@endif
+		</span>
 	</h3>
 
 	<h3>

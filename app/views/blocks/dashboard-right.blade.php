@@ -20,7 +20,7 @@
 	<button class="btn btn-small sched-action-btn" data-url="{{ URL::route('edit-sched', $sched->id) }}">
 		{{ FA::icon('edit')}}&nbsp;EDIT
 	</button>
-	<button class="btn btn-small">
+	<button class="btn btn-small" id="copy-sched-btn" data-url="{{ URL::route('branch-sched', $sched->id) }}">
 		{{ FA::icon('copy')}}&nbsp;COPY
 	</button>
 	<button class="btn btn-small" id="delete-sched-btn" 

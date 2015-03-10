@@ -68,6 +68,83 @@ class DataConvertUtils
         return $intDay;
     }
 
+    public static function importConstraint($schedule, $importFile)
+    {
+        //Start parsing the file
+        $file = fopen($importFile, "r");
+
+        $failures['percentPassed'] = 100;
+        $failures['rowsFailed'] = [];
+
+        $column_headers = array();
+        $row_count = 0;
+
+        while (!feof($file)) 
+        {
+            $row = fgetcsv($file, 1000);
+                
+            if ($row_count==0)
+            {
+                $column_headers = $row;
+                
+                if(!DataConvertUtils::verifyHeaders($column_headers, 'constraint'))
+                {
+                    throw new exception("Error: invalid headers");
+                }
+
+                $row_count += 1;
+                continue;
+            }
+
+            //if the row doesn't have enough columns skip it
+            //eventually use this as part of the % bad data
+            if(count($row) !== 3)
+            {
+                continue;
+            }
+
+            //check if the data is in the correct format using regex and other such methods
+            $event = models\Event::where('schedule_id', '=', $schedule->id)->where('name', '=', $row[0])->first();
+            $event2 = models\Event::where('schedule_id', '=', $schedule->id)->where('name', '=', $row[1])->first();
+
+            $key = "";
+            if(strcasecmp($row[2], 'before') == 0)
+            {
+                $key = "<";
+            }
+            else if(strcasecmp($row[2], 'after') == 0)
+            {
+                $key = ">";
+            }
+            else if(strcasecmp($row[2], 'equal') == 0)
+            {
+                $key = "=";
+            }
+            else if(strcasecmp($row[2], 'not') == 0)
+            {
+                $key = "!";
+            }
+
+            if($key == "")
+            {
+                //it failed
+                continue;
+            }
+
+            $constraint = Constraint::firstOrCreate(array(
+                'event_id'  => $event->id,
+                'value'     => $event2->id,
+                'key'       => $key
+            ));
+
+            $row_count += 1; 
+        }
+
+        fclose($file);
+
+        return $failures;
+    }
+
     public static function importFullSchedule($schedule, $importFile)
     {
         //Start parsing the file
@@ -179,6 +256,12 @@ class DataConvertUtils
         {
             return false;
         }
+        else if(count($headers) < 4 && $mode == 'constraint')
+        {
+            $verify = $verify && (strcasecmp($headers[0], 'Class') == 0); 
+            $verify = $verify && (strcasecmp($headers[1], 'Class') == 0); 
+            $verify = $verify && (strcasecmp($headers[2], 'Key') == 0); 
+        }
         else
         {
             $verify = $verify && (strcasecmp($headers[0], 'Room') == 0); 
@@ -239,7 +322,7 @@ class DataConvertUtils
         $event['Length'] = 'Length';
         $events[] = $event;
 
-        $fakeUID = 0523543;
+        $fakeUID = 1523543;
 
         foreach ($json as $value) 
         {

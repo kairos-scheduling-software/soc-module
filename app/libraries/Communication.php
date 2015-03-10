@@ -58,12 +58,12 @@ class Communication
     	$jsonBuilder = [];
     	$eventsBuilder = [];
     	$roomBuilder = [];
+        $constraintBuilder = [];
 
         $jsonBuilder['APIKey'] = "1bb0ea87-d786-4300-903d-e3aa4e3ac670";
 
     	foreach ($events as $event) 
     	{
-            $constraintBuilder = [];
     		$temp = new StdClass;
     		$timeblock = $event->etime;
 
@@ -88,7 +88,7 @@ class Communication
             $starttmArray[] = $timeblock->starttm;
             $startTime[$possibleDays] = $starttmArray;
 
-            $possibleStart = $startTime; // [[M, W], [1200]] should look like this caps important
+            $possibleStart = $startTime; // MW: [1200] should look like this caps important
             $temp->pStartTm = $possibleStart;
 
             //start moving on to the spaces
@@ -103,15 +103,14 @@ class Communication
 
             foreach ($eConstraints as $constraint) 
             {
-                $constraintTemp = new StdClass;
-                $constraintTemp->key = $constraint->key;
-                $constraintTemp->value = $constraint->value;
-                $constraintBuilder[] = $constraintTemp; 
+                $constraintTemp = [];
+                $key = $constraint->key;
+
+                $constraintTemp[] = $constraint->event_id;
+                $constraintTemp[] = $constraint->value;
+
+                $constraintBuilder[$key][] = $constraintTemp; 
             }
-
-            //add the list of constraints for the event
-            $temp->constraint = $constraintBuilder;
-
 
 
     		$eventsBuilder[] = $temp;
@@ -128,6 +127,7 @@ class Communication
 
     	$jsonBuilder['EVENT'] = $eventsBuilder;
     	$jsonBuilder['SPACE'] = $roomBuilder;
+        $jsonBuilder['CONSTRAINT'] = $constraintBuilder;
 
     	$json = json_encode($jsonBuilder);
     	return $json;

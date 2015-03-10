@@ -310,8 +310,12 @@ class ScheduleController extends BaseController {
 
 	public function import_schedule()
 	{
+		$user = Auth::user();
+
 		return View::make('import-schedule')->with([
-				'page_name'	=>	'Import Schdule'
+				'page_name'	=>	'Import Schedule',
+				'selected'	=> 	'Import Full',
+				'schedules' =>	$user->schedules
 			]);
 	}
 
@@ -327,7 +331,11 @@ class ScheduleController extends BaseController {
 		foreach($user->schedules as $schedule)
 		{
 			if ($schedule->name == $scheduleName)
-				return Redirect::route('import-schedule')->withErrors(array('scheduleName' => "The schedule name is already in use")) -> withInput();
+				return Redirect::route('import-schedule')->withErrors(array('scheduleName' => "The schedule name is already in use")) -> withInput()
+				->with([
+					'page_name'	=>	'Import Schedule',
+					'schedules' =>	$user->schedules
+				]);
 			
 		}
 
@@ -356,6 +364,62 @@ class ScheduleController extends BaseController {
 			DataConvertUtils::importFullSchedule($schedule, $importFile);
 
 			return Redirect::route('dashboard');
+  		}
+  		else
+  		{
+  			return Redirect::route('import-schedule')->withErrors($validator) -> withInput()->with([
+				'page_name'	=>	'Import Schedule',
+				'schedules' =>	$user->schedules
+			]);;
+  		}
+
+		
+	}
+
+	public function import_constraint()
+	{
+		ini_set('auto_detect_line_endings', true);
+
+		$scheduleName = Input::get('schedules');
+		$user = Auth::user();
+		$found = false;
+		$scheduleToModify;
+
+		// Make sure the schedule name is unique
+		foreach($user->schedules as $schedule)
+		{
+			if ($schedule->name == $scheduleName)
+			{
+				$scheduleToModify = $schedule;
+				$found = true;
+			}
+		}
+
+		if(!$found)
+		{
+			return Redirect::route('import-schedule')->withErrors(array('select schedule' => "The schedule name provided was not found")) -> withInput();
+		}
+
+		$importFile = Input::file('import');
+
+		//eventually add mimes:csv when I get a chance to find the correct php configuration
+		$rules = array(
+			'uploadfile' => 'required',
+			'select schedule' => 'required'
+		);
+  		$validator = Validator::make(array('uploadfile'=> $importFile, 'select schedule' => $scheduleName), $rules);
+
+  		if($validator->passes())
+  		{	
+			$passed = DataConvertUtils::importConstraint($schedule, $importFile);
+
+			$message = "The import failed";
+			if($passed['percentPassed'] > 95)
+			{
+				$message = $passed['percentPassed'] . "% constraints were added sucessfully";
+			}
+
+			return Redirect::route('import-schedule')->with('global', $message);
   		}
   		else
   		{

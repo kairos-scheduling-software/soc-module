@@ -82,6 +82,9 @@
         <!--Ticket manager css-->
         <link href="{{URL::asset('assets/css/ticket-manager.css')}}" rel="stylesheet">
     @endif
+    @if($page_name == 'Import Schedule')
+        <script src="{{URL::asset('assets/js/import.js')}}"></script>
+    @endif
 
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>

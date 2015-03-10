@@ -8,10 +8,22 @@ var add_class_url;
 var remove_class_url;
 var sched_id;
 var col_counts = [];
+var course_list = [];
 
 $(function(){
 
 	initialize_column_matrix();
+
+	add_class_url = $('#hidden-data').attr('data-addurl');
+	remove_class_url = $('#hidden-data').attr('data-removeurl');
+	sched_id = $('#hidden-data').attr('data-schedid');
+	var cursor_img = $('#hidden-data').data('cursor');
+
+	$('#search-clear').click(function(){
+		$('#class-search').val("");
+
+		$('div.scheduled-class').css('background-color', "#0099FF");
+	});
 
 	$('body').on('submit', '#new-class-form', function(e) {
 		e.preventDefault();
@@ -19,7 +31,7 @@ $(function(){
 		var form = $(this);
 		var class_name = $('input[name="class_name"').val();
 
-		$("div[data-group=" + group_id + "]").text(class_name);
+		$("div[data-group=" + group_id + "]").html("<span class='class-name-container'>" + class_name + "</span");
 		$("div[data-group=" + group_id + "]").popover('destroy');
 
 		
@@ -30,20 +42,36 @@ $(function(){
 			url:		url,
 			type: 		"POST",
 			data: 		data,
+			beforeSend: function() {
+				$('#sched-ok').hide();
+				$('#sched-bad').hide();
+				$('#checking-sched').show();
+			},
 			success: 	function(data, textStatus, jqXHR) {
+				$('#checking-sched').hide();
+				var json_data = JSON.parse(data);
+
+				if (json_data['wasFailure'])
+				{
+					$('#sched-bad').show();
+					$('#conflict-section').show();
+				}
+				else
+				{
+					$('#sched-ok').show();
+				}				
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
-				alert('Conflicts detected in schedule!');
+				console.log(JSON.stringify(jqXHR));
+				$('#checking-sched').hide();
+				$('#sched-bad').show();
 			}
 		});
 
 		return true;
 	});
 
-	add_class_url = $('#hidden-data').attr('data-addurl');
-	remove_class_url = $('#hidden-data').attr('data-removeurl');
-	sched_id = $('#hidden-data').attr('data-schedid');
-	var cursor_img = $('#hidden-data').data('cursor');
+	
 
 	resize_all();
 	$(window).resize(function(){
@@ -266,7 +294,18 @@ function resize_all()
 
 	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
 
-	$('#outer-container').css('min-width', ($(window).width() - 200) + 'px')
+	$('#outer-container').css('min-width', ($(window).width() - 200) + 'px');
+
+	$('.class-name-container').each(function() {
+		var course = $(this);
+		var div = course.closest('div.scheduled-class');
+		console.log("div: " + div.attr('data-group'));
+		var p = div.height();
+		p = (p - course.outerHeight(true)) / 4;
+
+		if(p >= 7)
+		div.css("padding-top", p + 'px');
+	});
 }
 
 function parse_days(json_days)
@@ -420,7 +459,7 @@ function setup_dropzones(key, block_class)
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
 			html_block += "' data-length='" + (block["length"] / 5) + "'";
 			html_block += " data-days='" + block["days"] + "'";
-			html_block += " title='Days: " + block["days"] + ", Time: " + block["etime"]["starttm"] + "'";
+			//html_block += " title='Days: " + block["days"] + ", Time: " + block["etime"]["starttm"] + "'";
 			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
@@ -461,7 +500,48 @@ function refresh_scheduled_class_draggables()
 		    		{
 		    			// TODO: update column matrix
 		    			// TODO: send ajax to delete class
+		    			var id = $("div[data-group=" + group_id + "]").data('class');
 		    			$("div[data-group=" + group_id + "]").remove();
+
+		    			$.ajax({
+							url:		remove_class_url,
+							type: 		"POST",
+							data: 		{'id':id, 'schedule':sched_id},
+							dataType: JSON,
+							beforeSend: function() {
+								$('#sched-ok').hide();
+								$('#sched-bad').hide();
+								$('#checking-sched').show();
+							},
+							success: 	function(data, textStatus, jqXHR) {
+								$('#checking-sched').hide();
+								var json_data = JSON.parse(data);
+								$('#checking-sched').hide();
+								if (json_data['wasFailure'] === 'false')
+								{
+									//$('#sched-bad').show();
+									//$('#conflict-section').show();
+									$('#conflict-section').hide();
+									$('#sched-ok').show();
+								}
+								else
+								{
+									$('#checking-sched').hide();
+									$('#sched-ok').show();
+									$('#conflict-section').hide();
+								}				
+							},
+							error: 		function(jqXHR, textStatus, errorThrown) {
+								/*
+								console.log(JSON.stringify(jqXHR));
+								$('#checking-sched').hide();
+								$('#sched-bad').show();
+								*/
+								$('#checking-sched').hide();
+								$('#conflict-section').hide();
+									$('#sched-ok').show();
+							}
+						});
 		    		}
 		    	}
     		});
@@ -509,6 +589,11 @@ function load_schedule()
 		var length = course.data('length');
 		var offsets = compute_offsets(start, col, length);
 
+		var course_name = course.find('span.class-name-container').text();
+
+		if (course_list.indexOf(course_name) < 0)
+			course_list.push(course_name);
+
 		//console.log("{left: " + offsets["left"] + ", top: " + offsets["top"]);
 
 		course.css({
@@ -520,6 +605,25 @@ function load_schedule()
 	});
 
 	refresh_scheduled_class_draggables();
+	
+	$('#class-search').autocomplete({
+		source: course_list,
+		open: function(event, ui) {
+			$('#class-search-container').append($('#ui-id-1'));
+			$('.ui-menu-item').click(function() {
+				$('#class-search').val($(this).text());
+				var name = $(this).text();
+				console.log('click');
+
+				$('.class-name-container').each(function() {
+					if ($(this).text() == name)
+					{
+						$(this).closest('div').css('background-color', '#4D944D');
+					}
+				});
+			});
+		}
+	});
 }
 
 function compute_offsets(start, day, length)

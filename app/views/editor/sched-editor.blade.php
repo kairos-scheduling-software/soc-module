@@ -194,35 +194,41 @@
 			</div>
 			<div id="collapse-six" class="panel-collapse collapse">
 				<div class="panel-body">
-					Class List
+					<div class="ui-widget" id="class-search-container">
+						<p>Type to Search the Schedule:</p>
+						<input id="class-search"class="form-control" placeholder="Class Name"/>
+						<span id="search-clear">{{FA::icon('times-circle')}}</span>
+					</div>
 				</div>
 			</div>
 		</div>
 		{{-- End accordion section --}}
 
-		<h3><span class="warning-icon">{{ FA::icon('warning') }}</span> Schedule Conflicts:</h3>
-		{{-- Begin accordion section --}}
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4>
-					<a data-toggle="collapse" data-parent="#accordion" href="#collapse-seven">
-						<span class="accordion-closed">
-							{{FA::icon('chevron-right')}}&nbsp;
-						</span>
-						<span class="accordion-open">
-							{{FA::icon('chevron-down')}}
-						</span>
-						&nbsp;<b>View Conflicts</b>
-					</a>
-				</h4>
-			</div>
-			<div id="collapse-seven" class="panel-collapse collapse">
-				<div class="panel-body">
-					Conflict List
+		<div id="conflict-section">
+			<h3><span class="warning-icon">{{ FA::icon('warning') }}</span> Schedule Conflicts:</h3>
+			{{-- Begin accordion section --}}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4>
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapse-seven">
+							<span class="accordion-closed">
+								{{FA::icon('chevron-right')}}&nbsp;
+							</span>
+							<span class="accordion-open">
+								{{FA::icon('chevron-down')}}
+							</span>
+							&nbsp;<b>View Conflicts</b>
+						</a>
+					</h4>
+				</div>
+				<div id="collapse-seven" class="panel-collapse collapse">
+					<div class="panel-body">
+						<b>CS 9000</b> conflicts with <b>CS 1400-008</b>
+					</div>
 				</div>
 			</div>
+			{{-- End accordion section --}}
 		</div>
-		{{-- End accordion section --}}
 
 	</div><!-- end div id=accordion -->
 </div>
@@ -271,7 +277,13 @@
 </script>
 
 <h1 id="sched-name">{{ $schedule->name }}
-	<a href="#"><span>{{FA::icon('edit')}}</span></a>
+	<a href="#"><span id="edit-icon">{{FA::icon('edit')}}</span></a>
+		<span id="sched-ok">{{ FA::icon('check')}} No conflicts in schedule.</span>
+		<span id="checking-sched">{{ FA::spin('spinner') }} Checking schedule...</span>
+		<span id="sched-bad">{{ FA::icon('warning') }} 
+			<a id="view-conflicts" href="#">Conflicts in schedule!  Click to view.</a>
+		</span>
+
 </h1>
 
 <div id="outer-container">

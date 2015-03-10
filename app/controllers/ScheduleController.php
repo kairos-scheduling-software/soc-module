@@ -281,22 +281,31 @@ class ScheduleController extends BaseController {
 		try {
 			$result = Communication::sendCheck($schedule->id);
 
-			return Response::json(['success' => 'No conflicts detected'], 200);
+			return $result;
 		}
 		catch (Exception $e)
 		{
-			//if ($e->getMessage() == "The schedule is in conflict")
-				return Response::json(['error' => 'Conflicts found in schedule'], 500);
-			//else
-			//	return Response::json(['error' => 'An API error occurred'], 500);
-
-			//exit();
+				return Response::json(['error' => 'Could not check schedule'], 500);
 		}
 	}
 
 	public function e_remove_class()
 	{
+		$id = Input::get('id');
+		$schedule = Schedule::find(Input::get('schedule'));
 
+		$class = models\Event::find($id);
+		$class->delete();
+
+		try {
+			$result = Communication::sendCheck($schedule->id);
+
+			return $result;
+		}
+		catch (Exception $e)
+		{
+				return Response::json(['error' => 'Could not check schedule'], 500);
+		}
 	}
 
 	public function import_schedule()

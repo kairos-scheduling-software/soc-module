@@ -21,9 +21,9 @@
 
 @if ($etime->length == 80 || $etime->length == 50)
 	@foreach($days as $day)
-		<div class="{{ $block_class }} scheduled-class" data-col="{{ $day }}" data-days="{{$etime->days}}"
-			 data-group="{{ $group_count . '-' . $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
-			{{ $class->name }}
+		<div class="{{ $block_class }} scheduled-class" data-class="{{ $class->id }}" data-col="{{ $day }}" 
+			data-days="{{$etime->days}}" data-group="{{ $group_count . '-' . $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
+			<span class="class-name-container">{{ $class->name }}</span>
 		</div>
 	@endforeach
 @endif

@@ -1,5 +1,5 @@
 .top-buffer {
-	height: 90px;
+	height: 70px;
 }
 
 #left-side-bar {
@@ -124,6 +124,39 @@ a:hover, a:focus {
 	font-size: 12pt;
 }
 
+ul.ui-autocomplete {
+	list-style-type: none;
+	border: 1px solid #363636;
+	border-bottom-right-radius: 5%;
+	border-bottom-left-radius: 5%;
+}
+
+.ui-menu-item:hover {
+	cursor: pointer;
+	color: blue;
+	font-weight: bold;
+}
+
+#class-search {
+	width: 90%;
+	display: inline-block;
+}
+
+#search-clear {
+	display: inline-block;
+	color: #808080;
+	font-size: 16pt;
+	line-height: 1;
+}
+
+#search-clear:hover {
+	cursor: pointer;
+}
+
+#conflict-section {
+	display: none;
+}
+
 #scratch-pad {
 	display: inline-block;
 	background-color: #B3B3B3;
@@ -166,6 +199,26 @@ a:hover, a:focus {
 	height: 8.1%;
 	margin-top: -7px;
 	margin-bottom: 8px;
+}
+
+#sched-name {
+	/*display:none;*/
+	margin-bottom: 0;
+}
+
+#sched-ok {
+	display: none;
+	color: green;
+}
+
+#checking-sched {
+	display: none;
+	color: #808080;
+}
+
+#sched-bad {
+	display: none;
+	color: #CC0000;
 }
 
 #sched-container {
@@ -223,11 +276,20 @@ a:hover, a:focus {
 	border: 1px solid black;
 	background-color: #0099FF;
 	color: white;
-	font-size: 9pt;
+	font-size: 10pt;
 	text-align: center;
 	word-wrap: break-word;
 	text-shadow: 0.5px 0.5px 1px black;
+	line-height: 1;
 }
+
+/*
+.class-name-container {
+	position: relative;
+  	top: 50%;
+  	transform: translateY(-50%);
+}
+*/
 
 .time-block-active {
 	position: absolute;

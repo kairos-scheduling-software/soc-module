@@ -80,8 +80,9 @@ $(function(){
 	});
 
 	$('.draggable').draggable({
-		cursorAt: { bottom: 25, left: 0 },
-		cursor: "url(" + cursor_img + "), auto",
+		//cursorAt: { bottom: 25, left: 0 },
+		//cursor: "url(" + cursor_img + "), auto",
+		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
         	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );

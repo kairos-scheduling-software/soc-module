@@ -9,7 +9,7 @@
 </style>
 <div id="toolbox">
 	<h1>{{ FA::icon('wrench') }}&nbsp;&nbsp;Toolbox</h1>
-	<h3>Classes:</h3>
+	<h3><span class="plus-icon">{{ FA::icon('plus') }}</span> Add Classes:</h3>
 	<div class="panel-group" id="accordion">
 
 		{{-- Begin accordion section --}}
@@ -175,7 +175,55 @@
 			</div>
 		</div>
 		{{-- End accordion section --}}
-		
+
+		<h3><span class="view-icon">{{ FA::flipHorizontal('search') }}</span> On the Schedule:</h3>
+		{{-- Begin accordion section --}}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4>
+					<a data-toggle="collapse" data-parent="#accordion" href="#collapse-six">
+						<span class="accordion-closed">
+							{{FA::icon('chevron-right')}}&nbsp;
+						</span>
+						<span class="accordion-open">
+							{{FA::icon('chevron-down')}}
+						</span>
+						&nbsp;<b>Scheduled Classes</b>
+					</a>
+				</h4>
+			</div>
+			<div id="collapse-six" class="panel-collapse collapse">
+				<div class="panel-body">
+					Class List
+				</div>
+			</div>
+		</div>
+		{{-- End accordion section --}}
+
+		<h3><span class="warning-icon">{{ FA::icon('warning') }}</span> Schedule Conflicts:</h3>
+		{{-- Begin accordion section --}}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4>
+					<a data-toggle="collapse" data-parent="#accordion" href="#collapse-seven">
+						<span class="accordion-closed">
+							{{FA::icon('chevron-right')}}&nbsp;
+						</span>
+						<span class="accordion-open">
+							{{FA::icon('chevron-down')}}
+						</span>
+						&nbsp;<b>View Conflicts</b>
+					</a>
+				</h4>
+			</div>
+			<div id="collapse-seven" class="panel-collapse collapse">
+				<div class="panel-body">
+					Conflict List
+				</div>
+			</div>
+		</div>
+		{{-- End accordion section --}}
+
 	</div><!-- end div id=accordion -->
 </div>
 

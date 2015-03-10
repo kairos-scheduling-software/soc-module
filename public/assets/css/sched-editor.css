@@ -1,3 +1,47 @@
+.top-buffer {
+	height: 90px;
+}
+
+#left-side-bar {
+	display: none;
+	float: left;
+	padding-left: 15px;
+	padding-right: 15px;
+	background-color: #808080;
+	box-shadow: inset -2px 0 2px #363636;
+}
+
+#toggle-container {
+	background-color: #808080;
+	color: white;
+	border-top-right-radius: 15%;
+	border-bottom-right-radius: 15%;
+	position: fixed;
+	top: 200px;
+	left: -3px;
+	width: 60px;
+	text-align: right;
+	font-size: 20pt;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-right: 15px;
+	box-shadow: 2px 2px 3px #363636, 2px -2px 3px #363636;
+	/*box-shadow: inset -2px -1px 2px #363636, inset -2px 1px 2px #363636;*/
+}
+
+#toggle-container a {
+	color: white;
+	text-shadow: 1px 1px 1px black, 1px -1px 1px black, -0.4px 0.4px 1px black, -0.4px -0.4px 1px black;
+}
+
+#main-container {
+	display: inline-block;
+	float: left;
+	overflow-x: hidden;
+	margin-left: 50px;
+	text-align: center;
+}
+
 h1 span {
 	font-size: 12pt;
 }
@@ -35,6 +79,24 @@ a:hover, a:focus {
 	margin-top: 30px;
 }
 
+#toolbox h3 > span.warning-icon {
+	color: yellow;
+	font-size: 24px;
+	text-shadow: 1px 1px 1px black;
+}
+
+#toolbox h3 > span.plus-icon {
+	color: white;
+	font-size: 24px;
+	text-shadow: 1px 1px 1px black;
+}
+
+#toolbox h3 > span.view-icon {
+	color: white;
+	font-size: 24px;
+	text-shadow: 1px 1px 1px black;
+}
+
 #custom-days {
 	margin-left: 20px;
 }
@@ -63,36 +125,51 @@ a:hover, a:focus {
 }
 
 #scratch-pad {
+	display: inline-block;
 	background-color: #B3B3B3;
 	border-radius: 10px;
 	border: 2px dashed #363636;
-	min-height: 200px;
-	width: 100%;
 	text-align: center;
 	color: #5E5E5E;
-	padding: 15% 10%;
 	font-size: 25px;
+	height: 100px;
+	padding: 50px;
+	/* margin: 0; */
+	margin-left: 50px;
+	width: 80%;
 }
 
-#hg-center {
-	text-align: center;
+#outer-container {
+	display: table;
+}
+
+#inner-container {
+	display: table-row;
+}
+
+#time-and-days {
+	display: table-row;
+}
+
+#empty-cell {
+	width: 70px;
 }
 
 #time-labels {
-	display: inline-block;
+	display: table-cell;
 	text-align: right;
-	margin-right: 10px;
-	height: 600px;
+	padding-right: 10px;
+	/* height: 600px; */
 }
 
 #time-labels p {
 	height: 8.1%;
-	margin: 0;
+	margin-top: -7px;
+	margin-bottom: 8px;
 }
 
 #sched-container {
 	/*border: 1px solid black;*/
-	display: inline-block;
 	border-top: 4px solid black;
 	height: 600px;
 	max-height: 600px;
@@ -108,22 +185,27 @@ a:hover, a:focus {
 }
 
 #sched-col-headers {
+	display: table-row;
 	padding-left: 50px;
 	overflow-x: auto;
 }
 
 .sched-col-header {
-	display: inline-block;
+	display: table-cell;
 	width: 275px;
 	margin: 0;
+	text-align: center;
 }
 
 .sched-day-column {
-	display: inline-block;
+	position: relative;
+	display: table-cell;/*inline-block;*/
 	width: 273px;
 	margin: 0;
+	padding-right: 1.5px;
 	background-color: white;
 	height: 100%;
+	border: 1px solid black;
 }
 
 .test-grid {
@@ -138,12 +220,13 @@ a:hover, a:focus {
 
 .scheduled-class {
 	position: absolute;
-	border: 1px solid white;
+	border: 1px solid black;
 	background-color: #0099FF;
 	color: white;
 	font-size: 9pt;
 	text-align: center;
 	word-wrap: break-word;
+	text-shadow: 0.5px 0.5px 1px black;
 }
 
 .time-block-active {
@@ -164,10 +247,15 @@ a:hover, a:focus {
 }
 
 #drag-helper {
-	z-index: 10;
-	color: #0099FF;
+	z-index: 999;
+	color: green;/*#0099FF;*/
 	font-size: 20pt;
 	text-shadow: 0px 0.5px 1px black;
+	opacity: 2;
+}
+
+#toolbox {
+	width: 320px;
 }
 
 #toolbox .fifty-min-blk {
@@ -209,6 +297,10 @@ a:hover, a:focus {
 	margin: 0;
 }
 
+.popover {
+	min-width: 250px;
+}
+
 
 ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background-color:#e5e5e5}::-webkit-scrollbar-thumb{background-color:#cdcdcd}::-webkit-scrollbar-thumb:hover{background-color:#030303}
 /*
@@ -230,11 +322,22 @@ a:hover, a:focus {
 	background-color: green;
 }*/
 
+#bottom-container {
+	display: inline-block;
+  	width: 100%;
+  	white-space: nowrap;
+  	height: 150px;
+}
+
 #drop-trash {
+	display: inline-block;
 	font-size: 60pt;
-	text-align: right;
-	margin-right:0;
-	margin-top: 5px;
+  	/* text-align: right; */
+  	/* margin-left: 100px; */
+  	margin-top: 5px;
+  	padding-left: 80px;
+  	margin-top: 15px;
+  	padding-top: 10px;
 }
 
 .trash-hover{
@@ -242,7 +345,7 @@ a:hover, a:focus {
     -webkit-transform: scale(1.5,1.5); /* Chrome, Safari, Opera */
     transform: scale(1.5,1.5); /* Standard syntax */
     z-index: 0;
-    opacity: 0.5;
+    /*opacity: 0.5;*/
 }
 
 

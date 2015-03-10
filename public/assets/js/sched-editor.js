@@ -7,14 +7,43 @@ var group_counter = 1;
 var add_class_url;
 var remove_class_url;
 var sched_id;
+var col_counts = [];
 
 $(function(){
 
 	initialize_column_matrix();
 
+	$('body').on('submit', '#new-class-form', function(e) {
+		e.preventDefault();
+		var group_id = $('#new-class-btn').attr('data-group');
+		var form = $(this);
+		var class_name = $('input[name="class_name"').val();
+
+		$("div[data-group=" + group_id + "]").text(class_name);
+		$("div[data-group=" + group_id + "]").popover('destroy');
+
+		
+		var data = form.serializeArray();
+		var url = form.attr('action');
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		data,
+			success: 	function(data, textStatus, jqXHR) {
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Conflicts detected in schedule!');
+			}
+		});
+
+		return true;
+	});
+
 	add_class_url = $('#hidden-data').attr('data-addurl');
 	remove_class_url = $('#hidden-data').attr('data-removeurl');
 	sched_id = $('#hidden-data').attr('data-schedid');
+	var cursor_img = $('#hidden-data').data('cursor');
 
 	resize_all();
 	$(window).resize(function(){
@@ -22,6 +51,8 @@ $(function(){
 			resize_all();
 		}, 500);		
 	});
+
+	load_schedule();
 
 	$('.panel-collapse').on('show.bs.collapse', function() {
 		$(this).closest('div.panel').find('span.accordion-open').show();
@@ -49,6 +80,8 @@ $(function(){
 	});
 
 	$('.draggable').draggable({
+		//cursorAt: { bottom: 25, left: 0 },
+		//cursor: "url(" + cursor_img + "), auto",
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
@@ -71,6 +104,8 @@ $(function(){
     		else if (dragged_block.hasClass('three-eighty'))
     			setup_dropzones('three-eighty', 'eighty-min-blk');
 
+    		$('#sched-container').css('opacity', 0.5);
+
     		$('.drop-zone').droppable({
 		    	hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
@@ -82,10 +117,17 @@ $(function(){
 		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class');
 		    		$("div[data-group=" + group_id + "]").attr('data-content', get_popover_content(group_id));
 
-		    		// TODO show popover
+		    		// Show popover
+		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
 		    		$(this).popover({
 		    			trigger: "manual",
 		    			html: true
+		    		}).on('shown.bs.popover', function() {
+		    			if(parseInt($('.popover').css('top')) < 0)
+	    				{
+	    					$('.popover').css('top', 0);
+	    					$('.arrow').css('top', pos + 'px');
+	    				}
 		    		}).popover('show');
 
 		    		$("div[data-group=" + group_id + "]").html();
@@ -137,6 +179,7 @@ $(function(){
     	stop: function(event, ui)
     	{
     		$('.drop-zone').remove();
+    		$('#sched-container').css('opacity', 1);
     	},
     	revert: 'invalid'
     });    
@@ -170,7 +213,7 @@ $(function(){
  * Dynamically resizes all elements on the page
  */
 function resize_all()
-{
+{/*
 	// Schedule container
 	var sched_container_w = $('#hg-center').width() - 50 - $('#time-labels').width();
 	var sched_container_h = $(window).height() 
@@ -204,7 +247,26 @@ function resize_all()
 	// Toolbox blocks
 	$('.fifty-min-blk').css('height', (10 * five_min_height));
 	$('.eighty-min-blk').css('height', (16 * five_min_height));
+	*/
 
+	var sched_height = $(window).height() 
+							- $('.top-buffer').outerHeight(true) 
+							- $('#sched-name').outerHeight(true) 
+							- $('#sched-col-headers').outerHeight(true)
+							- $('#bottom-container').outerHeight(true)
+							- parseInt($('#page_footer').css('height'));
+
+	$('#time-labels').css('height', sched_height + 'px');
+	five_min_height = $('#inner-container').height() / 144;
+
+	$('.fifty-min-blk').css('height', (10 * five_min_height));
+	$('.eighty-min-blk').css('height', (16 * five_min_height));
+
+	time_block_w = $('.sched-day-column').width() / 7;
+
+	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
+
+	$('#outer-container').css('min-width', ($(window).width() - 200) + 'px')
 }
 
 function parse_days(json_days)
@@ -225,8 +287,14 @@ function parse_days(json_days)
 	return days;
 }
 
+/**
+ * Returns the proper value for the CSS "top" property for a give time block
+ * 
+ * @param time_string: A start-time string of the form hhmm (e.g. 0805 means 8:05 AM)
+ */
 function get_vertical_offset(time_string)
 {
+	time_string = "" + time_string;
 	var hr_str = time_string.substring(0,2);
 	var min_str = time_string.substring(2);
 	var hr = parseInt(hr_str);
@@ -238,23 +306,44 @@ function get_vertical_offset(time_string)
 	return offset_factor;
 }
 
-function get_horizontal_offset(vertical, length, day)
+/**
+ * Returns the correct column to append a given time-block to
+ *
+ * @param vertical: The previously computed vertical offset of this block (See 'get_vertical_offset()')
+ * @param length: The duration, in minutes, of this time block
+ * @param day: The 3 character day abbreviation (e.g. mon, tue, etc.)
+ */
+function get_horizontal_offset(vertical, length, day, loading_mode)
 {
 	var col_index = day + "1";
+	var col_count = col_counts[day];
 	var col_num = 1;
+	var update = [];
 
 	for(var i = vertical; i < vertical + (length/5); i++)
 	{
 		if (day_columns[col_index][i] == "busy")
 		{
-			console.log("Location " + col_index + "[" + i + "] is in use.");
+			update = [];
+			//console.log("Location " + col_index + "[" + i + "] is in use.");
 			col_num++;
 			col_index = day + "" + col_num;
 			i = vertical;
-			if (col_num > 6)
-				return -1;
+
+			if (col_num > col_count)
+			{
+				var w = $('#outer-container').width();
+				$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
+				add_matrix_col(day);
+				col_count = col_counts[day];
+			}
 		}
+		else
+			update.push(i);
 	}
+
+	if(loading_mode)
+		update_column_matrix(col_index, update, "busy");
 
 	//console.log("Col Num: " + col_num);
 	return col_num - 1;
@@ -315,10 +404,10 @@ function setup_dropzones(key, block_class)
 			html_block += "id='" + id + "'";
 
 			// Set offsets of the dropzone
-			var left = $(day).offset()["left"];
-			var top = $(day).offset()["top"];
+			var left = 0;
+			var top = 0;
 			top += (block["offset"] * five_min_height);
-			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd);
+			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd, false);
 			
 			if (horiz == -1)
 			{
@@ -331,7 +420,8 @@ function setup_dropzones(key, block_class)
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
 			html_block += "' data-length='" + (block["length"] / 5) + "'";
 			html_block += " data-days='" + block["days"] + "'";
-			html_block += "></div>";
+			html_block += " title='Days: " + block["days"] + ", Time: " + block["etime"]["starttm"] + "'";
+			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
 	});
@@ -350,6 +440,8 @@ function setup_dropzones(key, block_class)
 function refresh_scheduled_class_draggables()
 {
 	$('.scheduled-class').draggable({
+		scroll: false,
+		stack: '#sched-container',
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
@@ -373,39 +465,14 @@ function refresh_scheduled_class_draggables()
 		    		}
 		    	}
     		});
+
+    		// TODO: set up other drop zones
     	},
     	stop: function(event, ui)
     	{
 
     	},
     	revert: 'invalid'
-	});
-
-	$('body').on('click', '#new-class-btn', function(e) {
-		e.preventDefault();
-		var group_id = $(this).attr('data-group');
-		var form = $('#new-class-form');
-		var class_name = $('input[name="class_name"').val();
-
-		$("div[data-group=" + group_id + "]").text(class_name);
-		$("div[data-group=" + group_id + "]").popover('destroy');
-
-		
-		var data = form.serializeArray();
-		var url = form.attr('action');
-
-		$.ajax({
-			url:		url,
-			type: 		"POST",
-			data: 		data,
-			success: 	function(data, textStatus, jqXHR) {
-			},
-			error: 		function(jqXHR, textStatus, errorThrown) {
-				alert('Conflicts detected in schedule!');
-			}
-		});
-
-		return true;
 	});
 }
 
@@ -424,10 +491,100 @@ function get_popover_content(group_id)
 	html += "<small><b>Room:</b></small><br>";
 	html += "<input type='text' class='form-control' name='room_name' placeholder='Room'>";
 	html += "<small><b>Professor:</b></small><br>";
-	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'></div>";
-	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form>";
+	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'>";
+	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form></div>";
 
 	return html;
+}
+
+
+function load_schedule()
+{
+	// Move the staged classes to their appropriate place in the grid
+	$('#class-staging > div.scheduled-class').each(function() {
+		var course = $(this);
+		var days = parse_days("" + course.data('days'));
+		var start = course.data('start');
+		var col = course.data('col');
+		var length = course.data('length');
+		var offsets = compute_offsets(start, col, length);
+
+		//console.log("{left: " + offsets["left"] + ", top: " + offsets["top"]);
+
+		course.css({
+			left: offsets["left"],
+			top: offsets["top"]
+		});
+
+		$(col).append(course);
+	});
+
+	refresh_scheduled_class_draggables();
+}
+
+function compute_offsets(start, day, length)
+{
+	var left = 0;//$(day).offset()["left"];
+	var top = 0;//$(day).offset()["top"];
+	var vert = get_vertical_offset(start);
+	top += (vert * five_min_height);
+	var horiz = get_horizontal_offset(vert, length, day.substring(1,4), true);
+
+	if (horiz == -1)
+	{
+		console.log("Horizontal failed");
+		horiz = 6;
+	}
+	left += horiz * time_block_w;
+
+	return {
+		left: left + "px",
+		top: top + "px"
+	};
+}
+
+function update_column_matrix(col, indices, mode)
+{
+	$.each(indices, function(i, index) {
+		day_columns[col][index] = mode;
+	});
+}
+
+function add_matrix_col(day)
+{
+	//var w = $('#outer-container').width();
+	//$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
+	var index = day + (col_counts[day] + 1);
+	day_columns[index] = [];
+
+	if (typeof day_columns[index] === 'undefined')
+	{
+		for (var j = 0; j < 144; j++)
+			day_columns[index].push("empty");
+	}
+
+	var num_cols = (col_counts[day] + 1);
+
+	switch(day)
+	{
+		case 'mon':
+			$('#mon-col').css('width', (num_cols * time_block_w) + 'px');
+			break;
+		case 'tue':
+			$('#tue-col').css('width', (num_cols * time_block_w) + 'px');
+			break;
+		case 'wed':
+			$('#wed-col').css('width', (num_cols * time_block_w) + 'px');
+			break;
+		case 'thu':
+			$('#thu-col').css('width', (num_cols * time_block_w) + 'px');
+			break;
+		case 'fri':
+			$('#fri-col').css('width', (num_cols * time_block_w) + 'px');
+			break;
+	}
+
+	col_counts[day] = num_cols;
 }
 
 function initialize_column_matrix()
@@ -462,6 +619,32 @@ function initialize_column_matrix()
 	day_columns["wed6"] = [];
 	day_columns["thu6"] = [];
 	day_columns["fri6"] = [];
+	day_columns["mon7"] = [];
+	day_columns["tue7"] = [];
+	day_columns["wed7"] = [];
+	day_columns["thu7"] = [];
+	day_columns["fri7"] = [];
+	day_columns["mon8"] = [];
+	day_columns["tue8"] = [];
+	day_columns["wed8"] = [];
+	day_columns["thu8"] = [];
+	day_columns["fri8"] = [];
+	day_columns["mon9"] = [];
+	day_columns["tue9"] = [];
+	day_columns["wed9"] = [];
+	day_columns["thu9"] = [];
+	day_columns["fri9"] = [];
+	day_columns["mon10"] = [];
+	day_columns["tue10"] = [];
+	day_columns["wed10"] = [];
+	day_columns["thu10"] = [];
+	day_columns["fri10"] = [];
+
+	col_counts["mon"] = 7;
+	col_counts["tue"] = 7;
+	col_counts["wed"] = 7;
+	col_counts["thu"] = 7;
+	col_counts["fri"] = 7;
 
 	for (var j = 0; j < 144; j++)
 		day_columns["mon1"].push("empty");
@@ -473,6 +656,7 @@ function initialize_column_matrix()
 		day_columns["thu1"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri1"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon2"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -483,6 +667,7 @@ function initialize_column_matrix()
 		day_columns["thu2"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri2"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon3"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -493,6 +678,7 @@ function initialize_column_matrix()
 		day_columns["thu3"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri3"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon4"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -503,6 +689,7 @@ function initialize_column_matrix()
 		day_columns["thu4"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri4"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon5"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -513,6 +700,7 @@ function initialize_column_matrix()
 		day_columns["thu5"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri5"].push("empty");
+	
 	for (var j = 0; j < 144; j++)
 		day_columns["mon6"].push("empty");
 	for (var j = 0; j < 144; j++)
@@ -523,6 +711,48 @@ function initialize_column_matrix()
 		day_columns["thu6"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri6"].push("empty");
+
+	for (var j = 0; j < 144; j++)
+		day_columns["mon7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu7"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri7"].push("empty");
 	
-	console.log(day_columns);
+	for (var j = 0; j < 144; j++)
+		day_columns["mon8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu8"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri8"].push("empty");
+	
+	for (var j = 0; j < 144; j++)
+		day_columns["mon9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu9"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri9"].push("empty");
+	
+	for (var j = 0; j < 144; j++)
+		day_columns["mon10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["tue10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["wed10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["thu10"].push("empty");
+	for (var j = 0; j < 144; j++)
+		day_columns["fri10"].push("empty");
 }

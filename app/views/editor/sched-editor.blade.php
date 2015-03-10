@@ -1,10 +1,15 @@
-@extends('layouts.holy-grail-2col')
+@extends('layouts.2col-fixed')
 
 @section('left-column')
-
+<script src="{{ URL::asset('assets/js/jquery.panelslider.min.js') }}"></script>
+<style>
+	.drag-cursor {
+		cursor: url('{{ URL::asset("assets/images/drag-cursor-sm.png") }}'), auto;
+	}
+</style>
 <div id="toolbox">
 	<h1>{{ FA::icon('wrench') }}&nbsp;&nbsp;Toolbox</h1>
-	<h3>Classes:</h3>
+	<h3><span class="plus-icon">{{ FA::icon('plus') }}</span> Add Classes:</h3>
 	<div class="panel-group" id="accordion">
 
 		{{-- Begin accordion section --}}
@@ -170,75 +175,175 @@
 			</div>
 		</div>
 		{{-- End accordion section --}}
-		
+
+		<h3><span class="view-icon">{{ FA::flipHorizontal('search') }}</span> On the Schedule:</h3>
+		{{-- Begin accordion section --}}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4>
+					<a data-toggle="collapse" data-parent="#accordion" href="#collapse-six">
+						<span class="accordion-closed">
+							{{FA::icon('chevron-right')}}&nbsp;
+						</span>
+						<span class="accordion-open">
+							{{FA::icon('chevron-down')}}
+						</span>
+						&nbsp;<b>Scheduled Classes</b>
+					</a>
+				</h4>
+			</div>
+			<div id="collapse-six" class="panel-collapse collapse">
+				<div class="panel-body">
+					Class List
+				</div>
+			</div>
+		</div>
+		{{-- End accordion section --}}
+
+		<h3><span class="warning-icon">{{ FA::icon('warning') }}</span> Schedule Conflicts:</h3>
+		{{-- Begin accordion section --}}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4>
+					<a data-toggle="collapse" data-parent="#accordion" href="#collapse-seven">
+						<span class="accordion-closed">
+							{{FA::icon('chevron-right')}}&nbsp;
+						</span>
+						<span class="accordion-open">
+							{{FA::icon('chevron-down')}}
+						</span>
+						&nbsp;<b>View Conflicts</b>
+					</a>
+				</h4>
+			</div>
+			<div id="collapse-seven" class="panel-collapse collapse">
+				<div class="panel-body">
+					Conflict List
+				</div>
+			</div>
+		</div>
+		{{-- End accordion section --}}
+
 	</div><!-- end div id=accordion -->
-	<h3>Scratch Pad:</h3>
-	<div id="scratch-pad">
-		Drag classes here to be rescheduled later
-	</div>
 </div>
 
 @stop
 
-@section('center-column')
+@section('main-column')
+
+<div id="toggle-container">
+	<a id="toggle-toolbox" href="#left-side-bar">{{ FA::icon('chevron-right') }}</a>
+</div>
+
+<script>
+	var panel_is_open = false;
+	$('#toggle-toolbox').click(function(e) {
+		e.preventDefault();
+
+		if (panel_is_open)
+		{
+			$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+			$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
+			panel_is_open = false;
+		}
+		else
+		{
+			//$('#toggle-container').zIndex($('#left-side-bar').zIndex() - 1);
+			$('#toggle-container').animate({marginLeft: +350}, {duration: 200});
+			panel_is_open = true;
+		}
+		
+		return false;
+	});
+	$('#toggle-toolbox').panelslider({
+		onOpen: function() {
+			var z = Math.min($('#custom_navbar').zIndex(), $('page_footer').zIndex());
+			$('#left-side-bar').zIndex(10);
+			//$('#left-side-bar').css('position', 'absolute');
+			//$('#main-column').zIndex(z-2);
+			$('#page_footer').zIndex(11);
+			$('#toggle-container').zIndex(11);
+			$('#toggle-toolbox').html('<i class="fa fa-chevron-left"></i>');
+		},
+		clickClose: false
+	});
+
+</script>
 
 <h1 id="sched-name">{{ $schedule->name }}
 	<a href="#"><span>{{FA::icon('edit')}}</span></a>
 </h1>
 
-<div id="sched-col-headers">
-	<div class="sched-col-header" id="mon-col-header">
-		<h3>MONDAY</h3>
+<div id="outer-container">
+	<div id="sched-col-headers">
+		<div class="sched-col-header" id="empty-cell"></div>
+		<div class="sched-col-header" id="mon-col-header">
+			<h3>MONDAY</h3>
+		</div>
+		<div class="sched-col-header" id="tue-col-header">
+			<h3>TUESDAY</h3>
+		</div>
+		<div class="sched-col-header" id="wed-col-header">
+			<h3>WEDNESDAY</h3>
+		</div>
+		<div class="sched-col-header" id="thu-col-header">
+			<h3>THURSDAY</h3>
+		</div>
+		<div class="sched-col-header" id="fri-col-header">
+			<h3>FRIDAY</h3>
+		</div>
 	</div>
-	<div class="sched-col-header" id="tue-col-header">
-		<h3>TUESDAY</h3>
-	</div>
-	<div class="sched-col-header" id="wed-col-header">
-		<h3>WEDNESDAY</h3>
-	</div>
-	<div class="sched-col-header" id="thu-col-header">
-		<h3>THURSDAY</h3>
-	</div>
-	<div class="sched-col-header" id="fri-col-header">
-		<h3>FRIDAY</h3>
+	<div id="inner-container">
+		<div id="time-labels">
+			<p>8:00</p>
+			<p>9:00</p>
+			<p>10:00</p>
+			<p>11:00</p>
+			<p>12:00</p>
+			<p>1:00</p>
+			<p>2:00</p>
+			<p>3:00</p>
+			<p>4:00</p>
+			<p>5:00</p>
+			<p>6:00</p>
+			<p>7:00</p>
+			<p>8:00</P>
+		</div>
+		{{--<div id="sched-container">--}}
+			<div class="sched-day-column" id="mon-col">
+			</div>
+			<div class="sched-day-column" id="tue-col">
+			</div>
+			<div class="sched-day-column" id="wed-col">
+			</div>
+			<div class="sched-day-column" id="thu-col">
+			</div>
+			<div class="sched-day-column" id="fri-col">
+			</div>
+		{{--</div>--}}
 	</div>
 </div>
-<div id="time-labels">
-	<p>8:00</p>
-	<p>9:00</p>
-	<p>10:00</p>
-	<p>11:00</p>
-	<p>12:00</p>
-	<p>1:00</p>
-	<p>2:00</p>
-	<p>3:00</p>
-	<p>4:00</p>
-	<p>5:00</p>
-	<p>6:00</p>
-	<p>7:00</p>
-	<p>8:00</P>
+<div id="class-staging">
+	<?php $group_count = 1; ?>
+	@foreach($schedule->events as $class)
+		@include('editor/staged-class')
+		<?php $group_count++; ?>
+	@endforeach
+	<script>group_counter = {{ $group_count }};</script>
 </div>
-<div id="sched-container">
-	<div class="sched-day-column" id="mon-col">
-	</div>
-	<div class="sched-day-column" id="tue-col">
-	</div>
-	<div class="sched-day-column" id="wed-col">
-	</div>
-	<div class="sched-day-column" id="thu-col">
-	</div>
-	<div class="sched-day-column" id="fri-col">
-	</div>
-</div>
-<div id="trash-container">
+<div id="bottom-container">
 	<div id="drop-trash">
 		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">
+	</div>
+	<div id="scratch-pad">
+		Drag classes here to be rescheduled later
 	</div>
 </div>
 <div id="hidden-data" class="hide"
 	 data-addurl="{{ URL::route('e-add-class') }}"
 	 data-removeurl= "{{ URL::route('e-remove-class') }}"
-	 data-schedid="{{ $schedule->id }}">
+	 data-schedid="{{ $schedule->id }}"
+	 data-cursor="{{ URL::asset('assets/images/drag-cursor-sm.png') }}">
 </div>
 
 @stop

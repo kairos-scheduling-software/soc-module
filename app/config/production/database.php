@@ -1,6 +1,6 @@
 <?php
 
-$mysql_url = parse_url(getenv($CLEARDB_DATABASE_URL));
+$mysql_url = parse_url(getenv('CLEARDB_DATABASE_URL'));
 
 return array(
 

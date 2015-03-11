@@ -24,11 +24,9 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
-
-	'local' => array('VCode2', 'Tyler-PC', 'lamp'),
-
-));
+$env = $app->detectEnvironment(function() {
+	return getenv('LARAVEL_ENV') ?: 'local';
+});
 
 /*
 |--------------------------------------------------------------------------

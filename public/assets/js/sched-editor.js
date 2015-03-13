@@ -22,7 +22,10 @@ $(function(){
 	$('#search-clear').click(function(){
 		$('#class-search').val("");
 
-		$('div.scheduled-class').css('background-color', "#0099FF");
+		$('div.scheduled-class').css({
+			backgroundColor: '#0099FF', 
+			opacity: '1', 
+			boxShadow: ''});
 	});
 
 	$('body').on('submit', '#new-class-form', function(e) {
@@ -284,22 +287,21 @@ function resize_all()
 							- $('#bottom-container').outerHeight(true)
 							- parseInt($('#page_footer').css('height'));
 
+	$('#main-container').css('width', $(window).width() + 'px');
+	time_block_w = 40;//$('#main-container').width() / 35;
+
 	$('#time-labels').css('height', sched_height + 'px');
 	five_min_height = $('#inner-container').height() / 144;
 
 	$('.fifty-min-blk').css('height', (10 * five_min_height));
 	$('.eighty-min-blk').css('height', (16 * five_min_height));
 
-	time_block_w = $('.sched-day-column').width() / 7;
-
 	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
-
-	$('#outer-container').css('min-width', ($(window).width() - 200) + 'px');
 
 	$('.class-name-container').each(function() {
 		var course = $(this);
 		var div = course.closest('div.scheduled-class');
-		console.log("div: " + div.attr('data-group'));
+		//console.log("div: " + div.attr('data-group'));
 		var p = div.height();
 		p = (p - course.outerHeight(true)) / 4;
 
@@ -605,11 +607,13 @@ function load_schedule()
 	});
 
 	refresh_scheduled_class_draggables();
+
+	course_list.sort();
 	
 	$('#class-search').autocomplete({
 		source: course_list,
 		open: function(event, ui) {
-			$('#class-search-container').append($('#ui-id-1'));
+
 			$('.ui-menu-item').click(function() {
 				$('#class-search').val($(this).text());
 				var name = $(this).text();
@@ -618,13 +622,27 @@ function load_schedule()
 				$('.class-name-container').each(function() {
 					if ($(this).text() == name)
 					{
-						$(this).closest('div').css('background-color', '#4D944D');
+						$(this).closest('div').css({
+							opacity: 1,
+							backgroundColor: '#4D944D',
+							boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
+						});
 					}
+					else
+						$(this).closest('div').css({
+							opacity: 0.2,
+							backgroundColor: '#0099FF',
+							boxShadow: ''
+						});
 				});
 			});
 		}
 	});
+
+	$('#class-search-container').append($('#ui-id-1'));
+	$('.ui-helper-hidden-accessible').addClass('hidden');
 }
+
 
 function compute_offsets(start, day, length)
 {

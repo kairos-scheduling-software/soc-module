@@ -245,6 +245,12 @@
 	var panel_is_open = false;
 	$('#toggle-toolbox').click(function(e) {
 		e.preventDefault();
+		
+		setTimeout(function() {
+			$('#left-side-bar').zIndex(10);
+			$('#page_footer').zIndex(11);
+			$('#toggle-container').zIndex(11);
+		}, 20);
 
 		if (panel_is_open)
 		{

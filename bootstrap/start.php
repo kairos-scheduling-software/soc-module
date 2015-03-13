@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('VCode2', 'Tyler-PC', 'lamp'),
+	'local' => array('VCode2', 'Tyler-PC', 'lamp')
 
 ));
 

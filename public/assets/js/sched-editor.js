@@ -287,7 +287,7 @@ function resize_all()
 							- $('#bottom-container').outerHeight(true)
 							- parseInt($('#page_footer').css('height'));
 
-	$('#main-container').css('width', $(window).width() + 'px');
+	//$('#main-container').css('width', $(window).width() + 'px');
 	time_block_w = 40;//$('#main-container').width() / 35;
 
 	$('#time-labels').css('height', sched_height + 'px');

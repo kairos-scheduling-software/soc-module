@@ -1,19 +1,26 @@
 $(function() 
 {
-	var mode = $('#import-mode option:selected').val();
-	place_description(mode);
-	update_header(mode);
-	shownScheduleSelector(mode);
-
 	$("#import-mode").change(function() {
 		var mode = $('#import-mode option:selected').val();
+		$('[id=clear]').addClass('hide');
 		place_description(mode);
 		update_header(mode);
 		shownScheduleSelector(mode);
 
 		$("#import").attr("action", $('#import-mode option:selected').attr('data-url'));
 	});
+
+	update_type();
 });
+
+function update_type()
+{
+	var mode = $('#import-mode option:selected').val();
+	place_description(mode);
+	update_header(mode);
+	shownScheduleSelector(mode);
+	$("#import").attr("action", $('#import-mode option:selected').attr('data-url'));
+}
 
 function place_description(mode)
 {
@@ -49,9 +56,11 @@ function place_description(mode)
 					+ "</br></br>"
 					+ "Title - The title of the class I.E. Object Oriented Programming"
 					+ "</br></br>"
+					+ "Type - The type of class it is from the following Laboratory, Discussion, Lecture, Seminar, or Special Topics"
+					+ "</br></br>"
 					+ "Time - The time of the class in the format day then time such as M1300|W1300"
 					+ "</br></br>"
-					+ "Length - The length of the class I.E. 80"
+					+ "Length - The length of the class in minutes I.E. 80"
 					+ "</br></br>";
 	}
 

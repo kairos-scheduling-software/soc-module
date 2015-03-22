@@ -82,17 +82,17 @@ Route::group(array('before'=> 'auth'), function()
 	//import schedule routes
 	Route::get('/import-schedule', array(
 		'as' => 'import-schedule',
-		'uses' => 'ScheduleController@import_schedule'
+		'uses' => 'ImportController@import_schedule'
 	));
 
 	Route::post('/import-schedule', array(
 		'as' => 'import-post',
-		'uses' => 'ScheduleController@import_post'
+		'uses' => 'ImportController@import_post'
 	));
 
 	Route::post('/import-constraint', array(
 		'as' => 'import-constraint',
-		'uses' => 'ScheduleController@import_constraint'
+		'uses' => 'ImportController@import_constraint'
 	));
 
 	Route::post('/branch-schedule/{sched_id}', array(

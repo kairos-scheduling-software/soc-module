@@ -41,7 +41,7 @@ var dashboard3 = (function () {
 
         svgWidth =  $('#content').width() - 300;
         svgHeight = $('#left-nav').height() - 50;
-
+        
         //Make an SVG Container
         svg = d3.select("#d3").append("svg")
                 .attr("width", svgWidth + gridMargin.left + gridMargin.right)
@@ -60,6 +60,7 @@ var dashboard3 = (function () {
 
         container = svg.append("g");
 
+        $(".d3-tip").remove();
         tip = d3.tip().attr('class', 'd3-tip').html(function (d) {
             return  '<table style="width:100%">' +
                         '<tr>' +
@@ -260,10 +261,10 @@ var dashboard3 = (function () {
         });
 
         room_list.sort();
-
+        
         var rooms_sel = $("#rooms-sel");
         rooms_sel.html('');
-        console.log(roomCounter);
+        //console.log(roomCounter);
         $.each(rooms, function (key, val) {
             console.log(key, val);
             rooms_sel.append('<option vlaue=' + val + '>' + key + '</option>');
@@ -613,21 +614,44 @@ var dashboard3 = (function () {
         return false;
         });
     }
-
+    
+    function createSelect(tag_prefix, label, multiple) {
+        var mult = "";
+        if(multiple) {
+            mult += 'multiple="multiple"';
+        }
+        return '<div class="form-group"><label for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + '  class="vis-select"></select></div>';
+    }
+    
     function render() {
+        $("#content").html('');
+        
+        $('#vis-menu').remove();
+        $('#left-nav').append('<div id="vis-menu"></div>');
+
+        var vis_menu = $('#vis-menu');
+        vis_menu.hide();
+
+        vis_menu.append(createSelect('sched', 'Schedule', false));
+
+        var result = "";
+        for(var i = 2000; i <= 2014; i++) {
+            result += '<option value="' + i + '-FALL">' + i + '-Fall</option><option value="' + i + '-SPRING">' + i + '-Spring</option><option value="' + i + '-SUMMER">' + i + '-Summer</option>';
+        }
+        $('#sched-sel').append(result);
+
+        vis_menu.append(createSelect('rooms', 'Room', true));
+        vis_menu.append(createSelect('class-type', 'Class Type', true));
+        vis_menu.append(createSelect('class', 'Class', true));
+        vis_menu.append(createSelect('prof', 'Professor', true));
 
         $("#content").load("assets/vis/vis3Filt.html", function () {
             //chart1 =
             createChart('#d3', vis_data['2000-FALL'], true);
-
-            $('select').multiselect({
-                maxHeight: 300,
-                buttonWidth: '175px'
-            });
+            vis_menu.show();
 
             $(".vis-select").change(function () {
-                console.log($("#year-sel").val() + '-' + $("#semester-sel").val(), false);
-                createChart('#d3', vis_data[$("#year-sel").val() + '-' + $("#semester-sel").val()]);
+                createChart('#d3', vis_data[$("#sched-sel").val()]);
             });
         });
     }

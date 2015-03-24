@@ -29,8 +29,8 @@ class Communication
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)
     {
-        //$host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
-        $host = 'localhost:8080/api/' . $mode;
+        $host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
+        //$host = 'localhost:8080/api/' . $mode;
 
 		//will need to set up
 		$curl = curl_init($host);

@@ -2,9 +2,6 @@ var dashboard3 = (function () {
 
     "use strict";
 
-    // Currently selected dashboard values
-    var chart1;
-
     var gridMargin = {top: 20, right: 5, bottom: 5, left: 70};
     var svgWidth = 1000;  // - gridMargin.left - gridMargin.right;
     var svgHeight = 1000;  // - gridMargin.top - gridMargin.bottom;
@@ -76,6 +73,10 @@ var dashboard3 = (function () {
                 '<td><span style="color:red">' + d.class_type + '</span></td>' +
                 '</tr>' +
                 '<tr>' +
+                '<td> Professor: &nbsp; </td>' +
+                '<td><span style="color:red">' + d.mprof + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
                 '<td> Room: </td>' +
                 '<td><span style="color:red">' + d.room + '</span></td>' +
                 '</tr>' +
@@ -123,6 +124,9 @@ var dashboard3 = (function () {
             init();
         }
 
+        // Get rid of any multiselect that is still active
+        //$('select').multiselect('destroy');
+
         var boxWidth = 12; //10
         var boxHeight = 50.0;
         var daysSkip = 1;
@@ -136,8 +140,11 @@ var dashboard3 = (function () {
         var prof = new Array();
         var class_types = new Array();
         var room_list = new Array();
+        var room_map = new Array();
+        var mprof = {};
         var rooms = {};
         var days = {};
+        var cnames = {};
 
         var data = [];
 
@@ -157,14 +164,15 @@ var dashboard3 = (function () {
             var day;
             var class_name;
             if (val.days[0] != "" && val.room != "") {
-
-                //console.log(JSON.stringify(val));
-
                 // Pre-populate array
                 getCol(val['room']);
 
                 class_name = getClassStringId(val.name);
                 setClassColorIndex(val.class_type);
+
+                if (mprof[val.main_prof] == null) {
+                    mprof[val.main_prof] = 1;
+                }
 
                 for (var j = 0; j < val.days.length; j++) {
                     // Kind of ugly... This can be done better.
@@ -194,12 +202,14 @@ var dashboard3 = (function () {
                         "title": val.title,
                         "room": val.room,
                         "class": class_name,
-                        "cname": class_name.substring(0, class_name.indexOf("-")) // Used for colors
+                        "cname": class_name.substring(0, class_name.indexOf("-")), // Used for colors
+                        "mprof": val.main_prof
                     };
 
+                    if (cnames[point.cname] == null) {
+                        cnames[point.cname] = 1;
+                    }
 
-
-                    //console.log(class_name.substring(0, class_name.indexOf("-")));
                     data.push(point);
                 }
 
@@ -222,6 +232,24 @@ var dashboard3 = (function () {
         if (boxWidth < 12) {
             boxWidth = 12;
         }
+        
+        // Do rooms here so we get the correct column alignment
+        $.each(rooms, function (i, val) {
+            room_list.push(i);
+        });
+
+        room_list.sort();
+        
+        roomCounter = 0;
+        rooms = {};
+        
+        var rooms_sel = $("#rooms-sel");
+        rooms_sel.html('');
+        //console.log(roomCounter);
+        $.each(room_list, function (key, val) {
+            getCol(val);
+            rooms_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
+        });
 
         // Calculate values so we don't have to do it each time a frame is rendered
         $.each(data, function (i, val) {
@@ -251,31 +279,51 @@ var dashboard3 = (function () {
 
         // Classes
         var class_sel = $("#class-type-sel");
+        class_sel.html('');
         $.each(class_types, function (i, val) {
-            class_sel.append('<option vlaue=' + i + '>' + val + '</option>');
+            class_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
         });
+        class_sel.multiselect('rebuild');
+        class_sel.multiselect('selectAll', false);
+        class_sel.multiselect('refresh');
 
-        // Rooms
-        $.each(rooms, function (i, val) {
-            room_list.push(i);
+        rooms_sel.multiselect('rebuild');
+        rooms_sel.multiselect('selectAll', false);
+        rooms_sel.multiselect('refresh');
+
+        $.each(mprof, function (i, val) {
+            prof.push(i);
         });
+        prof.sort();
 
-        room_list.sort();
-
-        var rooms_sel = $("#rooms-sel");
-        rooms_sel.html('');
+        var prof_sel = $("#prof-sel");
+        prof_sel.html('');
         //console.log(roomCounter);
-        $.each(rooms, function (key, val) {
-            console.log(key, val);
-            rooms_sel.append('<option vlaue=' + val + '>' + key + '</option>');
+        $.each(prof, function (key, val) {
+            //console.log(key, val);
+            prof_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
         });
 
-        $('select').multiselect('destroy')
-        $('select').multiselect({
-            //    width: 200
-            maxHeight: 300,
-            buttonWidth: '175px'
+        prof_sel.multiselect('rebuild');
+        prof_sel.multiselect('selectAll', false);
+        prof_sel.multiselect('refresh');
+
+        $.each(cnames, function (i, val) {
+            classes.push(i);
         });
+        classes.sort();
+
+        var class_sel = $("#class-sel");
+        class_sel.html('');
+        //console.log(roomCounter);
+        $.each(classes, function (key, val) {
+            //console.log(key, val);
+            class_sel.append('<option value=' + val + '>' + val.replace(/[^A-Z0-9]/g, ' ') + '</option>');
+        });
+
+        class_sel.multiselect('rebuild');
+        class_sel.multiselect('selectAll', false);
+        class_sel.multiselect('refresh');
 
         // The +0.1 makes it draw the very last bar. +1 causes a little bit of the axis to hang over
         var width = boxWidth * dayBoxes * numDays + 0.1;
@@ -415,6 +463,9 @@ var dashboard3 = (function () {
             .attr("height", function (d) {
                 return d.height;
             })
+            .attr("class", function (d) {
+                return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' ' + d.cname;
+            })
             .on('mouseover', function (d) {
                 d3.selectAll("." + d.class).style("fill", gridClassHighlightColor);
                 tip.direction(d.tipDir);
@@ -511,19 +562,16 @@ var dashboard3 = (function () {
                 if (arrow_y < 15) {
                     arrow_y = 15;
                 }
-                
+
                 console.log((final_x + 350) + ", " + (final_y + poHeight) + "; " + svgHeight);
-                
-                if((final_y + poHeight) > svgHeight) {
+
+                if ((final_y + poHeight) > svgHeight) {
                     final_y = svgHeight - 350;
                 }
-                
-                if((final_x + 350) > width) {
+
+                if ((final_x + 350) > width) {
                     final_x = final_x - $('#po-d3').width() - (xOffset * 3);
                 }
-
- 
-
 
                 // ADD CODE HERE TO FLIP WHICH DIRECTION THE POPOVER DISPLAYS ON THE X AXIS
                 gridClassSelected = d.name;
@@ -628,12 +676,16 @@ var dashboard3 = (function () {
         });
     }
 
-    function createSelect(tag_prefix, label, multiple) {
+    function createSelect(tag_prefix, label, multiple, classes) {
         var mult = "";
         if (multiple) {
             mult += 'multiple="multiple"';
         }
-        return '<div class="form-group"><label for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + '  class="vis-select"></select></div>';
+        return '<div class="form-group"><label for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + ' class="vis-select ' + classes + '"></select></div>';
+    }
+
+    function createOption(key, value) {
+        return '<option value="' + key + '">' + value + '</option>';
     }
 
     function render() {
@@ -645,7 +697,7 @@ var dashboard3 = (function () {
         var vis_menu = $('#vis-menu');
         vis_menu.hide();
 
-        vis_menu.append(createSelect('sched', 'Schedule', false));
+        vis_menu.append(createSelect('sched', 'Schedule', false, null));
 
         var result = "";
         for (var i = 2000; i <= 2014; i++) {
@@ -653,19 +705,36 @@ var dashboard3 = (function () {
         }
         $('#sched-sel').append(result);
 
-        vis_menu.append(createSelect('rooms', 'Room', true));
-        vis_menu.append(createSelect('class-type', 'Class Type', true));
-        vis_menu.append(createSelect('class', 'Class', true));
-        vis_menu.append(createSelect('prof', 'Professor', true));
+        vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
+        vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
+        vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
+        vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
+
+        $('select').multiselect({
+            maxHeight: 200,
+            buttonWidth: '175px'
+        });
+
+        $('#sched-sel').multiselect('setOptions', {
+            onChange: function (event) {
+                createChart('#d3', vis_data[$("#sched-sel").val()]);
+            }
+        });
+
+        $('.d_select').multiselect('setOptions', {
+            onChange: function (option, checked, select) {
+                if (checked) {
+                    d3.selectAll("." + $(option).val()).style("visibility", "visible");
+                } else {
+                    d3.selectAll("." + $(option).val()).style("visibility", "hidden");
+                }
+            }
+        });
 
         $("#content").load("assets/vis/vis3Filt.html", function () {
             //chart1 =
             createChart('#d3', vis_data['2000-FALL'], true);
             vis_menu.show();
-
-            $(".vis-select").change(function () {
-                createChart('#d3', vis_data[$("#sched-sel").val()]);
-            });
         });
     }
 

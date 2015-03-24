@@ -147,6 +147,8 @@ $(function(){
     		else if (dragged_block.hasClass('three-eighty'))
     			setup_dropzones('three-eighty', 'eighty-min-blk');
 
+    		$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+
     		$('#sched-container').css('opacity', 0.5);
 
     		$('.drop-zone').droppable({
@@ -206,9 +208,7 @@ $(function(){
 
 		    		$("div[data-group=" + group_id + "]").html();
 
-		    		$('.drop-zone').remove();
-
-		    		
+		    		$('.drop-zone').remove();	    		
 
 		    		refresh_scheduled_class_draggables();
 		    	},
@@ -283,6 +283,7 @@ $(function(){
 			$('#class-search').focus();
 		}
 	});
+	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 });
 
 /**
@@ -688,7 +689,7 @@ function parse_time(time_string)
 	else
 		time += hr + ":";
 
-	time += min + suffix;
+	time += min_str + suffix;
 
 	return time;
 }
@@ -803,6 +804,7 @@ function add_matrix_col(day)
 
 	var num_cols = (col_counts[day] + 1);
 
+
 	switch(day)
 	{
 		case 'mon':
@@ -823,6 +825,7 @@ function add_matrix_col(day)
 	}
 
 	col_counts[day] = num_cols;
+	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 }
 
 function initialize_column_matrix()

@@ -62,7 +62,7 @@ $(function(){
 					var col_index = day + col;
 					var indices = [];
 
-					for (i = params[v_offset]; i < (params[v_offset] + params[b_length]); i++)
+					for (i = params["v_offset"]; i < (params["v_offset"] + params["b_length"]); i++)
 						indices.push(i);
 
 					$(this).data('col_index', col_index);

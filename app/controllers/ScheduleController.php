@@ -27,17 +27,17 @@ class ScheduleController extends BaseController {
 	{
 		$id = Input::get('id');
 		$schedule = Schedule::find($id);
-
+/*
 		if(!$id || !$schedule)
 			return Redirect::route('dashboard');
 		else
-		{
+		{*/
 			$schedule = Schedule::find($id);
 			return View::make('sched_01')->with([
 				'page_name'	=>	'Schedule View',
 				'schedule'	=>	$schedule
 			]);
-		}
+		//}
 	}
 
 	public function edit_schedule($id)

@@ -196,7 +196,7 @@
 				<div class="panel-body">
 					<div class="ui-widget" id="class-search-container">
 						<p>Type to Search the Schedule:</p>
-						<input id="class-search"class="form-control" placeholder="Class Name"/>
+						<input id="class-search" class="form-control" placeholder="Class Name"/>
 						<span id="search-clear">{{FA::icon('times-circle')}}</span>
 					</div>
 				</div>
@@ -328,15 +328,15 @@
 			<p>8:00</P>
 		</div>
 		{{--<div id="sched-container">--}}
-			<div class="sched-day-column" id="mon-col">
+			<div class="sched-day-column" id="mon-col" data-ddd="mon">
 			</div>
-			<div class="sched-day-column" id="tue-col">
+			<div class="sched-day-column" id="tue-col" data-ddd="tue">
 			</div>
-			<div class="sched-day-column" id="wed-col">
+			<div class="sched-day-column" id="wed-col" data-ddd="wed">
 			</div>
-			<div class="sched-day-column" id="thu-col">
+			<div class="sched-day-column" id="thu-col" data-ddd="thu">
 			</div>
-			<div class="sched-day-column" id="fri-col">
+			<div class="sched-day-column" id="fri-col" data-ddd="fri">
 			</div>
 		{{--</div>--}}
 	</div>

@@ -32,11 +32,11 @@ $(function(){
 		e.preventDefault();
 		var group_id = $('#new-class-btn').attr('data-group');
 		var form = $(this);
+		var params = form.data('params');
 		var class_name = $('input[name="class_name"').val();
 
 		$("div[data-group=" + group_id + "]").html("<span class='class-name-container'>" + class_name + "</span");
 		$("div[data-group=" + group_id + "]").popover('destroy');
-
 		
 		var data = form.serializeArray();
 		var url = form.attr('action');
@@ -54,6 +54,18 @@ $(function(){
 				$('#checking-sched').hide();
 				var json_data = JSON.parse(data);
 
+				// Update the matrix
+				$("div[data-group=" + group_id + "]").each(function() {
+					var col = $(this).data('col');
+					var day = $(this).closest('div.sched-day-column').data('ddd');
+					var col_index = day + col;
+					var indices = [];
+
+					for (i = params[v_offset]; i < (params[v_offset] + params[b_length]); i++)
+						indices.push(i);
+
+					update_column_matrix(col_index, indices, "busy");
+				});
 				if (json_data['wasFailure'])
 				{
 					$('#sched-bad').show();
@@ -62,7 +74,7 @@ $(function(){
 				else
 				{
 					$('#sched-ok').show();
-				}				
+				}
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				console.log(JSON.stringify(jqXHR));
@@ -145,11 +157,34 @@ $(function(){
 		    		var group_id = $(this).attr('data-group');
 		    		$('.drop-zone').droppable("destroy");
 		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover time-block-active drop-zone ui-droppable');
-		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class');
-		    		$("div[data-group=" + group_id + "]").attr('data-content', get_popover_content(group_id));
+		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class not-yet-added');
+
+		    		var params = [];
+		    		params["col"] = parseInt($(this).attr('data-col'));
+		    		params["day_string"] = $(this).attr('data-days');
+		    		params["v_offset"] = parseInt($(this).attr('data-start'));
+		    		params["time"] = parse_time($(this).data('time'));
+		    		params["b_length"] = parseInt($(this).attr('data-length'));
+		    		params["days"] = [];
+
+		    		if (params["day_string"].indexOf("mon") >=0)
+		    			params["days"].push('mon');
+		    		if (params["day_string"].indexOf("tue") >=0)
+		    			params["days"].push('tue');
+		    		if (params["day_string"].indexOf("wed") >=0)
+		    			params["days"].push('wed');
+		    		if (params["day_string"].indexOf("thu") >=0)
+		    			params["days"].push('thu');
+		    		if (params["day_string"].indexOf("fri") >=0)
+		    			params["days"].push('fri');
+
+		    		var content = get_popover_content(group_id, params);
+		    		$("div[data-group=" + group_id + "]").attr('data-content', content);
 
 		    		// Show popover
 		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
+		    		var el = $(this);
+
 		    		$(this).popover({
 		    			trigger: "manual",
 		    			html: true
@@ -159,36 +194,21 @@ $(function(){
 	    					$('.popover').css('top', 0);
 	    					$('.arrow').css('top', pos + 'px');
 	    				}
+
+	    				$('#new-class-form').data('params', params);
+
+	    				$('#cancel-add-class').click(function() {
+	    					el.popover('destroy');
+	    					$('.not-yet-added').remove();
+	    				});
+
 		    		}).popover('show');
 
 		    		$("div[data-group=" + group_id + "]").html();
 
 		    		$('.drop-zone').remove();
 
-		    		var col = parseInt($(this).attr('data-col'));
-		    		var day_string = $(this).attr('data-days');
-		    		var v_offset = parseInt($(this).attr('data-start'));
-		    		var b_length = parseInt($(this).attr('data-length'));
-		    		var days = [];
-
-		    		if (day_string.indexOf("mon") >=0)
-		    			days.push('mon');
-		    		if (day_string.indexOf("tue") >=0)
-		    			days.push('tue');
-		    		if (day_string.indexOf("wed") >=0)
-		    			days.push('wed');
-		    		if (day_string.indexOf("thu") >=0)
-		    			days.push('thu');
-		    		if (day_string.indexOf("fri") >=0)
-		    			days.push('fri');
-
-		    		for (i = v_offset; i < (v_offset + b_length); i++)
-		    		{
-		    			$.each(days, function(k, d) {
-		    				var col_idx = d + "" + col;
-		    				day_columns[col_idx][i] = "busy";
-		    			});
-		    		}
+		    		
 
 		    		refresh_scheduled_class_draggables();
 		    	},
@@ -237,6 +257,31 @@ $(function(){
 			input.val(value - 5);
 		else
 			return;
+	});
+
+	// Listen for 'ctrl + f' and override the browser's default search
+	$(window).keydown(function(e) {
+		if (e.which == "70" && e.ctrlKey)
+		{
+			// Prevent the browser's default 'ctrl + f' behavior
+			e.preventDefault();
+
+			// Open the toolbox
+			if (!panel_is_open)
+				$('#toggle-toolbox').click();
+
+			// Close any open toolbox sections and open the 'On the Schedule' accordion item
+			$('.panel-collapse').each(function() {
+				if ($(this).hasClass('in') && ($(this).attr('id') != 'collapse-six'))
+					$(this).collapse('hide');
+			});
+
+			if (!($('#collapse-six').hasClass('in')))
+				$('#collapse-six').collapse('show');
+
+			// Place focus in the text input
+			$('#class-search').focus();
+		}
 	});
 });
 
@@ -461,7 +506,7 @@ function setup_dropzones(key, block_class)
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
 			html_block += "' data-length='" + (block["length"] / 5) + "'";
 			html_block += " data-days='" + block["days"] + "'";
-			//html_block += " title='Days: " + block["days"] + ", Time: " + block["etime"]["starttm"] + "'";
+			html_block += " data-time='" + block["etime"]["starttm"] + "'";
 			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
@@ -558,25 +603,94 @@ function refresh_scheduled_class_draggables()
 	});
 }
 
-function get_popover_content(group_id)
+function get_popover_content(group_id, params)
 {
 	var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
+	var days = "";
+
+	$.each(params["days"], function(i, day) {
+		switch(day)
+		{
+			case "mon":
+				if(days == "")
+					days = "M";
+				else
+					days += ", M";
+				break;
+			case "tue":
+				if(days == "")
+					days = "T";
+				else
+					days += ", T";
+				break;
+			case "wed":
+				if(days == "")
+					days = "W";
+				else
+					days += ", W";
+				break;
+			case "thu":
+				if(days == "")
+					days = "Th";
+				else
+					days += ", Th";
+				break;
+			case "fri":
+				if(days == "")
+					days = "F";
+				else
+					days += ", F";
+				break;
+		}
+	});
+
+	var times = "";
+
+
+
+	times = "time placeholder";
 
 	var html = "<div style='text-align:center'><h4>New Class</h4></div>";
-	html += "<b>Days:</b><br>";
-	html += "<b>Times:</b><br>";
-	html += "<div><form action='"+add_class_url+"' id='new-class-form'>";
+	html += "<b>Days: </b><em>"+ days +"</em><br>";
+	html += "<b>Time: </b><em>"+ params["time"] +"</em><br>";
+	html += "<b>Duration: </b><em>"+ (params["b_length"] * 5) +" min</em><br><br>";
+	html += "<div><form action='"+add_class_url+"' id='new-class-form' style='display: inline'>";
 	html += "<input type='hidden' name='block_id' value='"+blk_id+"'>";
 	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
 	html += "<small><b>Class Name:</b></small><br>";
-	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name'>";
+	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
 	html += "<small><b>Room:</b></small><br>";
-	html += "<input type='text' class='form-control' name='room_name' placeholder='Room'>";
+	html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
 	html += "<small><b>Professor:</b></small><br>";
-	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor'>";
-	html += "<p style='margin-top:10px'><button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button></p></form></div>";
+	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
+	html += "<button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
+	html += "</form><button class='btn btn-default' id='cancel-add-class'><i class='fa fa-times'></i> Cancel</button></div>";
 
 	return html;
+}
+
+function parse_time(time_string)
+{
+	time_string = "" + time_string;
+	var hr_str = time_string.substring(0,2);
+	var min_str = time_string.substring(2);
+	var hr = parseInt(hr_str);
+	var min = parseInt(min_str);
+
+	var time = "";
+	var suffix = " AM";
+
+	if (hr > 12)
+	{
+		time += (hr - 12) + ":";
+		suffix = " PM";
+	}
+	else
+		time += hr + ":";
+
+	time += min + suffix;
+
+	return time;
 }
 
 
@@ -641,6 +755,8 @@ function load_schedule()
 
 	$('#class-search-container').append($('#ui-id-1'));
 	$('.ui-helper-hidden-accessible').addClass('hidden');
+
+	console.log('Total columns: ' + total_cols());
 }
 
 
@@ -877,4 +993,17 @@ function initialize_column_matrix()
 		day_columns["thu10"].push("empty");
 	for (var j = 0; j < 144; j++)
 		day_columns["fri10"].push("empty");
+}
+
+function total_cols()
+{
+	var count = 0;
+
+	count += col_counts['mon'];
+	count += col_counts['tue'];
+	count += col_counts['wed'];
+	count += col_counts['thu'];
+	count += col_counts['fri'];
+
+	return count;
 }

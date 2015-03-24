@@ -173,12 +173,12 @@
 }
 
 .gly-rotate-90 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
-  -webkit-transform: rotate(90deg);
-  -moz-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  transform: rotate(90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 .axis line {
@@ -256,8 +256,9 @@
 
 #po-d3 {
     position: fixed;
-    width: 400px;
-    max-width: 400px;
+    width: 350px;
+    min-width: 350px;
+    max-width: 350px;
 }
 
 svg {
@@ -265,7 +266,7 @@ svg {
 }
 
 .messageBox {
-    width: 350px;
-    height: 300px;
+    width: 290px;
+    height: 200px;
     resize: none;
 }

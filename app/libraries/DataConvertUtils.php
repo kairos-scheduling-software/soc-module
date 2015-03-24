@@ -68,6 +68,29 @@ class DataConvertUtils
         return $intDay;
     }
 
+    public static function convertKey($tempKey)
+    {
+        $key = "";
+        
+        if(strcasecmp($tempKey, 'before') == 0)
+        {
+            $key = "<";
+        }
+        else if(strcasecmp($tempKey, 'after') == 0)
+        {
+            $key = ">";
+        }
+        else if(strcasecmp($tempKey, 'equal') == 0)
+        {
+            $key = "=";
+        }
+        else if(strcasecmp($tempKey, 'not') == 0)
+        {
+            $key = "!";
+        }
+        return $key;
+    }
+
     public static function importConstraint($schedule, $importFile)
     {
         //Start parsing the file
@@ -82,7 +105,13 @@ class DataConvertUtils
         while (!feof($file)) 
         {
             $row = fgetcsv($file, 1000);
-                
+
+            //this is not a real row
+            if(!$row)
+            {
+                continue;
+            }
+
             if ($row_count==0)
             {
                 $column_headers = $row;
@@ -95,11 +124,13 @@ class DataConvertUtils
                 $row_count += 1;
                 continue;
             }
+            $row_count++;
 
             //if the row doesn't have enough columns skip it
             //eventually use this as part of the % bad data
             if(count($row) !== 3)
             {
+                $failures['rowsFailed'][] = $row_count;
                 continue;
             }
 
@@ -107,27 +138,12 @@ class DataConvertUtils
             $event = models\Event::where('schedule_id', '=', $schedule->id)->where('name', '=', $row[0])->first();
             $event2 = models\Event::where('schedule_id', '=', $schedule->id)->where('name', '=', $row[1])->first();
 
-            $key = "";
-            if(strcasecmp($row[2], 'before') == 0)
-            {
-                $key = "<";
-            }
-            else if(strcasecmp($row[2], 'after') == 0)
-            {
-                $key = ">";
-            }
-            else if(strcasecmp($row[2], 'equal') == 0)
-            {
-                $key = "=";
-            }
-            else if(strcasecmp($row[2], 'not') == 0)
-            {
-                $key = "!";
-            }
+            $key = DataConvertUtils::convertKey($row[2]);
 
-            if($key == "")
+            //it failed if the event couldn't be found or the key is not supported
+            if($key == "" || $event === null || $event2 === null)
             {
-                //it failed
+                $failures['rowsFailed'][] = $row_count;
                 continue;
             }
 
@@ -136,12 +152,14 @@ class DataConvertUtils
                 'value'     => $event2->id,
                 'key'       => $key
             ));
-
-            $row_count += 1; 
         }
 
         fclose($file);
 
+        //minus the value of the header row during final failure calculation 
+        //since that row will already be verified if it gets here
+        $row_count = $row_count - 1;
+        $failures['percentPassed'] = ($row_count - count($failures['rowsFailed'])) / $row_count;
         return $failures;
     }
 
@@ -158,8 +176,14 @@ class DataConvertUtils
         while (!feof($file)) 
         {
             $row = fgetcsv($file, 1000);
+
+            //this is not a real row
+            if(!$row)
+            {
+                continue;
+            }
                 
-            if ($row_count==0)
+            if ($row_count== 0)
             {
                 $column_headers = $row;
                 
@@ -171,15 +195,15 @@ class DataConvertUtils
                 $row_count += 1;
                 continue;
             }
+            $row_count += 1;
 
             //if the row doesn't have enough columns skip it
-            //eventually use this as part of the % bad data
-            if(count($row) < 8)
+            //if any of the rows fail the regex check fail it
+            if(count($row) != 9 || !DataConvertUtils::verifyRow($row))
             {
+                $failures['rowsFailed'][] = $row_count;
                 continue;
             }
-
-            //check if the data is in the correct format using regex and other such methods
 
             $room = Room::firstOrCreate(
             array(
@@ -203,7 +227,7 @@ class DataConvertUtils
             $days = '';
             $time = '';
 
-            foreach (explode('|', $row[6]) as $value) 
+            foreach (explode('|', $row[7]) as $value) 
             {
                 if(strlen($days) > 0)
                 {
@@ -219,7 +243,7 @@ class DataConvertUtils
                 $timeblock = Etime::firstOrCreate(
                 array(
                    'starttm' => $time,
-                   'length' => $row[7],
+                   'length' => $row[8],
                    'days' => $days
                 ));
 
@@ -236,15 +260,18 @@ class DataConvertUtils
                 'professor' => $professor->id,
                 'schedule_id' => $schedule->id,
                 'room_id' => $room->id,
-                'class_type' => '',
+                'class_type' => $row[6],
                 'title' => $row[5],
                 'etime_id' => $timeblock ? $timeblock->id : 1
             ));
-
-            $row_count += 1; 
         }
 
         fclose($file);
+
+        //minus the value of the header row during final failure calculation 
+        //since that row will already be verified if it gets here
+        $row_count = $row_count - 1;
+        $failures['percentPassed'] = ($row_count - count($failures['rowsFailed'])) / $row_count;
 
         return $failures;
     }
@@ -252,28 +279,92 @@ class DataConvertUtils
     private static function verifyHeaders($headers, $mode)
     {
         $verify = true;
-        if($mode == 'full' && count($headers) < 8)
+        
+        if($mode == 'constraint')
         {
-            return false;
-        }
-        else if(count($headers) < 4 && $mode == 'constraint')
-        {
+            if(count($headers) != 3)
+            {
+                return false;
+            }
+
             $verify = $verify && (strcasecmp($headers[0], 'Class') == 0); 
             $verify = $verify && (strcasecmp($headers[1], 'Class') == 0); 
             $verify = $verify && (strcasecmp($headers[2], 'Key') == 0); 
         }
         else
         {
+            if(count($headers) != 9)
+            {
+                return false;
+            }
+
             $verify = $verify && (strcasecmp($headers[0], 'Room') == 0); 
             $verify = $verify && (strcasecmp($headers[1], 'Capacity') == 0); 
             $verify = $verify && (strcasecmp($headers[2], 'UUID') == 0); 
             $verify = $verify && (strcasecmp($headers[3], 'Professor') == 0); 
             $verify = $verify && (strcasecmp($headers[4], 'Class') == 0); 
-            $verify = $verify && (strcasecmp($headers[5], 'Title') == 0); 
-            $verify = $verify && (strcasecmp($headers[6], 'Time') == 0); 
-            $verify = $verify && (strcasecmp($headers[7], 'Length') == 0); 
+            $verify = $verify && (strcasecmp($headers[5], 'Title') == 0);
+            $verify = $verify && (strcasecmp($headers[6], 'Type') == 0); 
+            $verify = $verify && (strcasecmp($headers[7], 'Time') == 0); 
+            $verify = $verify && (strcasecmp($headers[8], 'Length') == 0); 
         }
         //additional modes can be added
+
+        return $verify;
+    }
+
+    /*
+    * Only supports full schedule import for now
+    */
+    private static function verifyRow($row)
+    {
+        if (!preg_match('/^[0-9]*$/', $row[1]))
+        {
+            return false;
+        }
+        else if(!preg_match('/^U[0-9]{7}$/', $row[2]))
+        {
+            return false;
+        }
+        else if(!DataConvertUtils::checkTypeForSupported($row[6]))
+        {
+            return false;
+        }
+        else if(!preg_match('/^[m,t,w,h,f,M,T,W,H,F][0-9]{4}((\|[m,t,w,h,f,M,T,W,H,F][0-9]{4})?)*$/', $row[7]))
+        {
+            return false;
+        }
+        else if(!preg_match('/^[0-9]*$/', $row[8]))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function checkTypeForSupported($type)
+    {
+        $verify = false;
+        if((strcasecmp($type, 'Laboratory') == 0))
+        {
+            $verify = true;
+        }
+        else if((strcasecmp($type, 'Discussion') == 0))
+        {
+            $verify = true;
+        }
+        else if((strcasecmp($type, 'Lecture') == 0))
+        {
+            $verify = true;
+        }
+        else if((strcasecmp($type, 'Seminar') == 0))
+        {
+            $verify = true;
+        }
+        else if((strcasecmp($type, 'Special Topics') == 0))
+        {
+            $verify = true;
+        }
 
         return $verify;
     }
@@ -318,6 +409,7 @@ class DataConvertUtils
         $event['Professor'] = 'Professor';
         $event['Event'] = 'Class';
         $event['Title'] = 'Title';
+        $event['Type'] = 'Type';
         $event['Time']  = 'Time';
         $event['Length'] = 'Length';
         $events[] = $event;
@@ -361,6 +453,7 @@ class DataConvertUtils
                 $event['Professor'] = 'Jim' . $fakeUID;
                 $event['Event'] = $value->name;
                 $event['Title'] = $value->title;
+                $event['Type']  = $value->class_type;
                 $event['Time'] = DataConvertUtils::convertIntToStringDay($value->day) . $value->starttm;
                 $event['Length'] = $value->length;
                 $events[$value->name] = $event;

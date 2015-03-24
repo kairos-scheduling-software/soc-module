@@ -3,96 +3,47 @@ var dashboard1 = (function () {
     "use strict";
 
     // Currently selected dashboard values
-    var chart1,
-            chart2,
-            selectedYear = 2014,
-            selectedSemester = "FALL";
+    var chart1;
+    var chart2;
+    var selectedYear = 2014;
+    var selectedSemester = "FALL";
 
-    function createSummaryChart(selector, dataset) {
+    function createNewSummaryChart(selector, data) {
+          var svg = dimple.newSvg(selector, 530, 600);
+          // Create and Position a Chart
+          var chart1 = new dimple.chart(svg, data);
+          chart1.setBounds(80, 40, 420, 450);
+          var x = chart1.addCategoryAxis("x", "Year")
+          chart1.addMeasureAxis("y", "Count");
 
-        for (var i = 0; i < dataset.length; i++) {
-            for (var j = 0; j < dataset[i].data.length; j++) {
-                dataset[i].data[j]['semester'] = dataset[i]['semester'];
-            }
-        }
+          // Order the x axis by date
+          x.addOrderRule("Date");
 
-        var data = {
-            "xScale": "linear",
-            "yScale": "linear",
-            "main": dataset
-        },
-        options = {
-            "axisPaddingLeft": 0,
-            "paddingLeft": 25,
-            "paddingRight": 0,
-            "axisPaddingRight": 0,
-            "axisPaddingTop": 5,
-            "interpolation": "linear",
-            "tickHintX": 20,
-            "click": yearSelectionHandler
-        },
-        legend = d3.select(selector).append("svg")
-                .attr("class", "legend")
-                .selectAll("g")
-                .data(dataset)
-                .enter()
-                .append("g")
-                .attr("transform", function (d, i) {
-                    return "translate(" + (64 + (i * 84)) + ", 0)";
-                });
+          // Add a thick line with markers
+          var lines = chart1.addSeries("Semester", dimple.plot.line);
+          lines.lineWeight = 5;
+          lines.lineMarkers = true;
 
-        legend.append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
-                .attr("class", function (d, i) {
-                    return 'color' + i;
-                });
+          lines.addEventHandler("click", function(e) {
+              return yearSelectionHandler(e.xValue + '-' + e.seriesValue);
+          });
+          lines.addEventHandler("mouseover", null);
 
-        legend.append("text")
-                .attr("x", 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .text(function (d, i) {
-                    return dataset[i].semester;
-                });
+          chart1.addLegend(180, 10, 360, 20, "bottom");
 
-        return new xChart('line-dotted', data, selector + " .graph", options);
+          // Draw the chart
+          chart1.draw();
+          return chart1;
     }
 
-    function createProfBreakdownChart(selector, dataset) {
-
-        var data = {
-            "xScale": "ordinal",
-            "yScale": "linear",
-            "type": "bar",
-            "main": dataset
-        },
-        options = {
-            "axisPaddingLeft": 0,
-            "axisPaddingTop": 5,
-            "paddingLeft": 20
-        };
-
-        return new xChart('bar', data, selector + " .graph", options);
-
-    }
-
-    function yearSelectionHandler(d, i) {
-        selectedYear = d.x;
-        selectedSemester = d.semester;
-        var data = {
-            "xScale": "ordinal",
-            "yScale": "linear",
-            "type": "bar",
-            "main": getProfBreakdownForYearSemester(selectedYear + '-' + selectedSemester)
-        };
-        $('#chart2>.title').html('Total Classes by Prof in ' + selectedSemester + " " + selectedYear);
-        chart2.data = results[selectedYear + '-' + selectedSemester];
-        chart2.draw(500);
+    function yearSelectionHandler(sched) {
+        $('#chart2>.title').html('Total Classes by Prof in ' + sched);
+        chart2.data = results[sched];
+        chart2.draw(750);
     }
 
     function createDimpleChart(selector, session) {
-        var svg = dimple.newSvg(selector, 650, 700);
+        var svg = dimple.newSvg(selector, 650, 600);
         chart2 = new dimple.chart(svg, results[session]);
         chart2.setBounds(60, 30, 580, 450);
         var x = chart2.addCategoryAxis("x", "Professor");
@@ -103,20 +54,6 @@ var dashboard1 = (function () {
         return chart2;
     }
 
-    function getProfBreakdownForYearSemester(session) {
-        // Transform data to single year/semester
-        var result = [];
-        for (var i = 0; i < results[session].length; i++) {
-            result.push({x: results[session][i].Country, y: results[session][i].Total});
-        }
-        return [
-            {
-                "className": ".medals",
-                "data": result
-            }
-        ];
-    }
-
     function render() {
 
         var html =
@@ -125,13 +62,13 @@ var dashboard1 = (function () {
                 '<div class="graph"></div>' +
                 '</div>' +
                 '<div id="chart2" class="chart chart2">' +
-                '<div class="title">Total Classes by Prof in FALL 2014</div>' +
+                '<div class="title">Total Classes by Prof in ' + selectedSemester + " " + selectedYear + '</div>' +
                 '<div class="graph"></div>' +
                 '</div>';
 
         $("#content").html(html);
 
-        chart1 = createSummaryChart('#chart1', summary);
+        chart1 = createNewSummaryChart('#chart1', summary);
         chart2 = createDimpleChart('#chart2', (selectedYear + '-' + selectedSemester));
     }
 

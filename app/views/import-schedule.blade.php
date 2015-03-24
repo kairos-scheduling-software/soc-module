@@ -32,9 +32,11 @@
 	</br></br>
 	Title - The title of the class I.E. Object Oriented Programming
 	</br></br>
+	Type - The type of class it is from the following Laboratory, Discussion, Lecture, Seminar, or Special Topics
+	</br></br>
 	Time - The time of the class in the format day then time such as M1300|W1300
 	</br></br>
-	Length - The length of the class I.E. 80
+	Length - The length of the class in minutes I.E. 80
 	</br></br>
 </p>
 @stop
@@ -45,8 +47,8 @@
 
 	<h3>
 		Schedule Name
-		<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName')}}"/>
-			<span>
+		<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName-text')}}"/>
+			<span id="clear">
 				@if($errors->has('scheduleName'))
 					{{$errors->first('scheduleName')}}
 				@endif
@@ -70,7 +72,7 @@
 	<h3>
 	Import File
 		<div><input type="file" id="import" name="import">
-			<span>
+			<span id="clear">
 				@if($errors->has('uploadfile'))
 					{{$errors->first('uploadfile')}}
 				@endif
@@ -82,6 +84,12 @@
 		</button>
 	</h3>
 	</form>
+
+	<div>
+		@if(isset($global))
+			{{$global}}
+		@endif
+	</div>
 </div>
 
 @stop

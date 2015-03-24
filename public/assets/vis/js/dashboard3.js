@@ -2,9 +2,6 @@ var dashboard3 = (function () {
 
     "use strict";
 
-    // Currently selected dashboard values
-    var chart1;
-
     var gridMargin = {top: 20, right: 5, bottom: 5, left: 70};
     var svgWidth = 1000;  // - gridMargin.left - gridMargin.right;
     var svgHeight = 1000;  // - gridMargin.top - gridMargin.bottom;
@@ -27,8 +24,8 @@ var dashboard3 = (function () {
     $('#po-d3').hide();
 
     var d3Zoom = d3.behavior.zoom()
-            .scaleExtent([0.25, 7])
-            .on("zoom", d3Zoomed);
+        .scaleExtent([0.25, 7])
+        .on("zoom", d3Zoomed);
 
     var weekdays = [['Sunday', 'Su'], ['Monday', 'M'], ['Tuesday', 'T'], ['Wednesday', 'W'], ['Thursday', 'Th'], ['Friday', 'F'], ['Saturday', 'Sa']];
 
@@ -39,60 +36,65 @@ var dashboard3 = (function () {
     /* Functions to create the individual charts involved in the dashboard */
     function init() {
 
-        svgWidth =  $('#content').width() - 300;
+        svgWidth = $('#content').width() - 300;
         svgHeight = $('#left-nav').height() - 50;
 
         //Make an SVG Container
         svg = d3.select("#d3").append("svg")
-                .attr("width", svgWidth + gridMargin.left + gridMargin.right)
-                .attr("height", svgHeight + gridMargin.top + gridMargin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + gridMargin.left + "," + gridMargin.top + ")");
+            .attr("width", svgWidth + gridMargin.left + gridMargin.right)
+            .attr("height", svgHeight + gridMargin.top + gridMargin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + gridMargin.left + "," + gridMargin.top + ")");
 
         // Zoom only works when it is over a rendered item. Render a white background.
         svg.append("rect")
-                .attr("x", 0 - gridMargin.left)
-                .attr("y", 0 - gridMargin.top)
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .attr("fill", "#FFFFFF")
-                .call(d3Zoom);
+            .attr("x", 0 - gridMargin.left)
+            .attr("y", 0 - gridMargin.top)
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("fill", "#FFFFFF")
+            .call(d3Zoom);
 
         container = svg.append("g");
 
+        $(".d3-tip").remove();
         tip = d3.tip().attr('class', 'd3-tip').html(function (d) {
             return  '<table style="width:100%">' +
-                        '<tr>' +
-                            '<td> Class: </td>' +
-                            '<td><span style="color:red">' + d.class.replace("_", " ").replace("_", " ") + '</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Title: </td>' +
-                            '<td><span style="color:red">' + d.title + '</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Type: </td>' +
-                            '<td><span style="color:red">' + d.class_type + '</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Room: </td>' +
-                            '<td><span style="color:red">' + d.room + '</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Start: </td>' +
-                            '<td><span style="color:red">' + d.starttm + '</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Length: &nbsp; </td>' +
-                            '<td><span style="color:red">' + d.length + ' minutes</span></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                            '<td> Day: </td>' +
-                            '<td><span style="color:red">' + d.days + '</span></td>' +
-                        '</tr>' +
-                    '</table>'
+                '<tr>' +
+                '<td> Class: </td>' +
+                '<td><span style="color:red">' + d.class.replace("_", " ").replace("_", " ") + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Title: </td>' +
+                '<td><span style="color:red">' + d.title + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Type: </td>' +
+                '<td><span style="color:red">' + d.class_type + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Professor: &nbsp; </td>' +
+                '<td><span style="color:red">' + d.mprof + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Room: </td>' +
+                '<td><span style="color:red">' + d.room + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Start: </td>' +
+                '<td><span style="color:red">' + d.starttm + '</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Length: &nbsp; </td>' +
+                '<td><span style="color:red">' + d.length + ' minutes</span></td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td> Day: </td>' +
+                '<td><span style="color:red">' + d.days + '</span></td>' +
+                '</tr>' +
+                '</table>'
 
-                    ;
+                ;
         });
         svg.call(tip);
     }
@@ -122,6 +124,9 @@ var dashboard3 = (function () {
             init();
         }
 
+        // Get rid of any multiselect that is still active
+        //$('select').multiselect('destroy');
+
         var boxWidth = 12; //10
         var boxHeight = 50.0;
         var daysSkip = 1;
@@ -135,8 +140,11 @@ var dashboard3 = (function () {
         var prof = new Array();
         var class_types = new Array();
         var room_list = new Array();
+        var room_map = new Array();
+        var mprof = {};
         var rooms = {};
         var days = {};
+        var cnames = {};
 
         var data = [];
 
@@ -156,14 +164,15 @@ var dashboard3 = (function () {
             var day;
             var class_name;
             if (val.days[0] != "" && val.room != "") {
-
-                //console.log(JSON.stringify(val));
-
                 // Pre-populate array
                 getCol(val['room']);
 
                 class_name = getClassStringId(val.name);
                 setClassColorIndex(val.class_type);
+
+                if (mprof[val.main_prof] == null) {
+                    mprof[val.main_prof] = 1;
+                }
 
                 for (var j = 0; j < val.days.length; j++) {
                     // Kind of ugly... This can be done better.
@@ -193,12 +202,14 @@ var dashboard3 = (function () {
                         "title": val.title,
                         "room": val.room,
                         "class": class_name,
-                        "cname": class_name.substring(0, class_name.indexOf("-")) // Used for colors
+                        "cname": class_name.substring(0, class_name.indexOf("-")), // Used for colors
+                        "mprof": val.main_prof
                     };
 
+                    if (cnames[point.cname] == null) {
+                        cnames[point.cname] = 1;
+                    }
 
-
-                    //console.log(class_name.substring(0, class_name.indexOf("-")));
                     data.push(point);
                 }
 
@@ -221,6 +232,24 @@ var dashboard3 = (function () {
         if (boxWidth < 12) {
             boxWidth = 12;
         }
+
+        // Do rooms here so we get the correct column alignment
+        $.each(rooms, function (i, val) {
+            room_list.push(i);
+        });
+
+        room_list.sort();
+
+        roomCounter = 0;
+        rooms = {};
+
+        var rooms_sel = $("#rooms-sel");
+        rooms_sel.html('');
+        //console.log(roomCounter);
+        $.each(room_list, function (key, val) {
+            getCol(val);
+            rooms_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
+        });
 
         // Calculate values so we don't have to do it each time a frame is rendered
         $.each(data, function (i, val) {
@@ -250,31 +279,51 @@ var dashboard3 = (function () {
 
         // Classes
         var class_sel = $("#class-type-sel");
+        class_sel.html('');
         $.each(class_types, function (i, val) {
-            class_sel.append('<option vlaue=' + i + '>' + val + '</option>');
+            class_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
+        });
+        class_sel.multiselect('rebuild');
+        class_sel.multiselect('selectAll', false);
+        class_sel.multiselect('refresh');
+
+        rooms_sel.multiselect('rebuild');
+        rooms_sel.multiselect('selectAll', false);
+        rooms_sel.multiselect('refresh');
+
+        $.each(mprof, function (i, val) {
+            prof.push(i);
+        });
+        prof.sort();
+
+        var prof_sel = $("#prof-sel");
+        prof_sel.html('');
+        //console.log(roomCounter);
+        $.each(prof, function (key, val) {
+            //console.log(key, val);
+            prof_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
         });
 
-        // Rooms
-        $.each(rooms, function (i, val) {
-            room_list.push(i);
+        prof_sel.multiselect('rebuild');
+        prof_sel.multiselect('selectAll', false);
+        prof_sel.multiselect('refresh');
+
+        $.each(cnames, function (i, val) {
+            classes.push(i);
+        });
+        classes.sort();
+
+        var class_sel = $("#class-sel");
+        class_sel.html('');
+        //console.log(roomCounter);
+        $.each(classes, function (key, val) {
+            //console.log(key, val);
+            class_sel.append('<option value=' + val + '>' + val.replace(/[^A-Z0-9]/g, ' ') + '</option>');
         });
 
-        room_list.sort();
-
-        var rooms_sel = $("#rooms-sel");
-        rooms_sel.html('');
-        console.log(roomCounter);
-        $.each(rooms, function (key, val) {
-            console.log(key, val);
-            rooms_sel.append('<option vlaue=' + val + '>' + key + '</option>');
-        });
-
-        $('select').multiselect('destroy')
-        $('select').multiselect({
-            //    width: 200
-            maxHeight: 300,
-            buttonWidth: '175px'
-        });
+        class_sel.multiselect('rebuild');
+        class_sel.multiselect('selectAll', false);
+        class_sel.multiselect('refresh');
 
         // The +0.1 makes it draw the very last bar. +1 causes a little bit of the axis to hang over
         var width = boxWidth * dayBoxes * numDays + 0.1;
@@ -282,255 +331,275 @@ var dashboard3 = (function () {
 
         // X bars
         container.append("g")
-                .attr("class", "x_axis")
-                .selectAll("line")
-                .data(d3.range(0, width, boxWidth))
-                .enter().append("line")
-                .attr("x1", function (d) {
-                    return d;
-                })
-                .attr("y1", 0)
-                .attr("x2", function (d) {
-                    return d;
-                })
-                .attr("y2", height + 50)
-                .attr("stroke", function (x) {
-                    if (x % (boxWidth * dayBoxes) == 0) {
-                        return "black";
-                    }
-                    return "gray";
-                })
-                .attr("stroke-width", function (x) {
-                    if (x % (boxWidth * dayBoxes) == 0) {
-                        return 1;
-                    }
-                    return 0.3;
-                });
+            .attr("class", "x_axis")
+            .selectAll("line")
+            .data(d3.range(0, width, boxWidth))
+            .enter().append("line")
+            .attr("x1", function (d) {
+                return d;
+            })
+            .attr("y1", 0)
+            .attr("x2", function (d) {
+                return d;
+            })
+            .attr("y2", height + 50)
+            .attr("stroke", function (x) {
+                if (x % (boxWidth * dayBoxes) == 0) {
+                    return "black";
+                }
+                return "gray";
+            })
+            .attr("stroke-width", function (x) {
+                if (x % (boxWidth * dayBoxes) == 0) {
+                    return 1;
+                }
+                return 0.3;
+            });
 
         // X
         container.selectAll(".x_axis")
-                .data(d3.range(0, width, boxWidth * dayBoxes))
-                .enter().append("text")
-                .attr("y", 0)
-                .attr("x", function (d) {
-                    return (d - ((boxWidth * dayBoxes) / 2));
-                })
-                .attr("font-size", 12)
-                .attr("dx", "0em")
-                .attr("dy", "-0.5em")
-                .attr("text-anchor", "middle")
-                //.attr('class', 'name')
-                .text(function (d, i) {
-                    return weekdays[(i + daysSkip) - 1][0];
-                });
+            .data(d3.range(0, width, boxWidth * dayBoxes))
+            .enter().append("text")
+            .attr("y", 0)
+            .attr("x", function (d) {
+                return (d - ((boxWidth * dayBoxes) / 2));
+            })
+            .attr("font-size", 12)
+            .attr("dx", "0em")
+            .attr("dy", "-0.5em")
+            .attr("text-anchor", "middle")
+            //.attr('class', 'name')
+            .text(function (d, i) {
+                return weekdays[(i + daysSkip) - 1][0];
+            });
 
         // X - Rooom labels
         container
-                .selectAll(".x_axis_labels")
-                .data(d3.range(0, width - 1, boxWidth))
-                .enter()
-                .append('g')
-                .attr("transform", function (d) {
-                    return "translate(" + (d + (boxWidth * 0.5)) + "," + 25 + ") rotate(90,0,0)";
-                })
-                .append("text")
-                .attr("y", 0)
-                .attr("x", 0)
-                .attr("font-size", 7)
-                .attr("dx", "0em")
-                .attr("dy", "0.35em")
-                .attr("text-anchor", "middle")
-                //.attr('class', 'name')
-                .text(function (d, i) {
-                    return room_list[i % dayBoxes];
-                });
+            .selectAll(".x_axis_labels")
+            .data(d3.range(0, width - 1, boxWidth))
+            .enter()
+            .append('g')
+            .attr("transform", function (d) {
+                return "translate(" + (d + (boxWidth * 0.5)) + "," + 25 + ") rotate(90,0,0)";
+            })
+            .append("text")
+            .attr("y", 0)
+            .attr("x", 0)
+            .attr("font-size", 7)
+            .attr("dx", "0em")
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            //.attr('class', 'name')
+            .text(function (d, i) {
+                return room_list[i % dayBoxes];
+            });
 
 
         // Y bars
         container.append("g")
-                .attr("class", "y_axis")
-                .selectAll("line")
-                .data(d3.range(0, height + 50, boxHeight))
-                .enter().append("line")
-                .attr("x1", 0)
-                .attr("y1", function (d) {
-                    return d;
-                })
-                .attr("x2", width)
-                .attr("y2", function (d) {
-                    return d;
-                })
-                .attr("stroke", function (x, y) {
-                    if (x <= 50 || x >= (height + 49)) {
-                        return "black";
-                    }
-                    return "gray";
-                })
-                .attr("stroke-width", function (x, y) {
-                    if (x <= 50 || x >= (height + 49)) {
-                        return 1;
-                    }
-                    return 0.3;
-                })
-                ;
+            .attr("class", "y_axis")
+            .selectAll("line")
+            .data(d3.range(0, height + 50, boxHeight))
+            .enter().append("line")
+            .attr("x1", 0)
+            .attr("y1", function (d) {
+                return d;
+            })
+            .attr("x2", width)
+            .attr("y2", function (d) {
+                return d;
+            })
+            .attr("stroke", function (x, y) {
+                if (x <= 50 || x >= (height + 49)) {
+                    return "black";
+                }
+                return "gray";
+            })
+            .attr("stroke-width", function (x, y) {
+                if (x <= 50 || x >= (height + 49)) {
+                    return 1;
+                }
+                return 0.3;
+            })
+            ;
 
         container.selectAll(".y_axis")
-                .data(d3.range(0, height + 50, boxHeight))
-                .enter().append("text")
-                .attr("x", 0)
-                .attr("y", function (d) {
-                    return d - (boxHeight) + 3 + 50;
-                })
-                .attr("font-size", 12)
-                .style("text-anchor", "end")
-                .attr("dx", "-5px")
-                .attr("dy", "0em")
-                .attr("text-anchor", "middle")
-                .text(function (d, i) {
-                    var hour = (i - 1) + firstTimeOfDay;
-                    if (hour >= 13) {
-                        return hour - 12 + ":00pm";
-                    }
-                    return hour + ":00am";
-                });
+            .data(d3.range(0, height + 50, boxHeight))
+            .enter().append("text")
+            .attr("x", 0)
+            .attr("y", function (d) {
+                return d - (boxHeight) + 3 + 50;
+            })
+            .attr("font-size", 12)
+            .style("text-anchor", "end")
+            .attr("dx", "-5px")
+            .attr("dy", "0em")
+            .attr("text-anchor", "middle")
+            .text(function (d, i) {
+                var hour = (i - 1) + firstTimeOfDay;
+                if (hour >= 13) {
+                    return hour - 12 + ":00pm";
+                }
+                return hour + ":00am";
+            });
 
         // Draw blocks from JSON object
         var blocks = container.selectAll("g.data")
-                .data(data)
-                .enter()
-                .append("g") // SWITCH BACK TO RECT
-                .filter(function (d) {
-                    return (d.x === d.x && d.y === d.y);
-                }) // Filter out classes with no time assigned to them (NaN != NaN)
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-                .attr("width", function (d) {
-                    return boxWidth;
-                })
-                .attr("height", function (d) {
-                    return d.height;
-                })
-                .on('mouseover', function (d) {
-                    d3.selectAll("." + d.class).style("fill", gridClassHighlightColor);
-                    tip.direction(d.tipDir);
-                    tip.show(d);
-                })
-                .on('mouseout', function (d) {
-                    tip.hide();
-                    d3.selectAll("." + d.class).style("fill", d.color);
-                });
-
+            .data(data)
+            .enter()
+            .append("g") // SWITCH BACK TO RECT
+            .filter(function (d) {
+                return (d.x === d.x && d.y === d.y);
+            }) // Filter out classes with no time assigned to them (NaN != NaN)
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
+            .attr("width", function (d) {
+                return boxWidth;
+            })
+            .attr("height", function (d) {
+                return d.height;
+            })
+            .attr("class", function (d) {
+                return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' ' + d.cname;
+            })
+            .on('mouseover', function (d) {
+                d3.selectAll("." + d.class).style("fill", gridClassHighlightColor);
+                tip.direction(d.tipDir);
+                tip.show(d);
+            })
+            .on('mouseout', function (d) {
+                tip.hide();
+                d3.selectAll("." + d.class).style("fill", d.color);
+            });
+        
         var gText = blocks
-                .append("g")
-                .attr("transform", function (d) {
-                    return "translate(" + d.x + "," + (d.y + 50) + ") rotate(90,0,0)";
-                })
-                .attr("class", function (d) {
-                    return "clText";
-                })
-                .append("text")
-                .attr("x", function (d) {
-                    return (d.height * 0.5);
-                })
-                .attr("y", function (d) {
-                    return 0;
-                })
-                .attr("font-size", 5)
-                .attr("dx", "0em")
-                .attr("dy", "-0.75em")
-                .text(function (d, i) {
-                    return d.class.replace("_", " ").replace("_", " ");
-                })
-                .style("text-anchor", "middle")
-                .style("fill", "#000000");
+            .append("g")
+            .attr("transform", function (d) {
+                return "translate(" + d.x + "," + (d.y + 50) + ") rotate(90,0,0)";
+            })
+            .attr("class", function (d) {
+                return "clText";
+            })
+            .append("text")
+            .attr("x", function (d) {
+                return (d.height * 0.5);
+            })
+            .attr("y", function (d) {
+                return 0;
+            })
+            .attr("font-size", 5)
+            .attr("dx", "0em")
+            .attr("dy", "-0.75em")
+            .text(function (d, i) {
+                return d.class.replace("_", " ").replace("_", " ");
+            })
+            .style("text-anchor", "middle")
+            .style("fill-opacity", 0)
+            .style("fill", "#000000")
+            .transition().duration(750)
+            .style("fill-opacity", 1);
 
         // Set block attributes
         var blockAttributes = blocks
-                .append("rect")
-                //.filter(function (d) {
-                //    return (d.x === d.x && d.y === d.y);
-                //}) // Filter out classes with no time assigned to them (NaN != NaN)
-                .attr("class", function (d) {
-                    return d.class;
-                })
-                .attr("x", function (d) {
-                    return d.x;
-                })
-                .attr("y", function (d) {
-                    return d.y + 50;
-                })
-                .attr("width", function (d) {
-                    return boxWidth;
-                })
-                .attr("height", function (d) {
-                    return d.height;
-                })
-                .style("fill-opacity", 0.3)
-                .style("fill", function (d) {
-                    return d.color;
-                })
-                .style("stroke", function (d) {
-                    return "#000000";
-                })
-                .attr("stroke-width", 0.3)
-                .attr("rx", 3) // set the x corner curve radius
-                .attr("ry", 3) // set the y corner curve radius
-                .on("click", function (d, i) {
-                    d3.event.stopPropagation();
-                })
-                .on("dblclick", function (d, i) {
-                    var xOffset = boxWidth * d3Zoom.scale();
+            .append("rect")
+            //.filter(function (d) {
+            //    return (d.x === d.x && d.y === d.y);
+            //}) // Filter out classes with no time assigned to them (NaN != NaN)
+            .attr("class", function (d) {
+                return d.class;
+            })
+            .style("fill-opacity", 0)
+            .attr("x", function (d) {
+                return d.x;
+            })
+            .attr("y", function (d) {
+                return d.y + 50;
+            })
+            .attr("width", function (d) {
+                return boxWidth;
+            })
+            .attr("height", function (d) {
+                return d.height;
+            })
+            .attr("rx", 3) // set the x corner curve radius
+            .attr("ry", 3) // set the y corner curve radius
+            .on("click", function (d, i) {
+                d3.event.stopPropagation();
+            })
+            .on("dblclick", function (d, i) {
+                var xOffset = boxWidth * d3Zoom.scale();
 
-                    // Find where the div is located on the screen
-                    var offset = $('#' + 'd3').offset();
+                // Find where the div is located on the screen
+                var offset = $('#' + 'd3').offset();
 
-                    // Get coords, translate them to svg coordinates
-                    var ctm = this.getCTM();
-                    var coords = getGridScreenCoords(d.x, d.y, ctm);
+                // Get coords, translate them to svg coordinates
+                var ctm = this.getCTM();
+                var coords = getGridScreenCoords(d.x, d.y, ctm);
 
-                    // Height of elements
-                    var poHeight = $('#po-d3').height();
-                    var svgHeight = $('#d3').height();
+                // Height of elements
+                var poHeight = $('#po-d3').height();
+                var svgHeight = $('#d3').height();
 
-                    // Offset y value based on where we are on the screen
-                    var yOffset = 0 ; //= (coords.y / svgHeight) * poHeight;
+                // Offset y value based on where we are on the screen
+                var yOffset = 0; //= (coords.y / svgHeight) * poHeight;
 
-                    var final_y = (coords.y + offset.top) - yOffset + 50;
-                    var final_x = (coords.x + offset.left + xOffset);
-                    var arrow_y = (((d.height) * d3Zoom.scale()) / 2) + yOffset;
+                var final_y = (coords.y + offset.top) - yOffset + 50;
+                var final_x = (coords.x + offset.left + xOffset);
+                var arrow_y = (((d.height) * d3Zoom.scale()) / 2) + yOffset;
 
-                    if (final_y < offset.top + 3) {
-                        final_y = offset.top + 3;
-                    }
+                if (final_y < offset.top + 3) {
+                    final_y = offset.top + 3;
+                }
 
-                    if (arrow_y < 15) {
-                        arrow_y = 15;
-                    }
+                if (arrow_y < 15) {
+                    arrow_y = 15;
+                }
 
-                    // ADD CODE HERE TO FLIP WHICH DIRECTION THE POPOVER DISPLAYS ON THE X AXIS
-                    gridClassSelected = d.name;
-                    // Set popover title
-                    $('#po-d3-name').html(d.name);
-                    $('#po-d3-title').html(d.title);
-                    $('#po-room').html(d.room);
-                    $('#po-dtm').html('[' + d.days + "], " + makeTimePretty(d.starttm) + ", " + d.length + " min");
-                    $('#message').val("");
-                    $('#event_id').val(d.id);
+                console.log((final_x + 350) + ", " + (final_y + poHeight) + "; " + svgHeight);
 
-                    $('#po-d3').show();
+                if ((final_y + poHeight) > svgHeight) {
+                    final_y = svgHeight - 350;
+                }
 
-                    // Set popover position
-                    $('#po-d3').css('left', final_x + 'px');
-                    $('#po-d3').css('top', (final_y) + 'px');
+                if ((final_x + 350) > width) {
+                    final_x = final_x - $('#po-d3').width() - (xOffset * 3);
+                }
 
-                    // Put arrow in correct spot
-                    $('#po-d3-arrow').css('top', (arrow_y) + 'px');
-                    $('#po-d3-arrow').hide();
-                });
+                // ADD CODE HERE TO FLIP WHICH DIRECTION THE POPOVER DISPLAYS ON THE X AXIS
+                gridClassSelected = d.name;
+                // Set popover title
+                $('#po-d3-name').html(d.name);
+                $('#po-d3-title').html(d.title);
+                $('#po-room').html(d.room);
+                $('#po-dtm').html('[' + d.days + "], " + makeTimePretty(d.starttm) + ", " + d.length + " min");
+                $('#message').val("");
+                $('#event_id').val(d.id);
+
+                $('#po-d3').show();
+
+                // Set popover position
+                $('#po-d3').css('left', final_x + 'px');
+                $('#po-d3').css('top', (final_y) + 'px');
+
+                // Put arrow in correct spot
+                $('#po-d3-arrow').css('top', (arrow_y) + 'px');
+                $('#po-d3-arrow').hide();
+            })
+            .style("stroke-opacity", 0)
+            .transition().duration(750)
+            .style("fill-opacity", 0.3)
+            .style("fill", function (d) {
+                return d.color;
+            })
+            .style("stroke", function (d) {
+                return "#000000";
+            })
+            .style("stroke-opacity", 1)
+            .attr("stroke-width", 0.3);
 
         function minutesToNumber(minutes) {
             return ((1.666) * minutes) / 100; // 100/60 = 1.666
@@ -588,47 +657,91 @@ var dashboard3 = (function () {
             $('#po-d3').hide();
         });
 
-     //set up the ticket submit button
-     $('#log_ticket').submit(function(e) {
-        e.preventDefault();
-        var form = $(this);
-        var postData = {event_id: $('#event_id').val(), message: $('#message').val() };
-        var url = form.attr("action");
+        //set up the ticket submit button
+        $('#submit-ticket').click(function (e) {
+            e.preventDefault();
+            //var form = $(this);
+            var postData = {event_id: $('#event_id').val(), message: $('#message').val()};
+            var url = 'tickets/add-ticket'; //form.attr("action");
 
-        $.ajax({
-            url:        url,
-            type:       "POST",
-            data:       postData,
-            success:    function(data, textStatus, jqXHR)
-            {
-                $('#po-d3').hide();
-            },
-            error:      function(jqXHR, textStatus, errorThrown) {
-                var message = $.parseJSON(jqXHR.responseText);
-                alert(message.error);
-                // TODO:  bootstrap error message
-            }
-        });
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: postData,
+                success: function (data, textStatus, jqXHR)
+                {
+                    $('#po-d3').hide();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var message = $.parseJSON(jqXHR.responseText);
+                    alert(message.error);
+                    // TODO:  bootstrap error message
+                }
+            });
 
-        return false;
+            return false;
         });
     }
 
+    function createSelect(tag_prefix, label, multiple, classes) {
+        var mult = "";
+        if (multiple) {
+            mult += 'multiple="multiple"';
+        }
+        return '<div class="form-group"><label for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + ' class="vis-select ' + classes + '"></select></div>';
+    }
+
+    function createOption(key, value) {
+        return '<option value="' + key + '">' + value + '</option>';
+    }
+
     function render() {
+        $("#content").html('');
+
+        $('#vis-menu').remove();
+        $('#left-nav').append('<div id="vis-menu"></div>');
+
+        var vis_menu = $('#vis-menu');
+        vis_menu.hide();
+
+        vis_menu.append(createSelect('sched', 'Schedule', false, null));
+
+        var result = "";
+        for (var i = 2000; i <= 2014; i++) {
+            result += '<option value="' + i + '-FALL">' + i + '-Fall</option><option value="' + i + '-SPRING">' + i + '-Spring</option><option value="' + i + '-SUMMER">' + i + '-Summer</option>';
+        }
+        $('#sched-sel').append(result);
+
+        vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
+        vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
+        vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
+        vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
+
+        $('select').multiselect({
+            maxHeight: 200,
+            buttonWidth: '175px'
+        });
+
+        $('#sched-sel').multiselect('setOptions', {
+            onChange: function (event) {
+                createChart('#d3', vis_data[$("#sched-sel").val()]);
+            }
+        });
+
+        $('.d_select').multiselect('setOptions', {
+            onChange: function (option, checked, select) {
+                if (checked) {
+                    d3.selectAll("." + $(option).val()).style("visibility", "visible");
+                } else {
+                    d3.selectAll("." + $(option).val()).style("visibility", "hidden");
+                }
+            }
+        });
 
         $("#content").load("assets/vis/vis3Filt.html", function () {
             //chart1 =
             createChart('#d3', vis_data['2000-FALL'], true);
-
-            $('select').multiselect({
-                maxHeight: 300,
-                buttonWidth: '175px'
-            });
-
-            $(".vis-select").change(function () {
-                console.log($("#year-sel").val() + '-' + $("#semester-sel").val(), false);
-                createChart('#d3', vis_data[$("#year-sel").val() + '-' + $("#semester-sel").val()]);
-            });
+            vis_menu.show();
         });
     }
 

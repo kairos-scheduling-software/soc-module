@@ -1,104 +1,111 @@
 var summary = [
-    {
-        "className": ".fall",
-        "semester": "FALL",
-        "data": [
+
             {
-                "x": 2008,
-                "y": 132
+                "Semester": "FALL",
+                "Year": 2008,
+                "Count": 132
             },
             {
-                "x": 2009,
-                "y": 128
+                "Semester": "FALL",
+                "Year": 2009,
+                "Count": 128
             },
             {
-                "x": 2010,
-                "y": 118
+                "Semester": "FALL",
+                "Year": 2010,
+                "Count": 118
             },
             {
-                "x": 2011,
-                "y": 139
+                "Semester": "FALL",
+                "Year": 2011,
+                "Count": 139
             },
             {
-                "x": 2012,
-                "y": 122
+                "Semester": "FALL",
+                "Year": 2012,
+                "Count": 122
             },
             {
-                "x": 2013,
-                "y": 95
+                "Semester": "FALL",
+                "Year": 2013,
+                "Count": 95
             },
             {
-                "x": 2014,
-                "y": 104
+                "Semester": "FALL",
+                "Year": 2014,
+                "Count": 104
+            },
+
+            {
+                "Semester": "SPRING",
+                "Year": 2008,
+                "Count": 126
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2009,
+                "Count": 147
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2010,
+                "Count": 144
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2011,
+                "Count": 132
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2012,
+                "Count": 142
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2013,
+                "Count": 149
+            },
+            {
+                "Semester": "SPRING",
+                "Year": 2014,
+                "Count": 125
+            },
+
+            {
+                "Semester": "SUMMER",
+                "Year": 2008,
+                "Count": 29
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2009,
+                "Count": 33
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2010,
+                "Count": 25
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2011,
+                "Count": 15
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2012,
+                "Count": 11
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2013,
+                "Count": 13
+            },
+            {
+                "Semester": "SUMMER",
+                "Year": 2014,
+                "Count": 10
             }
-        ]
-    },
-    {
-        "className": ".spring",
-        "semester": "SPRING",
-        "data": [
-            {
-                "x": 2008,
-                "y": 126
-            },
-            {
-                "x": 2009,
-                "y": 147
-            },
-            {
-                "x": 2010,
-                "y": 144
-            },
-            {
-                "x": 2011,
-                "y": 132
-            },
-            {
-                "x": 2012,
-                "y": 142
-            },
-            {
-                "x": 2013,
-                "y": 149
-            },
-            {
-                "x": 2014,
-                "y": 125
-            }
-        ]
-    },
-    {
-        "className": ".summer",
-        "semester": "SUMMER",
-        "data": [
-            {
-                "x": 2008,
-                "y": 29
-            },
-            {
-                "x": 2009,
-                "y": 33
-            },
-            {
-                "x": 2010,
-                "y": 25
-            },
-            {
-                "x": 2011,
-                "y": 15
-            },
-            {
-                "x": 2012,
-                "y": 11
-            },
-            {
-                "x": 2013,
-                "y": 13
-            },
-            {
-                "x": 2014,
-                "y": 10
-            }
-        ]
-    }
+
 ];

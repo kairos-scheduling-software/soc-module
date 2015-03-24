@@ -724,7 +724,7 @@ var dashboard3 = (function () {
 
         $('#sched-sel').multiselect('setOptions', {
             onChange: function (event) {
-                createChart('#d3', vis_data[$("#sched-sel").val()]);
+                createChart('#d3', visGetSchedData($("#sched-sel").val()));
             }
         });
 
@@ -740,7 +740,7 @@ var dashboard3 = (function () {
 
         $("#content").load("assets/vis/vis3Filt.html", function () {
             //chart1 =
-            createChart('#d3', vis_data['2000-FALL'], true);
+            createChart('#d3', visGetSchedData('2000-FALL'), true);
             vis_menu.show();
         });
     }

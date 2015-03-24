@@ -232,17 +232,17 @@ var dashboard3 = (function () {
         if (boxWidth < 12) {
             boxWidth = 12;
         }
-        
+
         // Do rooms here so we get the correct column alignment
         $.each(rooms, function (i, val) {
             room_list.push(i);
         });
 
         room_list.sort();
-        
+
         roomCounter = 0;
         rooms = {};
-        
+
         var rooms_sel = $("#rooms-sel");
         rooms_sel.html('');
         //console.log(roomCounter);
@@ -475,7 +475,7 @@ var dashboard3 = (function () {
                 tip.hide();
                 d3.selectAll("." + d.class).style("fill", d.color);
             });
-
+        
         var gText = blocks
             .append("g")
             .attr("transform", function (d) {
@@ -498,7 +498,10 @@ var dashboard3 = (function () {
                 return d.class.replace("_", " ").replace("_", " ");
             })
             .style("text-anchor", "middle")
-            .style("fill", "#000000");
+            .style("fill-opacity", 0)
+            .style("fill", "#000000")
+            .transition().duration(750)
+            .style("fill-opacity", 1);
 
         // Set block attributes
         var blockAttributes = blocks
@@ -509,6 +512,7 @@ var dashboard3 = (function () {
             .attr("class", function (d) {
                 return d.class;
             })
+            .style("fill-opacity", 0)
             .attr("x", function (d) {
                 return d.x;
             })
@@ -521,14 +525,6 @@ var dashboard3 = (function () {
             .attr("height", function (d) {
                 return d.height;
             })
-            .style("fill-opacity", 0.3)
-            .style("fill", function (d) {
-                return d.color;
-            })
-            .style("stroke", function (d) {
-                return "#000000";
-            })
-            .attr("stroke-width", 0.3)
             .attr("rx", 3) // set the x corner curve radius
             .attr("ry", 3) // set the y corner curve radius
             .on("click", function (d, i) {
@@ -592,7 +588,18 @@ var dashboard3 = (function () {
                 // Put arrow in correct spot
                 $('#po-d3-arrow').css('top', (arrow_y) + 'px');
                 $('#po-d3-arrow').hide();
-            });
+            })
+            .style("stroke-opacity", 0)
+            .transition().duration(750)
+            .style("fill-opacity", 0.3)
+            .style("fill", function (d) {
+                return d.color;
+            })
+            .style("stroke", function (d) {
+                return "#000000";
+            })
+            .style("stroke-opacity", 1)
+            .attr("stroke-width", 0.3);
 
         function minutesToNumber(minutes) {
             return ((1.666) * minutes) / 100; // 100/60 = 1.666

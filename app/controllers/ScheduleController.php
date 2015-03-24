@@ -85,7 +85,7 @@ class ScheduleController extends BaseController {
 		if ($schedule->save())
 		{
 			$user->schedules()->attach($schedule->id);
-			return URL::route('data-entry1', $schedule->id);
+			return URL::route('edit-sched', $schedule->id);
 		}
 		else
 			return Response::json(['error' => 'Could not create schedule at this time'], 500);

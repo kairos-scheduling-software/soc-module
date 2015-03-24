@@ -9,6 +9,7 @@ var remove_class_url;
 var sched_id;
 var col_counts = [];
 var course_list = [];
+var temp_indices = [];
 
 $(function(){
 
@@ -63,6 +64,9 @@ $(function(){
 
 					for (i = params[v_offset]; i < (params[v_offset] + params[b_length]); i++)
 						indices.push(i);
+
+					$(this).data('col_index', col_index);
+					$(this).data('indices', indices);
 
 					update_column_matrix(col_index, indices, "busy");
 				});
@@ -284,6 +288,11 @@ $(function(){
 		}
 	});
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+
+	$('.scheduled-class').click(function() {
+		console.log("Column: " + $(this).data('ddd') + $(this).data('col_index'));
+		console.log("Indices: " + $(this).data('indices'));
+	});
 });
 
 /**
@@ -430,7 +439,10 @@ function get_horizontal_offset(vertical, length, day, loading_mode)
 	}
 
 	if(loading_mode)
+	{
 		update_column_matrix(col_index, update, "busy");
+		temp_indices = update;
+	}
 
 	//console.log("Col Num: " + col_num);
 	return col_num - 1;
@@ -484,7 +496,7 @@ function setup_dropzones(key, block_class)
 	$.each(all_blocks[key], function(i, block)
 	{		
 		$.each(block["days"], function(j, day) {
-			var html_block = "<div class='drop-zone " + block_class + "'";
+			var html_block = "<div class='drop-zone " + block_class + " " + key + "'";
 			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
 			var id = day.substring(1) + "-" + block["id"];
 			var ddd = id.substring(0,3); // three char day abbreviation
@@ -508,6 +520,7 @@ function setup_dropzones(key, block_class)
 			html_block += "' data-length='" + (block["length"] / 5) + "'";
 			html_block += " data-days='" + block["days"] + "'";
 			html_block += " data-time='" + block["etime"]["starttm"] + "'";
+			html_block += " data-ddd='" + ddd + "'";
 			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
@@ -539,7 +552,23 @@ function refresh_scheduled_class_draggables()
     		var group_id = $(this).attr('data-group');
     		var id = $(this).attr('id');
     		//$("div[data-group=" + group_id + "]:not('#"+id+"')").hide();
-
+/*
+    		var dragged_block = $(this);
+    		
+    		if (dragged_block.hasClass('one-fifty'))
+    			setup_dropzones('one-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('one-eighty'))
+    			setup_dropzones('one-eighty', 'eighty-min-blk');
+    		else if (dragged_block.hasClass('two-fifty'))
+    			setup_dropzones('two-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('two-eighty'))
+    			setup_dropzones('two-eighty', 'eighty-min-blk');
+    		else if (dragged_block.hasClass('three-fifty'))
+    			setup_dropzones('three-fifty', 'fifty-min-blk');
+    		else if (dragged_block.hasClass('three-eighty'))
+    			setup_dropzones('three-eighty', 'eighty-min-blk');
+*/
+    		// Setup the trash drop zone
     		$('#trash-img').droppable({
     			hoverClass: "trash-hover",
 		    	drop: function(event, ui) {
@@ -705,6 +734,7 @@ function load_schedule()
 		var col = course.data('col');
 		var length = course.data('length');
 		var offsets = compute_offsets(start, col, length);
+		var indices = temp_indices;
 
 		var course_name = course.find('span.class-name-container').text();
 
@@ -714,9 +744,12 @@ function load_schedule()
 		//console.log("{left: " + offsets["left"] + ", top: " + offsets["top"]);
 
 		course.css({
-			left: offsets["left"],
-			top: offsets["top"]
+			left: offsets["left"] + "px",
+			top: offsets["top"] + "px"
 		});
+
+		course.data('col_index', (offsets["left"]/time_block_w) + 1);
+		course.data('indices', indices);
 
 		$(col).append(course);
 	});
@@ -777,8 +810,8 @@ function compute_offsets(start, day, length)
 	left += horiz * time_block_w;
 
 	return {
-		left: left + "px",
-		top: top + "px"
+		left: left,
+		top: top
 	};
 }
 

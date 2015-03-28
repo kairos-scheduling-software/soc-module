@@ -10,4 +10,9 @@ class Room extends Eloquent
 		return $this->hasMany('models\Event');
 	}
 
+	public function schedules()
+	{
+		return $this->belongsToMany('Schedule', 'room_schedule');
+	}
+
 }

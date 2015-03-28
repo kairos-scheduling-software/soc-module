@@ -104,7 +104,6 @@ class ImportController extends BaseController
 				echo $e->getMessage();
 				$schedule->delete();
 				$message = "Invalid headers in the import file";
-				return 'test';
 			}
 
 			return Redirect::route('import-schedule')->with('global', $message);

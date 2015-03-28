@@ -208,7 +208,6 @@ class DataConvertUtils
             $room = Room::firstOrCreate(
             array(
                 'name' => $row[0],
-                'schedule_id' => $schedule->id,
                 'capacity' => $row[1]
             ));
 
@@ -223,7 +222,15 @@ class DataConvertUtils
                 $professor->save();
             }
 
-                
+            if (!($schedule->rooms->contains($room->id))) 
+            {
+                $schedule->rooms()->sync([$room->id], false);
+            }
+            if (!($schedule->professors->contains($professor->id))) 
+            {
+                $schedule->professors()->sync([$professor->id], false);
+            }
+               
             $days = '';
             $time = '';
 

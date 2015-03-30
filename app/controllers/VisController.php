@@ -41,6 +41,7 @@ select
 from schedules s
 join events e
     on(s.id = e.schedule_id)
+where s.final = true
 group by
     s.semester,
     s.year,
@@ -64,6 +65,7 @@ join events e
 left join professors p
     on(e.professor = p.id)
 where s.id = $id0
+    -- and s.final = true -- Not needed here since we already did this in the first query
 group by
     e.class_type,
     p.name

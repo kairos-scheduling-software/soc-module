@@ -13,7 +13,8 @@ class VisController extends \BaseController {
 $sql = <<<SQL
 select
     s.id, s.`name`, s.year, s.semester
-from schedules s;
+from schedules s
+where s.final = true;
 SQL;
 
             $results = DB::select($sql, array());

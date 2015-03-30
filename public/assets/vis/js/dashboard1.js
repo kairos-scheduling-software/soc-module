@@ -30,7 +30,6 @@ var dashboard1 = (function () {
         lines.lineMarkers = true;
 
         lines.addEventHandler("click", function (e) {
-            console.log(JSON.stringify(scheduleMap));
             return yearSelectionHandler(scheduleMap[e.xValue + '-' + e.seriesValue]);
         });
         lines.addEventHandler("mouseover", null);
@@ -89,9 +88,6 @@ var dashboard1 = (function () {
     }
 
     function render() {
-
-
-
         $.ajax({
             dataType: "json",
             url: vis_url + '/0/0',
@@ -111,11 +107,8 @@ var dashboard1 = (function () {
 
                 chart1 = createNewSummaryChart('#chart1', data);
 
-                console.log(data.length);
-
                 // Since the JSON results are returned from the database sorted, pick the very last item
                 chart2 = createProfChart('#chart2', yearSelectionHandler(data[data.length - 1].id));
-
             }
         });
     }

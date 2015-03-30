@@ -141,7 +141,7 @@ var dashboard2 = (function () {
             mult += 'multiple="multiple"';
         }
         if (label.length > 0) {
-            result += '<label for="' + tag_prefix + '-sel">' + label + '</label>';
+            result += '<label for="' + tag_prefix + '-sel" class="vis-label">' + label + '</label>';
         }
         result += '<select id="' + tag_prefix + '-sel" ' + mult + '  class="vis2-select"></select></div>';
         return result;

@@ -288,3 +288,7 @@ text.axis-workweek {
 text.axis-worktime {
     fill: #000;
 }
+
+.vis-label {
+    width: 100%;
+}

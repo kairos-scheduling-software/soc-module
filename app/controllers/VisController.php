@@ -12,7 +12,7 @@ class VisController extends \BaseController {
 
 $sql = <<<SQL
 select
-    s.id, s.`name`
+    s.id, s.`name`, s.year, s.semester
 from schedules s;
 SQL;
 
@@ -31,6 +31,47 @@ SQL;
     {
             $sql = "";
             if($id1 == 0) {
+                // Class counts view
+$sql = <<<SQL
+select
+    count(*) as Count,
+    s.semester as Semester,
+    s.year as Year,
+    s.id
+from schedules s
+join events e
+    on(s.id = e.schedule_id)
+group by
+    s.semester,
+    s.year,
+    s.id
+order by 
+    s.year,
+    s.semester,
+    s.id;
+SQL;
+            } else if($id1 == 1) {
+                // Prof counts
+$sql = <<<SQL
+select
+    count(*) as Total,
+    s.`name`,
+    e.class_type as Type,
+    p.name as Professor
+from schedules s
+join events e
+    on(s.id = e.schedule_id)
+left join professors p
+    on(e.professor = p.id)
+where s.id = $id0
+group by
+    e.class_type,
+    p.name
+order by 
+    e.class_type,
+    p.name;
+SQL;
+            } else if($id1 == 2) {
                 // Main schedule view
 $sql = <<<SQL
 select
@@ -52,32 +93,6 @@ left join rooms r
 left join professors p
     on(e.professor = p.id)
 where s.id = $id0;
-SQL;
-            } else if($id1 == 1) {
-                // Class counts view
-$sql = <<<SQL
-select
-    a.Semester,
-    a.Year,
-    count(*) as Count
-from
-(
-    select
-        substr(s.`name`, 1, instr(s.`name`, ' ') - 1) as Semester,
-        substr(s.`name`, instr(s.`name`, ' ') + 1) as Year,
-        s.`name`
-    from schedules s
-    join events e
-        on(s.id = e.schedule_id)
-) a
-group by
-    a.Semester,
-    a.Year;
-SQL;
-            } else if($id1 == 2) {
-                // Heatmaps
-$sql = <<<SQL
-
 SQL;
             } else {
                 return '{}';

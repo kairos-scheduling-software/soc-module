@@ -69,10 +69,12 @@ class Communication
 
             //add all of the time and event data
     		$temp->id = $event->id;
-    		$temp->days_count = substr_count($timeblock->days, '|') + 1;
-    		$temp->duration = $timeblock->length;
-
-
+    		//$temp->days_count = substr_count($timeblock->days, '|') + 1;
+            //$temp->duration = $timeblock->length;
+            
+            $temp->time = new StdClass;
+            $temp->time->duration = $timeblock->length;
+    		
             //create the possible start times as a hard constraint
             $possibleStart = [];
             $startTime = [];
@@ -89,13 +91,13 @@ class Communication
             $startTime[$possibleDays] = $starttmArray;
 
             $possibleStart = $startTime; // MW: [1200] should look like this caps important
-            $temp->pStartTm = $possibleStart;
+            $temp->time->startTimes = $possibleStart;
 
             //start moving on to the spaces
 
-    		$temp->space = $event->room_id;
-    		$temp->max_participants = $event->room->capacity;
-    		$temp->persons = $event->professor;
+    		$temp->spaceId = $event->room_id;
+    		$temp->maxParticipants = $event->room->capacity;
+    		$temp->personId = $event->professor;
 
 
             //create the list of constraints for a single event
@@ -125,10 +127,10 @@ class Communication
     		$roomBuilder[] = $rTemp;
     	}
 
-    	$jsonBuilder['EVENT'] = $eventsBuilder;
-    	$jsonBuilder['SPACE'] = $roomBuilder;
+    	$jsonBuilder['EVENTS'] = $eventsBuilder;
+    	$jsonBuilder['SPACES'] = $roomBuilder;
 
-        $jsonBuilder['CONSTRAINT'] = count($constraintBuilder) != 0 ? $constraintBuilder: (object)null;
+        $jsonBuilder['CONSTRAINTS'] = count($constraintBuilder) != 0 ? $constraintBuilder: (object)null;
 
     	$json = json_encode($jsonBuilder);
     	return $json;

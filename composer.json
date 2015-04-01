@@ -6,7 +6,8 @@
 	"type": "project",
 	"require": {
 		"laravel/framework": "4.2.*",
-		"khill/fontawesomephp": "1.0.x"
+		"khill/fontawesomephp": "1.0.x",
+		"ext-mbstring": "*"
 	},
 	"autoload": {
 		"classmap": [

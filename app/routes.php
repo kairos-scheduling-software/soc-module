@@ -197,7 +197,7 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  => 'TicketController@resolve'
     ));
 
-    Route::get('vis', 'VisController@index');
+    Route::get('vis/list', 'VisController@index');
     Route::get('vis/{id0}/{id1}', 'VisController@getData');
     //Route::resource('vis', 'VisController', ['only' => ['index', 'show']]);
 });

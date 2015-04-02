@@ -14,7 +14,8 @@ $sql = <<<SQL
 select
     s.id, s.`name`, s.year, s.semester
 from schedules s
-where s.final = true;
+where s.final = true
+    order by s.year desc, s.semester;
 SQL;
 
             $results = DB::select($sql, array());
@@ -85,7 +86,7 @@ select
     e.class_type,
     e.title,
     r.`name` as room,
-    p.`name` as professor
+    p.`name` as main_prof
 from schedules s
 join events e
     on(s.id = e.schedule_id)

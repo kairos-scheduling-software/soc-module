@@ -2,6 +2,10 @@ var dashboard3 = (function () {
 
     "use strict";
 
+    var vis_url = 'vis';
+    var body;
+    var spin;
+
     var gridMargin = {top: 20, right: 5, bottom: 5, left: 70};
     var svgWidth = 1000;  // - gridMargin.left - gridMargin.right;
     var svgHeight = 1000;  // - gridMargin.top - gridMargin.bottom;
@@ -191,7 +195,9 @@ var dashboard3 = (function () {
                     } else if (val.days[j] === 'U') {
                         day = 7;
                     }
-
+                    
+                    console.log(class_name);
+                    var cname_ind = class_name.indexOf("-") < 0 ? class_name.length : class_name.indexOf("-");
                     var point = {
                         "starttm": val.starttm,
                         "length": val.length,
@@ -202,7 +208,7 @@ var dashboard3 = (function () {
                         "title": val.title,
                         "room": val.room,
                         "class": class_name,
-                        "cname": class_name.substring(0, class_name.indexOf("-")), // Used for colors
+                        "cname": class_name.substring(0, cname_ind), // Used for colors
                         "mprof": val.main_prof
                     };
 
@@ -226,6 +232,8 @@ var dashboard3 = (function () {
             }
 
         });
+        
+        console.log(JSON.stringify(data));
 
         dayBoxes = roomCounter;
         boxWidth = Math.round((svgWidth / numDays) / roomCounter);
@@ -461,9 +469,10 @@ var dashboard3 = (function () {
                 return boxWidth;
             })
             .attr("height", function (d) {
-                return d.height;
+                return bottomHeightLimit(d.y, d.height);
             })
             .attr("class", function (d) {
+                //console.log(JSON.stringify(d));
                 return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' ' + d.cname;
             })
             .on('mouseover', function (d) {
@@ -475,7 +484,7 @@ var dashboard3 = (function () {
                 tip.hide();
                 d3.selectAll("." + d.class).style("fill", d.color);
             });
-        
+
         var gText = blocks
             .append("g")
             .attr("transform", function (d) {
@@ -523,7 +532,7 @@ var dashboard3 = (function () {
                 return boxWidth;
             })
             .attr("height", function (d) {
-                return d.height;
+                return bottomHeightLimit(d.y, d.height);
             })
             .attr("rx", 3) // set the x corner curve radius
             .attr("ry", 3) // set the y corner curve radius
@@ -640,6 +649,25 @@ var dashboard3 = (function () {
             }
             return gridColorsIndex[cname];
         }
+        
+        function bottomHeightLimit(blockY, blockHeight) {
+            if(blockY > height) {
+                return 0;
+            } else if(blockY + blockHeight > height) {
+                return height - blockY;
+            }
+            return blockHeight;     
+        }
+        
+        function topHeightLimit(blockY, blockHeight) {
+            if(blockY < 0) {
+                if(blockHeight + blockY > 0) {
+                    return blockHeight + blockY; // set y to zero and calc new block height
+                }
+                return 0; // Class is out of the range
+            }
+            return blockHeight;     
+        }
 
         $('#po-d3-ok').click(function (e) {
             // Submit fields via JSON here.
@@ -683,6 +711,33 @@ var dashboard3 = (function () {
         });
     }
 
+    function yearSelectionHandler(sched, d3Select, doInit) {
+        if (sched != 'None' && sched != '') {
+            spin.spin();
+            body.append(spin.el);
+        }
+        //console.log(d3Select);
+
+        $.ajax({
+            dataType: "json",
+            url: vis_url + '/' + sched + '/2',
+            success: function (data) {
+                var newDays;
+                $.each(data, function (i, d) {
+                    newDays = [];
+                    var pd = jQuery.parseJSON(d.days);
+                    for (var j = 0; j < pd.length; j++) {
+                        newDays[j] = visDays[pd[j]];
+                    }
+                    data[i].days = newDays;
+                });
+                //console.log(JSON.stringify(data));
+                createChart(d3Select, data, doInit);
+                spin.stop();
+            }
+        });
+    }
+
     function createSelect(tag_prefix, label, multiple, classes) {
         var mult = "";
         if (multiple) {
@@ -705,18 +760,43 @@ var dashboard3 = (function () {
         vis_menu.hide();
 
         vis_menu.append(createSelect('sched', 'Schedule', false, null));
-
-        var result = "";
-        for (var i = 2000; i <= 2014; i++) {
-            result += '<option value="' + i + '-FALL">' + i + '-Fall</option><option value="' + i + '-SPRING">' + i + '-Spring</option><option value="' + i + '-SUMMER">' + i + '-Summer</option>';
-        }
-        $('#sched-sel').append(result);
-
         vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
         vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
         vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
         vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
 
+        body = $('body');
+        spin = new Spinner();
+
+        spin.spin();
+        body.append(spin.el);
+
+        $.ajax({
+            dataType: "json",
+            url: vis_url + '/list',
+            success: function (data) {
+                var result = '';
+                for (var i = 0; i < data.length; i++) {
+                    result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                }
+
+                // Need to refresh this after adding
+                $('#sched-sel').append(result);
+
+                $('#sched-sel').multiselect('rebuild');
+                $('#sched-sel').multiselect('refresh');
+
+                $("#content").load("assets/vis/vis3Filt.html", function () {
+                    //chart1 =
+                    //createChart('#d3', visGetSchedData('2000-FALL'), true);
+                    yearSelectionHandler(data[0]['id'], '#d3', true);
+                    vis_menu.show();
+                    spin.stop();
+                });
+            }
+        });
+
+        // Outside of function
         $('select').multiselect({
             maxHeight: 200,
             buttonWidth: '175px'
@@ -724,7 +804,8 @@ var dashboard3 = (function () {
 
         $('#sched-sel').multiselect('setOptions', {
             onChange: function (event) {
-                createChart('#d3', visGetSchedData($("#sched-sel").val()));
+                //createChart('#d3', visGetSchedData($("#sched-sel").val()));
+                yearSelectionHandler($("#sched-sel").val(), '#d3', false);
             }
         });
 
@@ -736,12 +817,6 @@ var dashboard3 = (function () {
                     d3.selectAll("." + $(option).val()).style("visibility", "hidden");
                 }
             }
-        });
-
-        $("#content").load("assets/vis/vis3Filt.html", function () {
-            //chart1 =
-            createChart('#d3', visGetSchedData('2000-FALL'), true);
-            vis_menu.show();
         });
     }
 

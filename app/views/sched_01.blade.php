@@ -44,6 +44,7 @@
     <script src="assets/vis/js/dimple.v2.1.2.min.js" type="text/javascript"></script>
     <script src="assets/vis/data/class-data.js" type="text/javascript"></script>
     <script src="assets/vis/js/chroma.min.js" type="text/javascript"></script>
+    <script src="assets/vis/js/spin.min.js" type="text/javascript"></script>
     <script src="assets/vis/js/dashboard1.js" type="text/javascript"></script>
     <script src="assets/vis/js/dashboard2.js" type="text/javascript"></script>
     <script src="assets/vis/js/dashboard3.js" type="text/javascript"></script>

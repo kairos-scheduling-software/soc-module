@@ -2,11 +2,9 @@ var dashboard2 = (function () {
 
     "use strict";
 
-    var chart1;
-    var chart2;
-    var chart3;
-    var chart4;
-    var chart5;
+    var vis_url = 'vis';
+    var body;
+    var spin;
 
     function createChart(selector, data) {
         if (data.length == 0) {
@@ -19,7 +17,7 @@ var dashboard2 = (function () {
             buckets = 9,
             colors = ["#ffffff", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
         var days = ["M", "T", "W", "H", "F", "S", "U"];
-        var times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
+        var times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12a"];
 
         var shift = (8 - 1) * (gridSize) + 14;
 
@@ -181,51 +179,91 @@ var dashboard2 = (function () {
         return data;
     }
 
+    function yearSelectionHandler(sched, d3Select) {
+        if(sched != 'None' && sched != '') {
+            spin.spin();
+            $(d3Select).append(spin.el);
+        }
+        console.log(d3Select);
+        
+        $.ajax({
+            dataType: "json",
+            url: vis_url + '/' + sched + '/2',
+            success: function (data) {
+                var newDays;
+                $.each(data, function (i, d) {
+                    newDays = [];
+                    var pd = jQuery.parseJSON(d.days);
+                    for (var j = 0; j < pd.length; j++) {
+                        newDays[j] = visDays[pd[j]];
+                    }
+                    data[i].days = newDays;
+                });
+
+                createChart(d3Select, transformData(data));
+                spin.stop();
+            }
+        });
+    }
+
     function multiselectCallback(selector, d3Select) {
         $(selector).multiselect('setOptions', {
             onChange: function (event) {
                 d3.select(d3Select + ' svg').remove();
-                createChart(d3Select, transformData(visGetSchedData($(selector).val())));
+                yearSelectionHandler($(selector).val(), d3Select);
             }
         });
 
     }
 
     function render() {
+        body = $('body');
+        spin = new Spinner({top:"342px"});
 
-        var html = '<div style="margin: 20px 20px 20px 20px;"><div id="d3-1" class="col-md-2"></div>\n\
-        <div id="d3-2" class="col-md-2"></div>\n\
-        <div id="d3-3" class="col-md-2"></div>\n\
-        <div id="d3-4" class="col-md-2"></div>\n\
-        <div id="d3-5" class="col-md-2"></div></div>';
-        $("#content").html(html);
+        $.ajax({
+            dataType: "json",
+            url: vis_url + '/list',
+            success: function (data) {
 
-        $('#d3-1').append(createSelect('sched1', 'Schedule 1', false));
-        $('#d3-2').append(createSelect('sched2', 'Schedule 2', false));
-        $('#d3-3').append(createSelect('sched3', 'Schedule 3', false));
-        $('#d3-4').append(createSelect('sched4', 'Schedule 4', false));
-        $('#d3-5').append(createSelect('sched5', 'Schedule 5', false));
+                var html = '<div style="margin: 20px 20px 20px 20px;"><div id="d3-1" class="col-md-2"></div>\n\
+                    <div id="d3-2" class="col-md-2"></div>\n\
+                    <div id="d3-3" class="col-md-2"></div>\n\
+                    <div id="d3-4" class="col-md-2"></div>\n\
+                    <div id="d3-5" class="col-md-2"></div></div>';
+                $("#content").html(html);
 
-        var result = '<option value="None">None</option>';
-        for (var i = 2000; i <= 2014; i++) {
-            result += '<option value="' + i + '-FALL">' + i + '-Fall</option><option value="' + i + '-SPRING">' + i + '-Spring</option><option value="' + i + '-SUMMER">' + i + '-Summer</option>';
-        }
-        $('#sched1-sel').append(result);
-        $('#sched2-sel').append(result);
-        $('#sched3-sel').append(result);
-        $('#sched4-sel').append(result);
-        $('#sched5-sel').append(result);
+                $('#d3-1').append(createSelect('sched1', 'Schedule 1', false));
+                $('#d3-2').append(createSelect('sched2', 'Schedule 2', false));
+                $('#d3-3').append(createSelect('sched3', 'Schedule 3', false));
+                $('#d3-4').append(createSelect('sched4', 'Schedule 4', false));
+                $('#d3-5').append(createSelect('sched5', 'Schedule 5', false));
 
-        $('select').multiselect({
-            maxHeight: 300,
-            buttonWidth: '185px'
+                // Change this to use the schedule selector
+                var result = '<option value="None">None</option>';
+                for (var i = 0; i < data.length; i++) {
+                    result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                }
+
+                $('#sched1-sel').append(result);
+                $('#sched2-sel').append(result);
+                $('#sched3-sel').append(result);
+                $('#sched4-sel').append(result);
+                $('#sched5-sel').append(result);
+
+                $('select').multiselect({
+                    maxHeight: 300,
+                    buttonWidth: '185px'
+                });
+
+                multiselectCallback('#sched1-sel', '#d3-1');
+                multiselectCallback('#sched2-sel', '#d3-2');
+                multiselectCallback('#sched3-sel', '#d3-3');
+                multiselectCallback('#sched4-sel', '#d3-4');
+                multiselectCallback('#sched5-sel', '#d3-5');
+                
+                $('#d3-1').append('<div id="spin-box"></div>');
+            }
         });
-
-        multiselectCallback('#sched1-sel', '#d3-1');
-        multiselectCallback('#sched2-sel', '#d3-2');
-        multiselectCallback('#sched3-sel', '#d3-3');
-        multiselectCallback('#sched4-sel', '#d3-4');
-        multiselectCallback('#sched5-sel', '#d3-5');
 
     }
 

@@ -233,7 +233,6 @@ class ImportController extends BaseController
 			catch(Exception $e)
 			{
 				$message = "Invalid headers in the import file";
-				return $e->getMessage();
 			}
 
 			return Redirect::route('import-schedule')

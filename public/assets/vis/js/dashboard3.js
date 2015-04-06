@@ -40,12 +40,12 @@ var dashboard3 = (function () {
     /* Functions to create the individual charts involved in the dashboard */
     function init() {
 
-        svgWidth = $('#content').width() - 300;
+        svgWidth = viewportSize.getWidth() - 200;
         svgHeight = $('#left-nav').height() - 50;
 
         //Make an SVG Container
         svg = d3.select("#d3").append("svg")
-            .attr("width", svgWidth + gridMargin.left + gridMargin.right)
+            .attr("width", svgWidth) // + gridMargin.left + gridMargin.right)
             .attr("height", svgHeight + gridMargin.top + gridMargin.bottom)
             .append("g")
             .attr("transform", "translate(" + gridMargin.left + "," + gridMargin.top + ")");
@@ -101,6 +101,19 @@ var dashboard3 = (function () {
                 ;
         });
         svg.call(tip);
+
+        window.onresize = function (event) {
+            var navbar_height = $('#custom_navbar').height() || 0;
+            svgWidth = viewportSize.getWidth() - 200 - 1;
+            svgHeight = viewportSize.getHeight() - navbar_height - 1;
+
+            $("#left-nav").css("top", navbar_height + "px");
+            $("#content").css("top", navbar_height + "px");
+
+            svg.attr("width", svgWidth + "px").attr("height", svgHeight + "px");
+            d3.select("#d3").attr("width", svgWidth + "px").attr("height", svgHeight + "px").attr("top", navbar_height + "px");
+            d3.select("#d3").select('svg').attr("width", svgWidth + "px").attr("height", svgHeight + "px");
+        };
     }
 
     // Other functions that need to be removed
@@ -195,8 +208,8 @@ var dashboard3 = (function () {
                     } else if (val.days[j] === 'U') {
                         day = 7;
                     }
-                    
-                    console.log(class_name);
+
+                    //console.log(class_name);
                     var cname_ind = class_name.indexOf("-") < 0 ? class_name.length : class_name.indexOf("-");
                     var point = {
                         "starttm": val.starttm,
@@ -232,8 +245,8 @@ var dashboard3 = (function () {
             }
 
         });
-        
-        console.log(JSON.stringify(data));
+
+        //console.log(JSON.stringify(data));
 
         dayBoxes = roomCounter;
         boxWidth = Math.round((svgWidth / numDays) / roomCounter);
@@ -477,7 +490,7 @@ var dashboard3 = (function () {
             })
             .on('mouseover', function (d) {
                 d3.selectAll("." + d.class).style("fill", gridClassHighlightColor);
-                tip.direction(d.tipDir);
+                tip.direction(d.tipdir);
                 tip.show(d);
             })
             .on('mouseout', function (d) {
@@ -649,24 +662,24 @@ var dashboard3 = (function () {
             }
             return gridColorsIndex[cname];
         }
-        
+
         function bottomHeightLimit(blockY, blockHeight) {
-            if(blockY > height) {
+            if (blockY > height) {
                 return 0;
-            } else if(blockY + blockHeight > height) {
+            } else if (blockY + blockHeight > height) {
                 return height - blockY;
             }
-            return blockHeight;     
+            return blockHeight;
         }
-        
+
         function topHeightLimit(blockY, blockHeight) {
-            if(blockY < 0) {
-                if(blockHeight + blockY > 0) {
+            if (blockY < 0) {
+                if (blockHeight + blockY > 0) {
                     return blockHeight + blockY; // set y to zero and calc new block height
                 }
                 return 0; // Class is out of the range
             }
-            return blockHeight;     
+            return blockHeight;
         }
 
         $('#po-d3-ok').click(function (e) {
@@ -751,6 +764,8 @@ var dashboard3 = (function () {
     }
 
     function render() {
+        $('footer').hide();
+        $('.top-buffer').hide();
         $("#content").html('');
 
         $('#vis-menu').remove();
@@ -759,11 +774,14 @@ var dashboard3 = (function () {
         var vis_menu = $('#vis-menu');
         vis_menu.hide();
 
+        vis_menu.append(createSelect('sched-type', 'Type', false, null));
         vis_menu.append(createSelect('sched', 'Schedule', false, null));
         vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
         vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
         vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
         vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
+        
+        $('#sched-type-sel').append('<option value="standard">Standard</option><option value="diff">Diff</option>');
 
         body = $('body');
         spin = new Spinner();

@@ -1,5 +1,6 @@
 @include('blocks/page_start')
 @include('blocks/header')
+@yield('top-center-column')
 <div class="hg-columns">
     <div class="hg-col" id="hg-center">
         <div class="top-buffer"></div>

@@ -1,42 +1,32 @@
-<div class="container" style="margin-left: 0; padding-left: 5">
-    <div class="row">
-        <div class="col-md-9">
-            <div>
-                <div id="d3-vis-inner">
-                    <div id='d3'></div>
-                    <!-- Reusable fake popover for all d3 elements -->
-                    <div id='po-d3' class="popover right">
-                        <div id='po-d3-arrow' class="arrow"></div>
-                        <div class="popover-title">
-                            <b><span id='po-d3-name'></span> - <span id='po-d3-title'></span></b>
-                            <button id='po-d3-close' type="button" class="close" aria-hidden="true">×</button>
-                        </div>
-                        <div class="popover-content">
-                            <div class="container-fluid">
-                                <!-- I took this out of the form because it caused it to redirect away from the page when you click submit -->
-                                <!-- <form action="tickets/add-ticket" role="form" class="form-horizontal" id="log_ticket"> -->
-                                    <div class="row">
-                                        <b>Day/Time:</b> <span class="pull-right" id='po-dtm'></span>
-                                        <br/>
-                                        <b>Room:</b> <span class="pull-right" id='po-room'></span>
-                                    </div>
-                                    <br/>
-                                    <div>
-                                        <input id="event_id" class="hide" value="555">
-                                        <div>
-                                            Message:
-                                            <textarea id="message" class="messageBox" data-value=""></textarea>
-                                            <button id="submit-ticket" name="submit" type="submit" class="btn btn-default">
-                                                Submit Ticket
-                                            </button>
-                                        </div>
-                                    </div>
-                                <!-- </form> -->
-                            </div>
-                        </div>
+<div id='d3'></div>
+<!-- Reusable fake popover for all d3 elements -->
+<div id='po-d3' class="popover right">
+    <div id='po-d3-arrow' class="arrow"></div>
+    <div class="popover-title">
+        <b><span id='po-d3-name'></span> - <span id='po-d3-title'></span></b>
+        <button id='po-d3-close' type="button" class="close" aria-hidden="true">×</button>
+    </div>
+    <div class="popover-content">
+        <div class="container-fluid">
+            <!-- I took this out of the form because it caused it to redirect away from the page when you click submit -->
+            <!-- <form action="tickets/add-ticket" role="form" class="form-horizontal" id="log_ticket"> -->
+                <div class="row">
+                    <b>Day/Time:</b> <span class="pull-right" id='po-dtm'></span>
+                    <br/>
+                    <b>Room:</b> <span class="pull-right" id='po-room'></span>
+                </div>
+                <br/>
+                <div>
+                    <input id="event_id" class="hide" value="555">
+                    <div>
+                        Message:
+                        <textarea id="message" class="messageBox" data-value=""></textarea>
+                        <button id="submit-ticket" name="submit" type="submit" class="btn btn-default">
+                            Submit Ticket
+                        </button>
                     </div>
                 </div>
-            </div>
+            <!-- </form> -->
         </div>
     </div>
 </div>

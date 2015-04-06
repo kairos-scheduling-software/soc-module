@@ -36,6 +36,14 @@ class Schedule extends Eloquent
 			->get();
 	}
 
+	public function removeConstraints()
+	{
+		foreach ($this->events as $event) 
+		{
+			$event->constraints()->delete();
+		}
+	}
+
 	public function to_json()
 	{
 		$events = $this->events;

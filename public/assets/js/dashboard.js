@@ -9,6 +9,12 @@ $(function(){
 	$('#create-sched-modal').css('left', modal_left);
 
 	$('#create-sched-btn').click(function(e) {
+		$('#create-sched-form').attr("action", $(this).attr('data-url'));
+		$("#create-sched-modal").modal('show');
+	});
+
+	$('#hg-right-content').on('click', '#copy-sched-btn', function(e) {
+		$('#create-sched-form').attr("action", $(this).attr('data-url'));
 		$("#create-sched-modal").modal('show');
 	});
 
@@ -40,7 +46,14 @@ $(function(){
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				//alert('Could not add create schedule at this time.');
 				// TODO:  bootstrap error message
-				$('#modal-errors').text('The name "' + name + '" is already in use');
+				if(jqXHR.responseText.indexOf('Name already in use') > -1)
+				{
+					$('#modal-errors').text('The name "' + name + '" is already in use');
+				}
+				else
+				{
+					$('#modal-errors').text('The schedule could not be created at this time');
+				}
 			}
 		});
 	});

@@ -18,11 +18,20 @@ class ImportController extends BaseController
 			$global = Session::get('global');
 		}
 
+		$year = date("Y");
+		$years = [];
+		
+		for($start = 2000; $start < $year + 5; $start++)
+		{
+			$years[] = $start;
+		}
 
 		return View::make('import-schedule')->with([
 				'page_name'	=>	'Import Schedule',
 				'selected'	=> 	$selected,
 				'schedules' =>	$user->schedules,
+				'years'		=> 	$years,
+				'currentYear'=> $year,
 				'global'	=>	$global
 			]);
 	}
@@ -47,13 +56,17 @@ class ImportController extends BaseController
 		}
 
 		$importFile = Input::file('import');
+		$semester = Input::get('semester');
+		$year = Input::get('year');
 
 		//eventually add mimes:csv when I get a chance to find the correct php configuration
 		$rules = array(
 			'uploadfile' => 'required',
-			'scheduleName' => 'required'
+			'scheduleName' => 'required',
+			'year'		   => 'required|numeric',
+			'semester'	   => 'required'
 		);
-  		$validator = Validator::make(array('uploadfile'=> $importFile, 'scheduleName' => $scheduleName), $rules);
+  		$validator = Validator::make(array('uploadfile'=> $importFile, 'scheduleName' => $scheduleName, 'year' => $year, 'semester' => $semester), $rules);
 
   		if($validator->passes())
   		{
@@ -63,6 +76,8 @@ class ImportController extends BaseController
 			array(
 				'name' => $scheduleName,
 				'last_edited_by' => $user->id,
+				'semester'	=>	$semester,
+				'year'		=> $year,
 				'description' => ""
 			));
 
@@ -101,7 +116,6 @@ class ImportController extends BaseController
 			}
 			catch(Exception $e)
 			{
-				echo $e->getMessage();
 				$schedule->delete();
 				$message = "Invalid headers in the import file";
 			}
@@ -110,6 +124,8 @@ class ImportController extends BaseController
   		}
   		else
   		{
+  			echo $year;
+  			return $semester;
   			return Redirect::route('import-schedule')->withErrors($validator) -> withInput()->with([
 				'selected' 	=>	'Import Full'
 			]);
@@ -118,7 +134,7 @@ class ImportController extends BaseController
 		
 	}
 
-	public function import_constraint()
+	public function import_resources($mode)
 	{
 		ini_set('auto_detect_line_endings', true);
 
@@ -127,7 +143,18 @@ class ImportController extends BaseController
 		$found = false;
 		$scheduleToModify;
 
-		// Make sure the schedule name is unique
+		$selected = 'Import Constraint';
+
+		if($mode == 'room')
+		{
+			$selected = 'Import Rooms';
+		}
+		else if($mode == 'professor')
+		{
+			$selected = 'Import Professors';
+		}
+
+		// Make sure the schedule exisits
 		foreach($user->schedules as $schedule)
 		{
 			if ($schedule->name == $scheduleName)
@@ -146,6 +173,10 @@ class ImportController extends BaseController
 		}
 
 		$importFile = Input::file('import');
+		if($mode == 'constraint')
+			$removePrevConstraint = Input::get('Replace');
+		else
+			$removePrevConstraint = false;
 
 		//eventually add mimes:csv when I get a chance to find the correct php configuration
 		$rules = array(
@@ -160,9 +191,28 @@ class ImportController extends BaseController
 
   			try
   			{
-				$returnData= DataConvertUtils::importConstraint($scheduleToModify, $importFile);
+  				if($removePrevConstraint)
+  				{
+  					$scheduleToModify->removeConstraints();
+  				}
 
-				$message = ($returnData['percentPassed'] * 100). "% of the constraints were added sucessfully";
+				$returnData = '';
+				
+				if($mode == 'constraint')
+				{
+					$returnData = DataConvertUtils::importConstraint($scheduleToModify, $importFile);
+				}
+				else if($mode == 'room')
+				{
+					$returnData = DataConvertUtils::importRooms($scheduleToModify, $importFile);
+				}
+				else if($mode == 'professor')
+				{
+					$returnData = DataConvertUtils::importProfessors($scheduleToModify, $importFile);
+				}
+				
+
+				$message = ($returnData['percentPassed'] * 100). "% of the " . $mode ."s were added sucessfully";
 				
 				if($returnData['percentPassed'] !== 1)
 				{
@@ -183,11 +233,12 @@ class ImportController extends BaseController
 			catch(Exception $e)
 			{
 				$message = "Invalid headers in the import file";
+				return $e->getMessage();
 			}
 
 			return Redirect::route('import-schedule')
 			->with([
-					'selected' 	=>	'Import Constraint',
+					'selected' 	=>	$selected,
 					'global' 	=> 	$message
 				]);
   		}
@@ -195,8 +246,9 @@ class ImportController extends BaseController
   		{
   			return Redirect::route('import-schedule')->withErrors($validator) -> withInput()
   			->with([
-					'selected' 	=>	'Import Constraint'
+					'selected' 	=>	$selected
 				]);
   		}		
 	}
 }
+

@@ -5,11 +5,6 @@ Route::get('/', array(
         'uses' => 'HomeController@home'
 ));
 
-Route::get('/createSchedule/{scheduleId}', array(
-            'as'=> 'createSchedule',
-            'uses' => 'APIController@create'
-));
-
 
 Route::group(array('before'=> 'guest'), function()
 {
@@ -79,6 +74,11 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  =>  'ScheduleController@create_schedule'
     ));
 
+    Route::post('/branch-schedule/{sched_id}', array(
+        'as' => 'branch-sched',
+        'uses' => 'ScheduleController@branch_schedule'
+    ));
+
     //import schedule routes
     Route::get('/import-schedule', array(
         'as' => 'import-schedule',
@@ -90,14 +90,9 @@ Route::group(array('before'=> 'auth'), function()
         'uses' => 'ImportController@import_post'
     ));
 
-    Route::post('/import-constraint', array(
-        'as' => 'import-constraint',
-        'uses' => 'ImportController@import_constraint'
-    ));
-
-    Route::post('/branch-schedule/{sched_id}', array(
-        'as' => 'branch-sched',
-        'uses' => 'ScheduleController@branch_schedule'
+    Route::post('/import-resources/{mode}', array(
+        'as' => 'import-resources',
+        'uses' => 'ImportController@import_resources'
     ));
 
     Route::get('/data-entry1/{sched_id}', array(

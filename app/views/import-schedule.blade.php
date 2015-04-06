@@ -8,11 +8,23 @@
 		@endif>
 		Import Full Schedule
 	</option>
-	<option data-url="{{URL::route('import-constraint')}}" value="Import Constraint" 
+	<option data-url="{{URL::route('import-resources', 'constraint')}}" value="Import Constraint" 
 		@if($selected == "Import Constraint")
 			selected
 		@endif>
 		Import Constraints
+	</option>
+	<option data-url="{{URL::route('import-resources', 'professor')}}" value="Import Professors" 
+		@if($selected == "Import Professors")
+			selected
+		@endif>
+		Import Professors
+	</option>
+	<option data-url="{{URL::route('import-resources', 'room')}}" value="Import Rooms" 
+		@if($selected == "Import Rooms")
+			selected
+		@endif>
+		Import Rooms
 	</option>
 </select>
 <hr>
@@ -47,26 +59,56 @@
 
 	<h3>
 		Schedule Name
-		<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName-text')}}"/>
-			<span id="clear">
-				@if($errors->has('scheduleName'))
-					{{$errors->first('scheduleName')}}
-				@endif
-			</span>
+		<div id='ImportFullDiv'>
+			<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName-text')}}"/>
+				<span id="clear">
+					@if($errors->has('scheduleName'))
+						{{$errors->first('scheduleName')}}
+					@endif
+				</span>
+			</div>
+			Semester
+			</br>
+			<select id='semester' name='semester'>
+				<option value="Fall" selected> Fall </option>
+				<option value="Spring"> Spring </option>
+				<option value="Summer"> Summer </option>
+			</select></br>
+			Year
+			</br>
+			<select id='year' name='year'>
+			@foreach($years as $year)
+				<option value="{{ $year }}" 
+					@if($year == $currentYear)
+						selected
+					@endif>
+					{{ $year }} 
+				</option>
+			@endforeach
+			</select> 
 		</div>
 
-		<select id='schedules' name='schedules'>
-		@foreach($schedules as $schedule)
-			<option value="{{ htmlspecialchars($schedule->name) }}">
-				{{ htmlspecialchars($schedule->name) }} 
-			</option>
-		@endforeach
-		</select> 
-		<span>
-			@if($errors->has('select schedule'))
-				{{$errors->first('select schedule')}}
-			@endif
-		</span>
+		<div id='ImportWithDropDown'>
+			<select id='schedules' name='schedules'>
+			@foreach($schedules as $schedule)
+				<option value="{{ htmlspecialchars($schedule->name) }}"
+					@if(Input::old('schedules') == $schedule->name)
+						selected
+					@endif>
+					{{ htmlspecialchars($schedule->name) }}
+				</option>
+			@endforeach
+			</select>
+			<span>
+				@if($errors->has('select schedule'))
+					{{$errors->first('select schedule')}}
+				@endif
+			</span>
+			</br>
+			<div id='ImportConstraintDiv' name='ImportConstraintDiv'>
+				<input type="checkbox" name="Replace" value="True">&nbsp Remove previous constraints for schedule<br>
+			</div>
+		</div>
 	</h3>
 
 	<h3>
@@ -85,7 +127,7 @@
 	</h3>
 	</form>
 
-	<div>
+	<div id="global-error">
 		@if(isset($global))
 			{{$global}}
 		@endif

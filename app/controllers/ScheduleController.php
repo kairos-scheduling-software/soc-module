@@ -68,6 +68,8 @@ class ScheduleController extends BaseController {
 	public function create_schedule()
 	{
 		$name = Input::get('sched_name');
+		$semester = Input::get('semester');
+		$year = Input::get('year');
 		$user = Auth::user();
 
 		// Make sure the schedule name is unique
@@ -76,10 +78,18 @@ class ScheduleController extends BaseController {
 			if ($schedule->name == $name)
 				return Response::json(['error' => 'Name already in use'], 500);
 		}
+		$verifySemester = (strcasecmp($semester, 'Fall') == 0) || (strcasecmp($semester, 'Spring') !== 0) || (strcasecmp($semester, 'Summer') !== 0);
+		
+		if(!is_numeric($year) || (strcasecmp($semester, 'Fall') !== 0) || !$verifySemester)
+		{
+			return Response::json(['error' => 'Could not create schedule at this time'], 500);
+		}
 
 		$schedule = new Schedule();
 		$schedule->name = $name;
 		$schedule->last_edited_by = $user->id;
+		$schedule->semester = $semester;
+		$schedule->year = $year;
 		$schedule->description = "Just another test schedule";
 
 		if ($schedule->save())
@@ -319,6 +329,8 @@ class ScheduleController extends BaseController {
 		}
 
 		$name = Input::get('sched_name');
+		$semester = Input::get('semester');
+		$year = Input::get('year');
 		$user = Auth::user();
 
 		// Make sure the schedule name is unique
@@ -328,59 +340,76 @@ class ScheduleController extends BaseController {
 				return Response::json(['error' => 'Name already in use'], 500);
 		}
 
+		$verifySemester = (strcasecmp($semester, 'Fall') == 0) || (strcasecmp($semester, 'Spring') !== 0) || (strcasecmp($semester, 'Summer') !== 0);
+		
+		if(!is_numeric($year) || (strcasecmp($semester, 'Fall') !== 0) || !$verifySemester)
+		{
+			return Response::json(['error' => 'Could not create schedule at this time'], 500);
+		}
+
 		$schedule = new Schedule();
 		$schedule->name = $name;
 		$schedule->last_edited_by = $user->id;
+		$schedule->semester = $semester;
+		$schedule->year = $year;
 		$schedule->description = $scheduleToCopy->description;
 
 		if ($schedule->save())
 		{
-			//TODO additional Error Checking
-			$user->schedules()->attach($schedule->id);
-
-			foreach ($scheduleToCopy->rooms as $value) 
+			try
 			{
-				$room = Room::create(
-				array(
-					'name' => $value->name,
-                    'schedule_id' => $schedule->id,
-                    'capacity' => $value->capacity
-				));
-			}
+				//TODO additional Error Checking
+				$user->schedules()->attach($schedule->id);
 
-			foreach ($scheduleToCopy->events as $event) 
-			{
-				$theRoomName = Room::find($event->room_id);
-				
-				$room = Room::firstOrCreate(
-				array(
-					'name' => $theRoomName->name,
-                    'schedule_id' => $schedule->id,
-				));
+				foreach ($scheduleToCopy->events as $event) 
+				{
+					$room = Room::find($event->room_id);
+					$professor = Professor::find($event->professor);
+					$schedule->rooms()->sync([$room->id], false);
+					$schedule->rooms()->sync([$professor->id], false);
 
-				$event = models\Event::firstOrNew(
-                 array(
-                    'name' => $event->name,
-                    'professor' => $event->id,
-                    'schedule_id' => $schedule->id,
-                    'room_id' => $room->id,
-                    'class_type' => $event->class_type,
-                    'title' => $event->title,
-                    'etime_id' => $event->etime_id
-            	));
-
-            	foreach ($event->constraints as $constraint) 
-            	{
-            		$constraint = Constraint::make(
-            		array(
-            			'key' => $constraint->key,
-            			'value' => $constraint->value,
-            			'event_id' => $event->id
+					$eventToCopy = models\Event::firstOrCreate(
+                 	array(
+                    	'name' => $event->name,
+                    	'professor' => $event->professor,
+                    	'schedule_id' => $schedule->id,
+                    	'room_id' => $room->id,
+                    	'class_type' => $event->class_type,
+                    	'title' => $event->title,
+                    	'etime_id' => $event->etime_id
             		));
-            	}
+
+            		foreach ($event->constraints as $constraint) 
+            		{
+            			$eventToFindFromScheduleToCopy = models\Event::find($constraint->value);
+
+            			$constraintEventToCopy = models\Event::firstOrCreate(
+                 		array(
+                    		'name' => $eventToFindFromScheduleToCopy->name,
+                    		'professor' => $eventToFindFromScheduleToCopy->professor,
+                    		'schedule_id' => $schedule->id,
+                    		'room_id' => $room->id,
+                    		'class_type' => $eventToFindFromScheduleToCopy->class_type,
+                    		'title' => $eventToFindFromScheduleToCopy->title,
+                    		'etime_id' => $eventToFindFromScheduleToCopy->etime_id
+            			));
+
+            			$constraint = Constraint::make(
+            			array(
+            				'key' => $constraint->key,
+            				'value' => $constraintEventToCopy->id,
+            				'event_id' => $eventToCopy->id
+            			));
+            		}
+				}
+			}
+			catch(Exception $e)
+			{
+				$schedule->delete();
+				return Response::json(['error' => 'Could not create schedule at this time'], 500);
 			}
 
-			return Response::json(['sucess' => 'schedule copy complete'], 200);
+			return URL::route('dashboard');
 		}
 		else
 			return Response::json(['error' => 'Could not create schedule at this time'], 500);

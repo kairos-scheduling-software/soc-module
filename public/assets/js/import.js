@@ -3,6 +3,7 @@ $(function()
 	$("#import-mode").change(function() {
 		var mode = $('#import-mode option:selected').val();
 		$('[id=clear]').addClass('hide');
+		$('#global-error').addClass('hide');
 		place_description(mode);
 		update_header(mode);
 		shownScheduleSelector(mode);
@@ -40,6 +41,24 @@ function place_description(mode)
 					+ "equal - the classes metioned will be at the same time <br><br>"
 					+ "not - the classes metioned cannot be at the same time <br><br>";
 	}
+	else if(mode == 'Import Professors')
+	{
+		description = "Select a CSV file that contains a list of professors. It will be expecting the columns in the following order: "
+					+ "</br></br>"
+					+ "UUID - The university id of the professor teaching the class"
+					+ "</br></br>"
+					+ "Professor- The name of the professor"
+					+ "</br></br>";
+	}
+	else if(mode == 'Import Rooms')
+	{
+		description = "Select a CSV file that containts a list of rooms. It will be expecting the columns in the following order: "
+					+ "</br></br>"
+					+ "Room - The name of the room that will be used"
+					+ "</br></br>"
+					+ "Capacity - How many people can fit in the room"
+					+ "</br></br>";
+	}
 	else
 	{
 		description = "Select a CSV file that mirrors a full schedule. It will be expecting the columns in the following order: "
@@ -75,6 +94,14 @@ function update_header(mode)
 	{
 		title = "Import Schedule Constraints";
 	}
+	else if(mode == 'Import Professors')
+	{
+		title = "Import Professors";
+	}
+	else if(mode == 'Import Rooms')
+	{
+		title = "Import Rooms";
+	}
 
 	$("#Import-Selected").html(title);
 	$("#Import-Selected").val(title);
@@ -84,12 +111,20 @@ function shownScheduleSelector(mode)
 {
 	if(mode == 'Import Constraint')
 	{
-		$('#schedules').removeClass("hide");
-		$('#ScheduleName-text').addClass("hide");
+		$('#ImportFullDiv').addClass("hide");
+		$('#ImportWithDropDown').removeClass("hide");
+		$('#ImportConstraintDiv').removeClass("hide");
+	}
+	else if(mode == 'Import Professors' || mode == 'Import Rooms')
+	{
+		$('#ImportFullDiv').addClass("hide");
+		$('#ImportWithDropDown').removeClass("hide");
+		$('#ImportConstraintDiv').addClass("hide");
 	}
 	else
 	{
-		$('#ScheduleName-text').removeClass("hide");
-		$('#schedules').addClass("hide");
+		$('#ImportFullDiv').removeClass("hide");
+		$('#ImportWithDropDown').addClass("hide");
+		$('#ImportConstraintDiv').addClass("hide");
 	}
 }

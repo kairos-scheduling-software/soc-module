@@ -163,6 +163,139 @@ class DataConvertUtils
         return $failures;
     }
 
+    public static function importRooms($schedule, $importFile)
+    {
+        //Start parsing the file
+        $file = fopen($importFile, "r");
+
+        $failures['percentPassed'] = 100;
+        $failures['rowsFailed'] = [];
+
+        $column_headers = array();
+        $row_count = 0;
+        while (!feof($file)) 
+        {
+            $row = fgetcsv($file, 1000);
+
+            //this is not a real row
+            if(!$row)
+            {
+                continue;
+            }
+                
+            if ($row_count== 0)
+            {
+                $column_headers = $row;
+                
+                if(!DataConvertUtils::verifyHeaders($column_headers, 'room'))
+                {
+                    throw new exception("Error: invalid headers");
+                }
+
+                $row_count += 1;
+                continue;
+            }
+            $row_count += 1;
+
+            //if the row doesn't have enough columns skip it
+            //if any of the rows fail the regex check fail it
+            if(count($row) != 2 || !is_numeric($row[1]) || $row[1] < 0) 
+            {
+                $failures['rowsFailed'][] = $row_count;
+                continue;
+            }
+
+            $room = Room::firstOrCreate(
+            array(
+                'name' => $row[0],
+                'capacity' => $row[1]
+            ));
+
+            if (!($schedule->rooms->contains($room->id))) 
+            {
+                $schedule->rooms()->sync([$room->id], false);
+            }
+        }
+
+        fclose($file);
+
+        //minus the value of the header row during final failure calculation 
+        //since that row will already be verified if it gets here
+        $row_count = $row_count - 1;
+        $failures['percentPassed'] = ($row_count - count($failures['rowsFailed'])) / $row_count;
+
+        return $failures;
+    }
+
+    public static function importProfessors($schedule, $importFile)
+    {
+        //Start parsing the file
+        $file = fopen($importFile, "r");
+
+        $failures['percentPassed'] = 100;
+        $failures['rowsFailed'] = [];
+
+        $column_headers = array();
+        $row_count = 0;
+        while (!feof($file)) 
+        {
+            $row = fgetcsv($file, 1000);
+
+            //this is not a real row
+            if(!$row)
+            {
+                continue;
+            }
+                
+            if ($row_count== 0)
+            {
+                $column_headers = $row;
+                
+                if(!DataConvertUtils::verifyHeaders($column_headers, 'professor'))
+                {
+                    throw new exception("Error: invalid headers");
+                }
+
+                $row_count += 1;
+                continue;
+            }
+            $row_count += 1;
+
+            //if the row doesn't have enough columns skip it
+            //if any of the rows fail the regex check fail it
+            if(count($row) != 2 || !preg_match('/^U[0-9]{7}$/', $row[0]))
+            {
+                $failures['rowsFailed'][] = $row_count;
+                continue;
+            }
+
+            $professor = Professor::firstOrNew(
+            array(
+                'uid'  => $row[0]
+            ));
+
+            if(!isset($professor->name))
+            {
+                $professor->name = $row[1];
+                $professor->save();
+            }
+
+            if (!($schedule->professors->contains($professor->id))) 
+            {
+                $schedule->professors()->sync([$professor->id], false);
+            }
+        }
+
+        fclose($file);
+
+        //minus the value of the header row during final failure calculation 
+        //since that row will already be verified if it gets here
+        $row_count = $row_count - 1;
+        $failures['percentPassed'] = ($row_count - count($failures['rowsFailed'])) / $row_count;
+
+        return $failures;
+    }
+
     public static function importFullSchedule($schedule, $importFile)
     {
         //Start parsing the file
@@ -297,6 +430,16 @@ class DataConvertUtils
             $verify = $verify && (strcasecmp($headers[0], 'Class') == 0); 
             $verify = $verify && (strcasecmp($headers[1], 'Class') == 0); 
             $verify = $verify && (strcasecmp($headers[2], 'Key') == 0); 
+        }
+        else if($mode == 'room')
+        {
+            $verify = $verify && (strcasecmp($headers[0], 'Room') == 0); 
+            $verify = $verify && (strcasecmp($headers[1], 'Capacity') == 0); 
+        }
+        else if($mode == 'professor')
+        {
+            $verify = $verify && (strcasecmp($headers[0], 'UUID') == 0); 
+            $verify = $verify && (strcasecmp($headers[1], 'Professor') == 0); 
         }
         else
         {
@@ -472,6 +615,148 @@ class DataConvertUtils
         foreach($events as $event)
         {
              fputcsv($fp, $event);
+        }
+        
+        fclose($fp);
+    }
+
+    
+    public static function temp($CSV, $roomCSV, $pathToWrite)
+    {
+        //Start parsing the file
+        $file = fopen($roomCSV, "r");
+        
+        $column_headers = array();
+        $parsedRoom_csv = array();
+        $row_count = 0;
+        while (!feof($file)) 
+        {
+            $row = fgetcsv($file, 1000);
+                
+            if ($row_count==0)
+            {
+                $column_headers = $row;
+                $row_count += 1;
+                continue;
+            }
+
+            $parsedRoom_csv[$row[0]] = $row[4];
+
+            $row_count += 1; 
+        }
+
+        fclose($file);
+
+        $titles = [];
+        $events = [];
+
+        //add the headers
+        $event = array();
+        $event['Room'] = 'Room';
+        $event['Capacity'] = 'Capacity';
+        $event['UUID'] = 'UUID';
+        $event['Professor'] = 'Professor';
+        $event['Event'] = 'Class';
+        $event['Title'] = 'Title';
+        $event['Type'] = 'Type';
+        $event['Time']  = 'Time';
+        $event['Length'] = 'Length';
+        $events[] = $event;
+
+        $professorsFakeID = [];
+
+        $fakeUID = 1523543;
+
+        //Start parsing the file
+        $csvFile = fopen($CSV, "r");
+        $column_headers = array();
+        $row_count = 0;
+        $current_schedule = "";
+        $previous_schedule = "";
+        while (!feof($csvFile)) 
+        {
+            $row = fgetcsv($csvFile, 1000);
+                
+            if ($row_count==0)
+            {
+                $column_headers = $row;
+                $row_count += 1;
+                continue;
+            }
+
+            $current_schedule = $row[1] . "_" . $row[0];
+
+            if($current_schedule !== $previous_schedule && $previous_schedule != "")
+            {
+                $path = $pathToWrite . "\\" . $previous_schedule;
+                DataConvertUtils::write_file($path, $events);
+                $events = [];
+
+                //add the headers
+                $event = array();
+                $event['Room'] = 'Room';
+                $event['Capacity'] = 'Capacity';
+                $event['UUID'] = 'UUID';
+                $event['Professor'] = 'Professor';
+                $event['Event'] = 'Class';
+                $event['Title'] = 'Title';
+                $event['Type'] = 'Type';
+                $event['Time']  = 'Time';
+                $event['Length'] = 'Length';
+                $events[] = $event;
+            }
+
+            if(!isset($professorsFakeID[$row[16]]))
+            {
+                $professorsFakeID[$row[16]] = $fakeUID;
+                $fakeUID++;
+            }
+
+            if(strlen(($row[15])) < 3)
+            {
+                continue;
+            }
+
+            $days = "";
+            foreach (explode(',', $row[10]) as $value) 
+            {
+                if(strlen($days) > 0)
+                {
+                    $days .= '|';
+                }
+
+                $days .= $value . $row[12];
+            }            
+
+            $event = array();
+            $event['Room'] = $row[15];
+            $event['Capacity'] = isset($parsedRoom_csv[$row[15]]) ? $parsedRoom_csv[$row[15]] : 0;
+            $event['UUID']  = 'U' . $professorsFakeID[$row[16]];   //fake
+            $event['Professor'] = $row[16];
+            $event['Event'] = $row[2] . " " . $row[3];
+            $event['Title'] = $row[9];
+            $event['Type']  = $row[5];
+            $event['Time'] = $days;
+            $event['Length'] = $row[14];
+            $events[] = $event;
+
+            $previous_schedule = $current_schedule;
+        }
+
+        $path = $pathToWrite . "\\" . $current_schedule;
+        DataConvertUtils::write_file($path, $events);
+
+        fclose($csvFile);
+    }
+
+    public static function write_file($toWrite, $events)
+    {
+        $toWrite = $toWrite .".csv";
+        $fp = fopen($toWrite, 'w');
+
+        foreach($events as $event)
+        {  
+            fputcsv($fp, $event);
         }
         
         fclose($fp);

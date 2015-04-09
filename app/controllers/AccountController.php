@@ -47,12 +47,20 @@ class AccountController extends BaseController {
 				die();
 				*/
 				//send them an activation email
+				try
+				{
 				Mail::send('emails.auth.activate', array('link' => URL::route('activate', $user->activation_code), 'username' => $user->username), 
 					function($message) use ($user)
 					{
 						$message->to($user->email, $user->username)->subject('Activate Kairos Account');
 					}
 				);
+				}
+				catch(Exception $e)
+				{
+					echo($e);
+					die();
+				}
 			}
 
 			//place holder we will most likely want to return them to the page they are working on/the dashboard

@@ -560,6 +560,7 @@ function refresh_scheduled_class_draggables()
     		var length = dragged_block.data('length');
     		var days = parse_days(dragged_block.data('days'));
     		var drop_height = (length / 5) * five_min_height;
+    		var class_html = dragged_block.html();
 
     		scheduled_class_drop_zones(length, days, drop_height);
     		
@@ -568,8 +569,48 @@ function refresh_scheduled_class_draggables()
 		    	activeClass: "time-block-active",
 		    	drop: function(event, ui)
 		    	{
-		    		alert("dropped!");
+		    		$('.sc_drop_zone').droppable("destroy");
+
+		    		// Remove the old blocks
+		    		$("div[data-group=" + group_id + "]").remove();
+
+		    		var blk = $(this);
+		    		var group = blk.data('group');
+
+		    		$('.sc_drop_zone').each(function() {
+		    			var this_block = $(this);
+		    			if (this_block.data('group') == group)
+		    			{
+		    				this_block.removeClass('time-block-hover time-block-active drop-zone ui-droppable sc_drop_zone');
+		    				this_block.addClass('scheduled-class not-yet-added');
+		    				this_block.html(class_html);
+		    			}
+		    		});
+
+		    		$('.class-name-container').each(function() {
+						var course = $(this);
+						var div = course.closest('div.scheduled-class');
+						//console.log("div: " + div.attr('data-group'));
+						var p = div.height();
+						p = (p - course.outerHeight(true)) / 4;
+
+						if(p >= 7)
+						div.css("padding-top", p + 'px');
+					});
+
 		    		$('.sc_drop_zone').remove();
+		    	},
+		    	over: function(event, ui)
+		    	{
+		    		var group_id = $(this).attr('data-group');
+		    		$("div[data-group=" + group_id + "]").each(function() {
+		    			if (!$(this).hasClass('scheduled-class'))
+		    				$(this).addClass('time-block-hover');
+		    		});
+		    	},
+		    	out: function(event, ui) {
+		    		var group_id = $(this).attr('data-group');
+		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover');
 		    	}
     		});
 
@@ -644,7 +685,7 @@ function scheduled_class_drop_zones(length, days, height)
 	var key = '' + nums[days.length] + '-' + (length == 50 ? 'fifty' : 'eighty');
 	$.each(all_blocks[key], function(i, block){
 		$.each(block["days"], function(i, day) {
-			var html_block = "<div class='sc_drop_zone drop-zone'";
+			var html_block = "<div class='sc_drop_zone'";
 			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
 			var id = day.substring(1) + "-" + block["id"];
 			var ddd = id.substring(0,3); // three char day abbreviation

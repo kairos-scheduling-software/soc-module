@@ -42,6 +42,9 @@ class AccountController extends BaseController {
 			//save the user to the database
 			if($user->save())
 			{
+				echo("Email: " . Config::get('mail.username') . "<br>Password: " . Config::get('mail.password'));
+				die();
+
 				//send them an activation email
 				Mail::send('emails.auth.activate', array('link' => URL::route('activate', $user->activation_code), 'username' => $user->username), 
 					function($message) use ($user)

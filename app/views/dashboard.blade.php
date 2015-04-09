@@ -8,7 +8,7 @@
 		<hr>
 		<h2>New Schedule</h2>
 		<p>
-			<button class="btn new-sched" id="create-sched-btn">
+			<button class="btn new-sched" id="create-sched-btn" data-url="{{ URL::route('create-sched') }}">
 				{{ FA::icon('plus') }}&nbsp;&nbsp;
 				Create
 			</button>

@@ -3,11 +3,11 @@
 class Schedule extends Eloquent 
 {
 	protected $table = 'schedules';
-	protected $fillable = array('name','json_schedule', 'description', 'last_edited_by');
+	protected $fillable = array('name','json_schedule', 'description', 'year', 'semester', 'final' ,'last_edited_by');
 
 	public function users()
 	{
-		return $this->belongsToMany('User');
+		return $this->belongsToMany('User', 'schedule_user');
 	}
 
 	public function events()
@@ -17,7 +17,12 @@ class Schedule extends Eloquent
 
 	public function rooms()
 	{
-		return $this->hasMany('Room');
+		return $this->belongsToMany('Room', 'room_schedule');
+	}
+
+	public function professors()
+	{
+		return $this->belongsToMany('Professor', 'professor_schedule');
 	}
 
 	public function tickets()
@@ -29,6 +34,14 @@ class Schedule extends Eloquent
 			->where('tickets.resolve', '=', 0)
 			->orderBy('events.name')
 			->get();
+	}
+
+	public function removeConstraints()
+	{
+		foreach ($this->events as $event) 
+		{
+			$event->constraints()->delete();
+		}
 	}
 
 	public function to_json()

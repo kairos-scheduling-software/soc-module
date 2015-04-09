@@ -10,4 +10,9 @@ class Professor extends Eloquent
 		return $this->hasMany('Event');
 	}
 
+	public function schedules()
+	{
+		return $this->belongsToMany('Schedule', 'professor_schedule');
+	}
+
 }

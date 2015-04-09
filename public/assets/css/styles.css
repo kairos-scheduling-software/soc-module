@@ -1160,3 +1160,10 @@ td.prog-label {
 .navbar-default .navbar-nav>.open>a:focus {
 	background-color: #363636;
 }
+
+.badge {
+	position: relative;
+	top: -3px;
+	background-color: #E07833;
+	line-height: 1.3;
+}

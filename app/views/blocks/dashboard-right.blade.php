@@ -35,13 +35,39 @@
 </div>
 <hr>
 <div class="sched-admin-section">
-	<h3>{{ FA::icon('group')}}&nbsp;Users</h3>
-	@foreach($sched->users as $user)
-		<p><span class="red-x">{{ FA::icon('times-circle')}}</span>&nbsp;&nbsp;{{ $user->full_name() }}</p>
-	@endforeach
-	<a href="#">Add&nbsp;a&nbsp;user&nbsp;{{ FA::lg('plus')}}</a>
-</div>
-<hr>
-<div class="sched-admin-section">
-	<h3>{{ FA::icon('flag') }}&nbsp;<a href="{{URL::route('ticket-manager', $sched->id)}}">Proposed Changes</a></h3>
+	<?php
+		$tickets = $sched->tickets(); 
+		$hasTickets = count($tickets);
+		$i = 5;
+	?>
+	<h3>{{ FA::icon('support') }}&nbsp;
+		Support Tickets
+		@if($hasTickets)
+			<span class="badge" style="margin-top: -5px">{{ $hasTickets }}</span>
+		@endif
+	</h3>
+	@if($hasTickets)
+		<table style="margin-bottom: 20px; margin-top: 20px">
+			<tr>
+				<th>Class</th>
+				<th>Comment</th>
+			</tr>
+		@foreach($tickets as $ticket)
+			@if($i > 0)
+				<tr>
+					<td style="padding-top: 6px; padding-bottom: 6px; padding-right: 15px">{{ $ticket->name }}</td>
+					<td>{{ strlen($ticket->message) > 80 ? substr($ticket->message, 0, 79) . "..." :  $ticket->message}}</td>
+				</tr>
+				<?php $i--; ?>
+			@endif
+		@endforeach
+		@if($hasTickets > 5)
+			<td><small>+ {{ ($hasTickets - 5) }} more...</small></td>
+		@endif
+		</table>
+		
+		<a href="{{URL::route('ticket-manager', $sched->id)}}">Go to Ticket Manager {{ FA::icon('arrow-circle-right') }}</a>
+	@else
+		No open tickets for this schedule
+	@endif
 </div>

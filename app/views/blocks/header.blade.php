@@ -21,7 +21,7 @@
 					<a href="{{ URL::route('home') }}">{{ FA::icon('dashboard') }} Dashboard</a>
 				</li>
 				<li {{ $page_name == 'DATATOOLS' ? 'class="selected_page"' : '' }}>
-					<a href="{{URL::route('view-sched')}}">{{ FA::icon('database') }} Data Tools</a>
+					<a href="{{URL::route('view-sched')}}">{{ FA::icon('line-chart') }} Data Tools</a>
 				</li>
 				<li {{ $page_name == 'HELP' ? 'class="selected_page"' : '' }}>
 					<a href="#help">{{ FA::icon('question-circle') }} Help</a>

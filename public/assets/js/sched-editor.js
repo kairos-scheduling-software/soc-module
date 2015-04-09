@@ -72,11 +72,13 @@ $(function(){
 				});
 				if (json_data['wasFailure'])
 				{
+					console.log('was failure: true');
 					$('#sched-bad').show();
 					$('#conflict-section').show();
 				}
 				else
 				{
+					console.log('was failure: false');
 					$('#sched-ok').show();
 				}
 			},
@@ -89,16 +91,16 @@ $(function(){
 
 		return true;
 	});
-
 	
 
 	resize_all();
+	/*
 	$(window).resize(function(){
 		setTimeout(function() {
 			resize_all();
 		}, 500);		
 	});
-
+*/
 	load_schedule();
 
 	$('.panel-collapse').on('show.bs.collapse', function() {
@@ -287,6 +289,7 @@ $(function(){
 			$('#class-search').focus();
 		}
 	});
+	
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
 	$('.scheduled-class').click(function() {

@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 'tmlekthpauinhbav',//getenv('email_password'),
+	'password' => getenv('email_password'),
 
 	/*
 	|--------------------------------------------------------------------------

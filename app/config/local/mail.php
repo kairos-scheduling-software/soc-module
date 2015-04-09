@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 'kairos2015',
+	'password' => 'tmlekthpauinhbav',//'kairos2015',
 
 	/*
 	|--------------------------------------------------------------------------

@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 'kairos2015',
+	'password' => getenv('email_password'),
 
 	/*
 	|--------------------------------------------------------------------------

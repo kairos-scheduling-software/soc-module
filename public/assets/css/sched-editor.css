@@ -301,6 +301,12 @@ ul.ui-autocomplete > li {
 	line-height: 1;
 }
 
+.sc_time_block {
+	position: absolute;
+	background: rgba(0,0,0,0.2) !important;
+	border: 1px solid white;
+}
+
 /*
 .class-name-container {
 	position: relative;
@@ -311,13 +317,13 @@ ul.ui-autocomplete > li {
 
 .time-block-active {
 	position: absolute;
-	background: rgba(0,0,0,0.2);
+	background: rgba(0,0,0,0.2) !important;
 	border: 1px solid white;
 }
 
 .time-block-hover {
 	position: absolute;
-	background: rgba(0,110,0,0.2);
+	background: rgba(0,110,0,0.2) !important;
 	border: 1px solid white;
 }
 
@@ -425,6 +431,7 @@ ul.ui-autocomplete > li {
 #drop-trash {
 	display: inline-block;
 	font-size: 60pt;
+	float: left;
   	/* text-align: right; */
   	/* margin-left: 100px; */
   	margin-top: 5px;

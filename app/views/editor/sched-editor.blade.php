@@ -353,9 +353,6 @@
 	<div id="drop-trash">
 		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">
 	</div>
-	<div id="scratch-pad">
-		Drag classes here to be rescheduled later
-	</div>
 </div>
 <div id="hidden-data" class="hide"
 	 data-addurl="{{ URL::route('e-add-class') }}"

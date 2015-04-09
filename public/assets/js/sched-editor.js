@@ -555,22 +555,24 @@ function refresh_scheduled_class_draggables()
     		var group_id = $(this).attr('data-group');
     		var id = $(this).attr('id');
     		//$("div[data-group=" + group_id + "]:not('#"+id+"')").hide();
-/*
+
     		var dragged_block = $(this);
+    		var length = dragged_block.data('length');
+    		var days = parse_days(dragged_block.data('days'));
+    		var drop_height = (length / 5) * five_min_height;
+
+    		scheduled_class_drop_zones(length, days, drop_height);
     		
-    		if (dragged_block.hasClass('one-fifty'))
-    			setup_dropzones('one-fifty', 'fifty-min-blk');
-    		else if (dragged_block.hasClass('one-eighty'))
-    			setup_dropzones('one-eighty', 'eighty-min-blk');
-    		else if (dragged_block.hasClass('two-fifty'))
-    			setup_dropzones('two-fifty', 'fifty-min-blk');
-    		else if (dragged_block.hasClass('two-eighty'))
-    			setup_dropzones('two-eighty', 'eighty-min-blk');
-    		else if (dragged_block.hasClass('three-fifty'))
-    			setup_dropzones('three-fifty', 'fifty-min-blk');
-    		else if (dragged_block.hasClass('three-eighty'))
-    			setup_dropzones('three-eighty', 'eighty-min-blk');
-*/
+    		$(".sc_drop_zone").droppable({
+				hoverClass: "time-block-hover",
+		    	activeClass: "time-block-active",
+		    	drop: function(event, ui)
+		    	{
+		    		alert("dropped!");
+		    		$('.sc_drop_zone').remove();
+		    	}
+    		});
+
     		// Setup the trash drop zone
     		$('#trash-img').droppable({
     			hoverClass: "trash-hover",
@@ -630,9 +632,51 @@ function refresh_scheduled_class_draggables()
     	},
     	stop: function(event, ui)
     	{
-
+    		$('.sc_drop_zone').remove();
     	},
     	revert: 'invalid'
+	});
+}
+
+function scheduled_class_drop_zones(length, days, height)
+{
+	var nums = ['zero', 'one', 'two', 'three', 'four', 'five'];
+	var key = '' + nums[days.length] + '-' + (length == 50 ? 'fifty' : 'eighty');
+	$.each(all_blocks[key], function(i, block){
+		$.each(block["days"], function(i, day) {
+			var html_block = "<div class='sc_drop_zone drop-zone'";
+			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
+			var id = day.substring(1) + "-" + block["id"];
+			var ddd = id.substring(0,3); // three char day abbreviation
+			html_block += "id='" + id + "'";
+
+			// Set offsets of the dropzone
+			var left = 0;
+			var top = 0;
+			top += (block["offset"] * five_min_height);
+			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd, false);
+			
+			if (horiz == -1)
+			{
+				console.log("Horizontal failed");
+				return;
+			}
+			left += horiz * time_block_w;
+
+			html_block += " style='left: " + left + "px; top: " + top + "px; position: absolute' ";
+			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
+			html_block += "' data-length='" + (block["length"] / 5) + "'";
+			html_block += " data-days='" + block["days"] + "'";
+			html_block += " data-time='" + block["etime"]["starttm"] + "'";
+			html_block += " data-ddd='" + ddd + "'";
+			html_block += "></div>"; // TODO: figure out tool tips
+			$(day).append(html_block);
+		});
+	});
+
+	$('.sc_drop_zone').css({
+		width: time_block_w +'px',
+		height: height +'px'
 	});
 }
 

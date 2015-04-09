@@ -55,7 +55,7 @@
 		@foreach($tickets as $ticket)
 			@if($i > 0)
 				<tr>
-					<td style="padding-top: 6px; padding-bottom: 6px; padding-right: 15px">{{ $ticket->name }}</td>
+					<td style="padding-top: 6px; padding-bottom: 6px; padding-right: 15px; white-space: nowrap">{{ $ticket->name }}</td>
 					<td>{{ strlen($ticket->message) > 80 ? substr($ticket->message, 0, 79) . "..." :  $ticket->message}}</td>
 				</tr>
 				<?php $i--; ?>

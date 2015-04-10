@@ -13,6 +13,7 @@ var temp_indices = [];
 
 var rooms;
 var room_groups;
+var professors;
 
 $(function(){
 
@@ -804,17 +805,25 @@ function get_popover_content(group_id, params)
 	$.each(room_groups, function(grp, obj) {
 		html += "<option>" + grp + "</option>";
 	});
-	html += "</select><br/>";
+	html += "</select>";
 	
 	html += "<small><b>Room:</b></small><br/>";
 	html += "<select class='form-control' name='room_name'>";
 	$.each(rooms, function(i, rm) {
 		html += "<option>" + rm + "</option>";
 	});
-	html += "</select><br/>";
+	html += "</select>";
 	//html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
-	html += "<small><b>Professor:</b></small><br>";
-	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
+	
+	html += "<small><b>Professor:</b></small><br/>";
+	html += "<select class='form-control' name='prof_name'>";
+	$.each(professors, function(i, prof) {
+		var uid = prof['uid'];
+		var prof_name = prof['name'];
+		html += "<option value='" + uid + "'>" + prof_name + "</option>";
+	});
+	html += "</select>";
+	//html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
 	html += "<button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
 	html += "</form><button class='btn btn-default' id='cancel-add-class'><i class='fa fa-times'></i> Cancel</button></div>";
 

@@ -83,11 +83,12 @@
                 }
                 grp.push(rname);
             });
-            
             $.each(room_groups, function(grp, rm_list) {
                 rm_list.sort();
                 rm_list.unshift('All');
             });
+            
+            professors = {{ json_encode($professors) }};
             // schedule_json = {{ $schedule->to_json() }};
             // load_schedule(schedule_json);
         });

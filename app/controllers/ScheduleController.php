@@ -53,13 +53,15 @@ class ScheduleController extends BaseController {
 				->join('room_mappings', 'room_groups.name', '=', 'room_mappings.name')
 				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
 				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		$professors = Professor::select('uid', 'name')->get();
 
 		return View::make('editor.sched-editor')->with([
 			'page_name'		=>	'Schedule Editor',
 			'schedule'		=>	$schedule,
 			'time_blocks'	=>	$time_blocks,
 			'rooms'			=>	$rooms,
-			'room_groups'	=>	$room_groups
+			'room_groups'	=>	$room_groups,
+			'professors'	=>	$professors
 		]);
 	}
 

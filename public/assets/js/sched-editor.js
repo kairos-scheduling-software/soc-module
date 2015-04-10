@@ -316,7 +316,7 @@ $(document).ready(function () {
 		$('select[name="room_name"] option').remove();
 		$('select[name="room_name"]').append(html);
 	});
-};
+});
 
 /**
  * Dynamically resizes all elements on the page

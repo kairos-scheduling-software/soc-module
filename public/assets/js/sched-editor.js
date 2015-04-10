@@ -808,9 +808,9 @@ function get_popover_content(group_id, params)
 	
 	html += "<small><b>Room:</b></small><br/>";
 	html += "<select class='form-control' name='room_name'>";
-	//$.each(rooms, function(rm, grps) {
-	//	html += "<option class='" + grps + "'>" + rm + "</option>";
-	//});
+	$.each(rooms, function(i, rm) {
+		html += "<option>" + rm + "</option>";
+	});
 	html += "</select><br/>";
 	//html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
 	html += "<small><b>Professor:</b></small><br>";

@@ -64,6 +64,30 @@
         $(function() {
             time_blocks = {{ $time_blocks }};
             process_time_blocks(time_blocks);
+            var rms = {{ json_encode($rooms) }};
+            var grps = {{ json_encode($room_groups) }};
+            
+            room_groups = Object.create(null);
+            rooms = [];
+            $.each(rms, function(i, rm) {
+                rooms.push(rm['name']);
+            });
+            rooms.sort();
+            rooms.unshift('All');
+            $.each(grps, function(i, rec) {
+                var grp_name = rec['grp_name'];
+                var rname = rec['rname'];
+                var grp = room_groups[grp_name];
+                if (grp === undefined) {
+                    grp = room_groups[grp_name] = [];
+                }
+                grp.push(rname);
+            });
+            
+            $.each(room_groups, function(grp, rm_list) {
+                rm_list.sort();
+                rm_list.unshift('All');
+            });
             // schedule_json = {{ $schedule->to_json() }};
             // load_schedule(schedule_json);
         });

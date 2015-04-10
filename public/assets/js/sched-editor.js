@@ -11,6 +11,9 @@ var col_counts = [];
 var course_list = [];
 var temp_indices = [];
 
+var rooms;
+var room_groups;
+
 $(function(){
 
 	initialize_column_matrix();
@@ -91,7 +94,6 @@ $(function(){
 
 		return true;
 	});
-	
 
 	resize_all();
 	/*
@@ -297,6 +299,24 @@ $(function(){
 		console.log("Indices: " + $(this).data('indices'));
 	});
 });
+
+$(document).ready(function () {
+	$('body').on('change', 'select[name="room_grp_name"]', function(e) {
+		var grp_name = $('select[name="room_grp_name"] option:selected')[0].value;
+		var rm_list;
+		if (grp_name == 'All') {
+			rm_list = rooms;
+		} else {
+			rm_list = room_groups[grp_name];
+		}
+		var html = '';
+		$.each(rm_list, function(i, rm) {
+			html += '<option>' + rm + '</option>';
+		});
+		$('select[name="room_name"] option').remove();
+		$('select[name="room_name"]').append(html);
+	});
+};
 
 /**
  * Dynamically resizes all elements on the page
@@ -777,8 +797,22 @@ function get_popover_content(group_id, params)
 	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
 	html += "<small><b>Class Name:</b></small><br>";
 	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
-	html += "<small><b>Room:</b></small><br>";
-	html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
+	
+	html += "<small><b>Room groups:</b></small><br/>";
+	html += "<select class='form-control' name='room_grp_name'>";
+	html += "<option selected>All</option>";
+	$.each(room_groups, function(grp, obj) {
+		html += "<option>" + grp + "</option>";
+	});
+	html += "</select><br/>";
+	
+	html += "<small><b>Room:</b></small><br/>";
+	html += "<select class='form-control' name='room_name'>";
+	//$.each(rooms, function(rm, grps) {
+	//	html += "<option class='" + grps + "'>" + rm + "</option>";
+	//});
+	html += "</select><br/>";
+	//html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
 	html += "<small><b>Professor:</b></small><br>";
 	html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
 	html += "<button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";

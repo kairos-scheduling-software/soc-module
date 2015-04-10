@@ -47,11 +47,19 @@ class ScheduleController extends BaseController {
 
 		if (!$schedule)
 			return Redirect::route('dashboard'); // TODO: redirect to 404
+		
+		$rooms = Room::select('name')->get();
+		$room_groups = DB::table('room_groups')
+				->join('room_mappings', 'room_groups.name', '=', 'room_mappings.name')
+				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
+				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
 
 		return View::make('editor.sched-editor')->with([
 			'page_name'		=>	'Schedule Editor',
 			'schedule'		=>	$schedule,
-			'time_blocks'	=>	$time_blocks
+			'time_blocks'	=>	$time_blocks,
+			'rooms'			=>	$rooms,
+			'room_groups'	=>	$room_groups
 		]);
 	}
 

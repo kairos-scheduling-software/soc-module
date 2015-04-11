@@ -41,6 +41,8 @@
 				Sort by:&nbsp;<select class="form-control">
 					<option>Recently Edited</option>
 					<option>Schedule Name</option>
+					<option>Year</option>
+					<option>Semester</option>
 				</select>
 			</div>
 		</div>
@@ -52,12 +54,15 @@
 				<div class="sched-name-2 sched-list-col-header">
 					Name
 				</div>
+				<div class="semester-col sched-list-col-header">
+					Semester
+				</div>
+				<div class="year-col sched-list-col-header">
+					Year
+				</div>
 				<div class="last-edited sched-list-col-header">
 					Last Edited
-				</div>
-				<div class="edited-by sched-list-col-header">
-					Edited By
-				</div>			
+				</div>		
 				@foreach($schedules as $schedule)
 					@include('blocks/schedule-list-row')
 				@endforeach
@@ -65,6 +70,7 @@
 			@endif
 
 		</div>
+		<div class="footer-space"></div>
 	@stop
 
 	@section('right-column')

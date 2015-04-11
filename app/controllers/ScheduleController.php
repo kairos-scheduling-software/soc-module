@@ -90,7 +90,7 @@ class ScheduleController extends BaseController {
 		$schedule->last_edited_by = $user->id;
 		$schedule->semester = $semester;
 		$schedule->year = $year;
-		$schedule->description = "Just another test schedule";
+		$schedule->description = "";
 
 		if ($schedule->save())
 		{

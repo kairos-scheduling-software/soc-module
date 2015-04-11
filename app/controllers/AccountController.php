@@ -4,7 +4,7 @@ class AccountController extends BaseController {
 
 	public function register()
 	{
-		return View::make('account.register');
+		return View::make('account.register')->with('page_name', 'register');
 	}
 
 	public function postRegister()
@@ -22,6 +22,7 @@ class AccountController extends BaseController {
 
 		if($validate -> fails())
 		{
+			if($validate)
 			//return errors and redirect to the form
 			return Redirect::route('register')-> withErrors($validate) -> withInput(Input::except('password')); 
 
@@ -58,13 +59,12 @@ class AccountController extends BaseController {
 				}
 				catch(Exception $e)
 				{
-					echo($e);
-					die();
+					return Redirect::route('register')->with('global', 'Account could not be created at this time');
 				}
 			}
 
 			//place holder we will most likely want to return them to the page they are working on/the dashboard
-			return Redirect::route('home');
+			return Redirect::route('register')->with('global', 'An email has been sent for account activation');
 		}
 	}
 
@@ -89,7 +89,7 @@ class AccountController extends BaseController {
 
 	public function getLogin()
 	{
-		return View::make('account.login');
+		return View::make('account.register')->with('page_name', 'login');
 	}
 
 	public function postLogin()
@@ -118,7 +118,7 @@ class AccountController extends BaseController {
 			}
 		}
 
-		return Redirect::route('getLogin')->with('global', 'username and password did not match, or the account is not active')->withInput(Input::except('password'));
+		return Redirect::route('getLogin')->with('global-login', 'username and password did not match, or the account is not active')->withInput(Input::except('password'));
 	}
 
 	public function logout()

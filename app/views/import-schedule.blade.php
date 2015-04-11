@@ -28,29 +28,31 @@
 	</option>
 </select>
 <hr>
-	
-<p id="import-description">
-	Select a CSV file that mirrors a full schedule. It will be expecting the columns in the following order: 
-	</br></br>
-	Room - The name of the room that will be used
-	</br></br>
-	Capacity - How many people can fit in the room
-	</br></br>
-	UUID - The university id of the professor teaching the class
-	</br></br>
-	Professor- The name of the professor
-	</br></br>
-	Class - The name of the class I.E. CS1410-01
-	</br></br>
-	Title - The title of the class I.E. Object Oriented Programming
-	</br></br>
-	Type - The type of class it is from the following Laboratory, Discussion, Lecture, Seminar, or Special Topics
-	</br></br>
-	Time - The time of the class in the format day then time such as M1300|W1300
-	</br></br>
-	Length - The length of the class in minutes I.E. 80
-	</br></br>
-</p>
+<div class="import-description-div">
+	<p id="import-description">
+		Select a CSV file that mirrors a full schedule. It will be expecting the columns in the following order: 
+		</br></br>
+		Room - The name of the room that will be used
+		</br></br>
+		Capacity - How many people can fit in the room
+		</br></br>
+		UUID - The university id of the professor teaching the class
+		</br></br>
+		Professor- The name of the professor
+		</br></br>
+		Class - The name of the class I.E. CS1410-01
+		</br></br>
+		Title - The title of the class I.E. Object Oriented Programming
+		</br></br>
+		Type - The type of class it is from the following Laboratory, Discussion, Lecture, Seminar, or Special Topics
+		</br></br>
+		Time - The time of the class in the format day then time such as M1300|W1300
+		</br></br>
+		Length - The length of the class in minutes I.E. 80
+		</br></br>
+	</p>
+</div>
+
 @stop
 
 @section('center-column')
@@ -60,7 +62,7 @@
 	<h3>
 		Schedule Name
 		<div id='ImportFullDiv'>
-			<div><input type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName-text')}}"/>
+			<div><input class="input-import" type="text" id="ScheduleName-text" name ="ScheduleName-text" value="{{Input::old('ScheduleName-text')}}"/>
 				<span id="clear">
 					@if($errors->has('scheduleName'))
 						{{$errors->first('scheduleName')}}
@@ -69,14 +71,14 @@
 			</div>
 			Semester
 			</br>
-			<select id='semester' name='semester'>
+			<select class="input-import-dropdown" id='semester' name='semester'>
 				<option value="Fall" selected> Fall </option>
 				<option value="Spring"> Spring </option>
 				<option value="Summer"> Summer </option>
 			</select></br>
 			Year
 			</br>
-			<select id='year' name='year'>
+			<select class="input-import-dropdown" id='year' name='year'>
 			@foreach($years as $year)
 				<option value="{{ $year }}" 
 					@if($year == $currentYear)
@@ -89,7 +91,7 @@
 		</div>
 
 		<div id='ImportWithDropDown'>
-			<select id='schedules' name='schedules'>
+			<select class="input-import-dropdown" id='schedules' name='schedules'>
 			@foreach($schedules as $schedule)
 				<option value="{{ htmlspecialchars($schedule->name) }}"
 					@if(Input::old('schedules') == $schedule->name)
@@ -121,8 +123,9 @@
 			</span>
 		</div></br>
 
-		<button class="btn btn-primary btn-sm" id="import-schedule-btn">
-			Select File
+		<button class="btn new-sched" id="import-schedule-btn">
+			{{ FA::icon('cloud-upload') }}&nbsp;&nbsp;
+				Import
 		</button>
 	</h3>
 	</form>

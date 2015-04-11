@@ -85,6 +85,9 @@
     @if($page_name == 'Import Schedule')
         <script src="{{URL::asset('assets/js/import.js')}}"></script>
     @endif
+    @if($page_name == 'login' || $page_name == 'register')
+        <link href="{{URL::asset('assets/css/account.css')}}" rel="stylesheet">
+    @endif
 
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>

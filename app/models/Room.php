@@ -4,6 +4,7 @@ class Room extends Eloquent
 {
 	protected $table = 'rooms';
 	protected $fillable = array('name','capacity', 'schedule_id', 'availability');
+	protected $touches = array('schedules');
 
 	public function events()
 	{

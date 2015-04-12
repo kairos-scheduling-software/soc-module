@@ -330,7 +330,7 @@ class ScheduleController extends BaseController {
 		$schedule->description = Input::get('data');
 		if($schedule->save())
 		{
-			return Response::json(['success' => 'Successfully updated the description'], 200);
+			return Response::json(['success' => 'Successfully updated the description', 'data' => $schedule], 200);
 		}
 
 		return Resonse::json(['error' => 'could not find the schedule to update'], 500);

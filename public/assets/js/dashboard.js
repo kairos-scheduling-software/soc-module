@@ -146,7 +146,7 @@ function add_description(element)
 				data:  		{"data" : textFromArea}, 
 				type: 		"POST",
 				success: 	function(data, textStatus, jqXHR) {
-
+					$('#row_' + data.data.id).find('.sched-list-row').find('.last-edited').html(data.data.updated_at);
 				},
 				error: 		function(jqXHR, textStatus, errorThrown) {
 					alert('Could not update the description at this time.');

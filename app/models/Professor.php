@@ -4,6 +4,7 @@ class Professor extends Eloquent
 {
 	protected $table = 'professors';
 	protected $fillable = array('name', 'uid');
+	protected $touches = array('schedules');
 
 	public function events()
 	{

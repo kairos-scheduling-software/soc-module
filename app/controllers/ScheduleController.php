@@ -318,6 +318,24 @@ class ScheduleController extends BaseController {
 		}
 	}
 
+	public function update_description($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+
+		if(!$schedule)
+		{
+			return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+		}
+
+		$schedule->description = Input::get('data');
+		if($schedule->save())
+		{
+			return Response::json(['success' => 'Successfully updated the description'], 200);
+		}
+
+		return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+	}
+
 	public function branch_schedule($idToCopy)
 	{
 

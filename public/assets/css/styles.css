@@ -1197,3 +1197,9 @@ td.prog-label {
 {
 	width: 17%;
 }
+
+.edit-description
+{
+    cursor:pointer;
+    width: 100%;
+}

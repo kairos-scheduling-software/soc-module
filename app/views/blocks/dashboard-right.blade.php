@@ -4,11 +4,13 @@
 <h2>{{ $sched->name }}</h2>
 <div class="sched-admin-section">
 	<h3>{{ FA::icon('file-text-o')}}&nbsp;Description</h3>
-	@if($sched->description)
-		{{ $sched->description }}
-	@else
-		<a href="#">Add&nbsp;a&nbsp;description&nbsp;{{ FA::lg('plus')}}</a>
-	@endif
+	<div id="description-field" data-url="{{ URL::route('description-update', $sched->id)}}">
+		@if($sched->description)
+			<div id="edit-desc" value="{{$sched->description}}" class="edit-description" onclick="add_description('edit-desc')">{{ $sched->description }}</div>
+		@else
+			<div id="edit-desc" value="" class="edit-description" onclick="add_description('edit-desc')">Add&nbsp;a&nbsp;description&nbsp;{{ FA::lg('plus')}}</div>
+		@endif
+	</div>
 </div>
 <hr>
 <div class="sched-admin-section">

@@ -79,6 +79,11 @@ Route::group(array('before'=> 'auth'), function()
         'uses' => 'ScheduleController@branch_schedule'
     ));
 
+    Route::post('/description-update/{sched_id}', array(
+        'as' => 'description-update',
+        'uses' => 'ScheduleController@update_description'
+    ));
+
     //import schedule routes
     Route::get('/import-schedule', array(
         'as' => 'import-schedule',

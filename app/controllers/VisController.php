@@ -79,6 +79,7 @@ SQL;
                 // Main schedule view
 $sql = <<<SQL
 select
+    e.id,
     et.starttm,
     et.`length`,
     concat('[', replace(et.days, '|', ','), ']') as days,

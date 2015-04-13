@@ -39,9 +39,9 @@ var dashboard3 = (function () {
 
     /* Functions to create the individual charts involved in the dashboard */
     function init() {
-
-        svgWidth = viewportSize.getWidth() - 200;
-        svgHeight = $('#left-nav').height() - 50;
+        var navbar_height = $('#custom_navbar').height() || 0;
+        svgWidth = viewportSize.getWidth() - 200 - 1;
+        svgHeight = viewportSize.getHeight() - navbar_height - 1;
 
         //Make an SVG Container
         svg = d3.select("#d3").append("svg")
@@ -212,6 +212,7 @@ var dashboard3 = (function () {
                     //console.log(class_name);
                     var cname_ind = class_name.indexOf("-") < 0 ? class_name.length : class_name.indexOf("-");
                     var point = {
+                        "id": val.id,
                         "starttm": val.starttm,
                         "length": val.length,
                         "days": val.days,
@@ -290,6 +291,7 @@ var dashboard3 = (function () {
             } else {
                 val['tipDir'] = 'n';
             }
+
         });
 
         $.each(gridColors, function (i, val) {
@@ -486,16 +488,16 @@ var dashboard3 = (function () {
             })
             .attr("class", function (d) {
                 //console.log(JSON.stringify(d));
-                return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' ' + d.cname;
+                return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' cls_id_' + d.id;
             })
             .on('mouseover', function (d) {
-                d3.selectAll("." + d.class).style("fill", gridClassHighlightColor);
-                tip.direction(d.tipdir);
+                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor);
+                tip.direction(d.tipDir);
                 tip.show(d);
             })
             .on('mouseout', function (d) {
                 tip.hide();
-                d3.selectAll("." + d.class).style("fill", d.color);
+                d3.selectAll(".cls_id_" + d.id).style("fill", d.color);
             });
 
         var gText = blocks
@@ -532,7 +534,7 @@ var dashboard3 = (function () {
             //    return (d.x === d.x && d.y === d.y);
             //}) // Filter out classes with no time assigned to them (NaN != NaN)
             .attr("class", function (d) {
-                return d.class;
+                return 'cls_id_' + d.id;
             })
             .style("fill-opacity", 0)
             .attr("x", function (d) {
@@ -763,10 +765,13 @@ var dashboard3 = (function () {
         return '<option value="' + key + '">' + value + '</option>';
     }
 
-    function render() {
+    function render(sched) {
         $('footer').hide();
         $('.top-buffer').hide();
         $("#content").html('');
+
+        d3.select('#content').style('min-width', '0px');
+        d3.select('#content').style('min-height', '0px');
 
         $('#vis-menu').remove();
         $('#left-nav').append('<div id="vis-menu"></div>');
@@ -774,14 +779,16 @@ var dashboard3 = (function () {
         var vis_menu = $('#vis-menu');
         vis_menu.hide();
 
-        vis_menu.append(createSelect('sched-type', 'Type', false, null));
+        if (sched == undefined) {
+            vis_menu.append(createSelect('sched-type', 'Type', false, null));
+            $('#sched-type-sel').append('<option value="standard">Standard</option><option value="diff">Diff</option>');
+        }
+
         vis_menu.append(createSelect('sched', 'Schedule', false, null));
         vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
         vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
         vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
         vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
-        
-        $('#sched-type-sel').append('<option value="standard">Standard</option><option value="diff">Diff</option>');
 
         body = $('body');
         spin = new Spinner();
@@ -794,8 +801,18 @@ var dashboard3 = (function () {
             url: vis_url + '/list',
             success: function (data) {
                 var result = '';
-                for (var i = 0; i < data.length; i++) {
-                    result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+
+                if (sched == undefined) {
+                    for (var i = 0; i < data.length; i++) {
+                        result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                    }
+                } else {
+                    // Only add the single item
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i]['id'] === sched) {
+                            result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                        }
+                    }
                 }
 
                 // Need to refresh this after adding
@@ -805,9 +822,7 @@ var dashboard3 = (function () {
                 $('#sched-sel').multiselect('refresh');
 
                 $("#content").load("assets/vis/vis3Filt.html", function () {
-                    //chart1 =
-                    //createChart('#d3', visGetSchedData('2000-FALL'), true);
-                    yearSelectionHandler(data[0]['id'], '#d3', true);
+                    yearSelectionHandler((sched || data[0]['id']), '#d3', true);
                     vis_menu.show();
                     spin.stop();
                 });
@@ -816,7 +831,7 @@ var dashboard3 = (function () {
 
         // Outside of function
         $('select').multiselect({
-            maxHeight: 200,
+            maxHeight: 175,
             buttonWidth: '175px'
         });
 

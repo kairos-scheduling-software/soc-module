@@ -6,6 +6,10 @@ var dashboard2 = (function () {
     var body;
     var spin;
 
+    var days = ["Su", "M", "T", "W", "Th", "F", "S"];
+    var times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12a"];
+    var colors = ["#ffffff", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
+
     function createChart(selector, data) {
         if (data.length == 0) {
             return [];
@@ -14,10 +18,8 @@ var dashboard2 = (function () {
         width = 200 - margin.left - margin.right,
             height = 675 - margin.top - margin.bottom,
             gridSize = 40,
-            buckets = 9,
-            colors = ["#ffffff", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
-        var days = ["M", "T", "W", "H", "F", "S", "U"];
-        var times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12a"];
+            buckets = 9;
+            
 
         var shift = (8 - 1) * (gridSize) + 14;
 
@@ -180,12 +182,12 @@ var dashboard2 = (function () {
     }
 
     function yearSelectionHandler(sched, d3Select) {
-        if(sched != 'None' && sched != '') {
+        if (sched != 'None' && sched != '') {
             spin.spin();
             $(d3Select).append(spin.el);
         }
         console.log(d3Select);
-        
+
         $.ajax({
             dataType: "json",
             url: vis_url + '/' + sched + '/2',
@@ -218,20 +220,22 @@ var dashboard2 = (function () {
 
     function render() {
         body = $('body');
-        spin = new Spinner({top:"342px"});
-
+        spin = new Spinner({top: "342px"});
+        d3.select('#content').style('min-width', '1280px');
+        d3.select('#content').style('min-height', '600px');
         $.ajax({
             dataType: "json",
             url: vis_url + '/list',
             success: function (data) {
 
-                var html = '<div style="margin: 20px 20px 20px 20px;"><div id="d3-1" class="col-md-2"></div>\n\
-                    <div id="d3-2" class="col-md-2"></div>\n\
-                    <div id="d3-3" class="col-md-2"></div>\n\
-                    <div id="d3-4" class="col-md-2"></div>\n\
-                    <div id="d3-5" class="col-md-2"></div></div>';
+                var html = '<div class="col-xs-10" style="margin: 20px 20px 20px 50px;">\n\
+                    <div id="d3-1" class="col-xs-2" style="min-width: 200px;"></div>\n\
+                    <div id="d3-2" class="col-xs-2" style="min-width: 200px;"></div>\n\
+                    <div id="d3-3" class="col-xs-2" style="min-width: 200px;"></div>\n\
+                    <div id="d3-4" class="col-xs-2" style="min-width: 200px;"></div>\n\
+                    <div id="d3-5" class="col-xs-2" style="min-width: 200px;"></div></div>';
                 $("#content").html(html);
-
+                
                 $('#d3-1').append(createSelect('sched1', 'Schedule 1', false));
                 $('#d3-2').append(createSelect('sched2', 'Schedule 2', false));
                 $('#d3-3').append(createSelect('sched3', 'Schedule 3', false));
@@ -260,7 +264,7 @@ var dashboard2 = (function () {
                 multiselectCallback('#sched3-sel', '#d3-3');
                 multiselectCallback('#sched4-sel', '#d3-4');
                 multiselectCallback('#sched5-sel', '#d3-5');
-                
+
                 $('#d3-1').append('<div id="spin-box"></div>');
             }
         });

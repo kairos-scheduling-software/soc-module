@@ -746,42 +746,28 @@ function get_popover_content(group_id, params)
 {
 	var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
 	var days = "";
-
+	var days_arr = [];
+	
 	$.each(params["days"], function(i, day) {
-		switch(day)
-		{
+		switch(day) {
 			case "mon":
-				if(days == "")
-					days = "M";
-				else
-					days += ", M";
+				days_arr.push('M');
 				break;
 			case "tue":
-				if(days == "")
-					days = "T";
-				else
-					days += ", T";
+				days_arr.push('T');
 				break;
 			case "wed":
-				if(days == "")
-					days = "W";
-				else
-					days += ", W";
+				days_arr.push('W');
 				break;
 			case "thu":
-				if(days == "")
-					days = "Th";
-				else
-					days += ", Th";
+				days_arr.push('Th');
 				break;
 			case "fri":
-				if(days == "")
-					days = "F";
-				else
-					days += ", F";
+				days_arr.push('F');
 				break;
 		}
 	});
+	days = days_arr.join(', ');
 
 	var times = "";
 
@@ -798,6 +784,9 @@ function get_popover_content(group_id, params)
 	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
 	html += "<small><b>Class Name:</b></small><br>";
 	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
+	
+	html += "<small><b>Max Enrollments:</b></small><br/>";
+	html += "<input type='text' class='form-control' name='enrollment' placeholder='Class Enrollment' required>";
 	
 	html += "<small><b>Room groups:</b></small><br/>";
 	html += "<select class='form-control' name='room_grp_name'>";

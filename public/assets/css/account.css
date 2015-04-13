@@ -1,0 +1,58 @@
+.account-body
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.account-error
+{
+	font-size: 10pt;
+	color: red;
+}
+
+.account-form-control {
+	width: 70%;
+	height: 50px;
+	font-size: 14pt;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.account-reg
+{
+    border-right: thick double;
+    height: 100%;
+}
+
+.account-reg-log
+{
+	background-color: #CCCCCC;
+	color: #003366;
+	width: 50%;
+	height: 75%;
+	min-width: 500px;
+	margin-top: 100px;
+	border-radius: 10px;
+	font-size: 18pt;
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.account-form
+{
+	display: inline-block;
+}
+
+.global
+{
+	font-size: 10pt;
+}
+
+
+.account-btn-login {
+	background-color: #D85600;
+	color: #002143;
+	font-size: 16pt;
+	padding-right: 20px;
+	padding-left: 20px;
+}

@@ -14,6 +14,6 @@
   </div>
   <div class="modal-footer login-footer">
     New To Kairos?
-    <a href="#" id="btn-register" class="btn">Register</a>
+    <a href="{{URL::route('register')}}" id="btn-register" class="btn">Register</a>
   </div>
 </div>

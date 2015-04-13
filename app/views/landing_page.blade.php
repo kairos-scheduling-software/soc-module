@@ -17,8 +17,8 @@
 		<p>
 			Choose an option to continue:
 		</p>
-		<a href="#guest" class="btn btn-lg">
-			Continue as Guest
+		<a href="#Api" class="btn btn-lg">
+			API documentation
 		</a>
 		<a class="btn btn-lg" data-toggle="modal" href="#login-modal">
 			Login

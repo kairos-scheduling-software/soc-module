@@ -5,6 +5,7 @@ class Event extends \Eloquent
 {
 	protected $table = 'events';
 	protected $fillable = array('name','professor', 'schedule_id', 'room_id', 'class_type', 'title', 'etime_id');
+	protected $touches = array('schedule');
 
 	public function constraints()
 	{
@@ -24,5 +25,10 @@ class Event extends \Eloquent
 	public function tickets()
 	{
 		return $this->hasMany('Ticket');
+	}
+
+	public function schedule()
+	{
+		return $this->belongsTo('Schedule');
 	}
 }

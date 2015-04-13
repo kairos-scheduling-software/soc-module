@@ -117,3 +117,48 @@ $(function(){
 		});
 	});
 });
+
+function add_description(element)
+{
+	var tex = $('#' + element).attr('value').trim();
+    var textarea = $('<textarea style="resize:none;" id="edit-desc-text">' + tex + '</textarea>');
+    $('#' + element).replaceWith(textarea);
+    textarea.focus();
+    
+    textarea.blur(function(){
+    	var textFromArea = $('#edit-desc-text').val();
+
+    	if(textFromArea == "" || textFromArea.trim() == "Add a description".trim())
+    	{
+    		var originalDesc = $('<div id="edit-desc" value="" class="edit-description" onclick="add_description(\'edit-desc\')">Add&nbsp;a&nbsp;description&nbsp;<i class="fa fa-plus fa-lg"></i></div>');
+    		textarea.replaceWith(originalDesc);
+    		textFromArea = "";
+    	}
+    	else
+    	{
+    		var newDesc = $('<div id="edit-desc" value="' + textFromArea + '" class="edit-description" onclick="add_description(\'edit-desc\')">' + textFromArea + '</div>');
+    		textarea.replaceWith(newDesc);
+    	}
+
+    	var url = $('#description-field').attr('data-url');
+    		$.ajax({
+				url:		url,
+				data:  		{"data" : textFromArea}, 
+				type: 		"POST",
+				success: 	function(data, textStatus, jqXHR) {
+					var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+					var hours = ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+					var stamp = new Date(data.data.updated_at);
+					var time_stamp = months[stamp.getMonth()] + " " + (stamp.getDate() < 10 ? "0" + stamp.getDate() : stamp.getDate());
+					time_stamp += ", " + stamp.getFullYear() + " at ";
+					time_stamp += hours[stamp.getHours()] + ":" + (stamp.getMinutes() < 10 ? "0" + stamp.getMinutes() : stamp.getMinutes());
+					time_stamp += " " + (stamp.getHours() > 11 ? "pm" : "am");
+					$('#row_' + data.data.id).find('.sched-list-row').find('.last-edited').html(time_stamp);
+				},
+				error: 		function(jqXHR, textStatus, errorThrown) {
+					alert('Could not update the description at this time.');
+					//TODO: show bootstrap error message
+				}
+			});
+    });
+}

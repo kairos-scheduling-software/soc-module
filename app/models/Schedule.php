@@ -93,4 +93,17 @@ class Schedule extends Eloquent
 
 		return json_encode($jsonBuilder);
 	}
+
+	/**
+	 * A helper function for nicer formatting of "last editied" string.
+	 */
+	public function last_edited()
+	{
+		$string = "";
+		$string .= date_format($this->updated_at, "M d, Y");
+		$string .= " at ";
+		$string .= date_format($this->updated_at, "g:i a");;
+		
+		return $string;
+	}
 }

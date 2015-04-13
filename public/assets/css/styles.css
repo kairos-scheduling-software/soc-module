@@ -471,7 +471,7 @@ footer {
 }
 
 .sched-name-2 {
-	width: 50%;
+	width: 24%;
 	margin: 10px 6px;
 	display: inline-block;
 }
@@ -483,7 +483,14 @@ footer {
 	display: inline-block;
 }
 
-.edited-by {
+.year-col {
+	width: 24%;
+	margin: 10px 0;
+	padding: 0;
+	display: inline-block;
+}
+
+.semester-col {
 	width: 24%;
 	margin: 10px 0;
 	padding: 0;
@@ -1166,4 +1173,33 @@ td.prog-label {
 	top: -3px;
 	background-color: #E07833;
 	line-height: 1.3;
+}
+
+.import-description-div
+{
+	overflow-y: scroll;
+	display: inline-block;
+	margin-bottom: 90px;
+	max-height: 500px;
+}
+
+.footer-space
+{
+	min-height: 30px !important;
+}
+
+.input-import
+{
+	width: 25%;
+}
+
+.input-import-dropdown
+{
+	width: 17%;
+}
+
+.edit-description
+{
+    cursor:pointer;
+    width: 100%;
 }

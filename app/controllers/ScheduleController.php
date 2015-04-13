@@ -100,7 +100,7 @@ class ScheduleController extends BaseController {
 		$schedule->last_edited_by = $user->id;
 		$schedule->semester = $semester;
 		$schedule->year = $year;
-		$schedule->description = "Just another test schedule";
+		$schedule->description = "";
 
 		if ($schedule->save())
 		{
@@ -348,6 +348,24 @@ class ScheduleController extends BaseController {
 		{
 				return Response::json(['error' => 'Could not check schedule'], 500);
 		}
+	}
+
+	public function update_description($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+
+		if(!$schedule)
+		{
+			return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+		}
+
+		$schedule->description = Input::get('data');
+		if($schedule->save())
+		{
+			return Response::json(['success' => 'Successfully updated the description', 'data' => $schedule], 200);
+		}
+
+		return Resonse::json(['error' => 'could not find the schedule to update'], 500);
 	}
 
 	public function branch_schedule($idToCopy)

@@ -1,5 +1,16 @@
 <?php
 
+$db_env = getenv('KAIROS_SOC_DB');
+if ($db_env == null) {
+	$db_env = 'mysql://root:@localhost/kairos_soc';
+}
+
+$db_url = parse_url($db_env);
+
+if (!isset($db_url['pass'])) {
+	$db_url['pass'] = '';
+}
+
 return array(
 
 	/*
@@ -20,12 +31,12 @@ return array(
 
 	'connections' => array(
 
-		'mysql' => array(
-			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'kairos_soc',
-			'username'  => 'root',
-			'password'  => '',
+		$db_url['scheme'] => array(
+			'driver'    => $db_url['scheme'],
+			'host'      => $db_url['host'],
+			'database'  => substr($db_url['path'], 1),
+			'username'  => $db_url['user'],
+			'password'  => $db_url['pass'],
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
@@ -43,5 +54,7 @@ return array(
 		),
 
 	),
+	
+	'default' => $db_url['scheme'],
 
 );

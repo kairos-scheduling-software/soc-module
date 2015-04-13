@@ -273,26 +273,48 @@ class ScheduleController extends BaseController {
 	{
 		// TODO: add error checking!!
 		$schedule = Schedule::find(Input::get('sched_id'));
-
+		
 		// Add & save the room
-		$room = Room::firstOrCreate(['name' => Input::get('room_name'), 'schedule_id' => $schedule->id]);
-		$room->capacity = 80;
-		$room->save();/*
-		if (!$room)
-		{
-			$room = new Room();
-			$room->name = Input::get('room_name');
-			$room->capacity = 80;
-			$room->schedule_id = $schedule->id;
-			$room->save();
-		}*/
+		//$room = Room::firstOrCreate(['name' => Input::get('room_name'), 'schedule_id' => $schedule->id]);
+		//$room->capacity = 80;
+		//$room->save();/*
+		//if (!$room)
+		//{
+		//	$room = new Room();
+		//	$room->name = Input::get('room_name');
+		//	$room->capacity = 80;
+		//	$room->schedule_id = $schedule->id;
+		//	$room->save();
+		//}*/
+		$enroll = Input::get('enrollment');
+		
+		$room = new StdClass;
+		$room_name = Input::get('room_name');
+		$room_group = Input::get('room_grp_name');
+		$room->group = null;
+		$room->id = null;
+		$room->is_final = false;
+		if ($room_group.toLowerCase() != 'all') {
+			$room->group = $room_group;
+		}
+		if ($room_name.toLowerCase() != 'all') {
+			$rm_id = Room::select('id')->where('name', '=', $room_name)->firstOrFail();
+			$room->id = $rm_id->id;
+			$room->is_final = true;
+		}
+		
+		$prof_uid = Input::get('prof_name');
+		$prof = Professor::select('id')->where('uid', '=', $prof_uid)->firstOrFail();
 
 		// Add & save the class
 		$class = new models\Event();
 		$class->name = Input::get('class_name');
-		$class->professor = 1;
+		//$class->maxParticipant = $enroll;
+		$class->professor = $prof->id;
 		$class->schedule_id = $schedule->id;
 		$class->room_id = $room->id;
+		$class->room_group = $room->group;
+		$class->is_rm_final = $room->is_final;
 		$class->class_type = "Lecture";
 		$class->etime_id = Input::get('block_id');
 		$class->save();

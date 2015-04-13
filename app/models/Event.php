@@ -29,6 +29,6 @@ class Event extends \Eloquent
 
 	public function schedule()
 	{
-		return \Schedule::find($this->schedule_id);
+		return $this->belongsTo('Schedule');
 	}
 }

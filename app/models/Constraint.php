@@ -8,6 +8,6 @@ class Constraint extends Eloquent
 
 	public function event()
 	{
-		return models\Event::find($this->value);
+		return $this->belongsTo('Event');
 	}
 }

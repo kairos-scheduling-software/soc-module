@@ -11,7 +11,7 @@
 			{{ $schedule->year }}
 		</div>	
 		<div class="last-edited">
-			{{ $schedule->updated_at }}
+			{{ $schedule->last_edited() }}
 		</div>	
 	</div>
 </a>

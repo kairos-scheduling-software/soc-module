@@ -146,7 +146,14 @@ function add_description(element)
 				data:  		{"data" : textFromArea}, 
 				type: 		"POST",
 				success: 	function(data, textStatus, jqXHR) {
-					$('#row_' + data.data.id).find('.sched-list-row').find('.last-edited').html(data.data.updated_at);
+					var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+					var hours = ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+					var stamp = new Date(data.data.updated_at);
+					var time_stamp = months[stamp.getMonth()] + " " + (stamp.getDate() < 10 ? "0" + stamp.getDate() : stamp.getDate());
+					time_stamp += ", " + stamp.getFullYear() + " at ";
+					time_stamp += hours[stamp.getHours()] + ":" + (stamp.getMinutes() < 10 ? "0" + stamp.getMinutes() : stamp.getMinutes());
+					time_stamp += " " + (stamp.getHours() > 11 ? "pm" : "am");
+					$('#row_' + data.data.id).find('.sched-list-row').find('.last-edited').html(time_stamp);
 				},
 				error: 		function(jqXHR, textStatus, errorThrown) {
 					alert('Could not update the description at this time.');

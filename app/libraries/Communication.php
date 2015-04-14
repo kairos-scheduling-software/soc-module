@@ -14,7 +14,7 @@ class Communication
 
     	$json = Communication::create_backEndJson($schedule);
 
-        $result = Communication::sendJsonToCoreService('check', $json, $schedule_id);
+        $result = Communication::sendJsonToCoreService('new', $json, $schedule_id);
 
         //do error checking
         $scheduleResults = json_decode($result);
@@ -24,7 +24,7 @@ class Communication
             throw new Exception('ERROR: ' . $scheduleResults->Error);
         }
 
-        return json_encode($scheduleResults);
+        return $scheduleResults;
     }
 
     private static function sendJsonToCoreService($mode, $json, $schedule_id)
@@ -53,7 +53,8 @@ class Communication
     {
 
     	$events = $schedule->events;
-    	$rooms = $schedule->rooms;
+    	//$rooms = $schedule->rooms;
+        $rooms = Room::select('id', 'capacity')->get();
 
     	$jsonBuilder = [];
     	$eventsBuilder = [];
@@ -95,8 +96,28 @@ class Communication
 
             //start moving on to the spaces
 
-    		$temp->spaceId = $event->room_id;
-    		$temp->maxParticipants = $event->room->capacity;
+    		if ($event->is_rm_final == true) {
+                $temp->spaceId = $event->room_id;
+            } else {
+                $rm_grp = $event->room_group;
+                $rm_list = $rooms;
+                if ($rm_grp != null) {
+                    $rm_list = Room::select('id')->join('room_mappings', 'rooms.id', '=', 'room_mappings.rid')
+                            ->where('room_mappings.name', '=', $rm_grp)->get();
+                }
+                $spaces = [];
+                foreach ($rm_list as $rm) {
+                    $spaces[] = $rm->id;
+                }
+                $temp->spaceId = $spaces;
+            }
+            
+            
+    		$cap = $event->enroll_cap;
+            if ($cap == null || $cap == 0) {
+                $cap = $event->room->capacity;
+            }
+            $temp->maxParticipants = $cap;
     		$temp->personId = $event->professor;
 
 
@@ -123,7 +144,7 @@ class Communication
     		$rTemp = new StdClass;
     		$rTemp->id = $room->id;
     		$rTemp->capacity = $room->capacity;
-    		$rTemp->times = $room->availability;
+    		//$rTemp->times = $room->availability;
     		$roomBuilder[] = $rTemp;
     	}
 

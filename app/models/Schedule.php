@@ -54,7 +54,12 @@ class Schedule extends Eloquent
 		{
 
 			$timeblock = $value->etime;
-			$room = Room::find($value->room_id)->name;
+			$room_id = $value->room_id;
+			if ($room_id == null) {
+				$room = '';
+			} else {
+				$room = Room::find($value->room_id)->name;
+			}
 			$professor = Professor::find($value->professor)->name;
 
 			if($timeblock)
@@ -86,7 +91,6 @@ class Schedule extends Eloquent
 				$temp->title = $value->title;
 				$temp->room = $room;
 				$temp->professor = $professor;
-    			$jsonBuilder[] = $temp;
 				$jsonBuilder[] = $temp;
 			}
 		}

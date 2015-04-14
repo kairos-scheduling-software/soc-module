@@ -294,10 +294,10 @@ class ScheduleController extends BaseController {
 		$room->group = null;
 		$room->id = null;
 		$room->is_final = false;
-		if ($room_group.toLowerCase() != 'all') {
+		if (strtolower($room_group) != 'all') {
 			$room->group = $room_group;
 		}
-		if ($room_name.toLowerCase() != 'all') {
+		if (strtolower($room_name) != 'all') {
 			$rm_id = Room::select('id')->where('name', '=', $room_name)->firstOrFail();
 			$room->id = $rm_id->id;
 			$room->is_final = true;
@@ -309,7 +309,7 @@ class ScheduleController extends BaseController {
 		// Add & save the class
 		$class = new models\Event();
 		$class->name = Input::get('class_name');
-		//$class->maxParticipant = $enroll;
+		$class->enroll_cap = $enroll;
 		$class->professor = $prof->id;
 		$class->schedule_id = $schedule->id;
 		$class->room_id = $room->id;
@@ -317,13 +317,14 @@ class ScheduleController extends BaseController {
 		$class->is_rm_final = $room->is_final;
 		$class->class_type = "Lecture";
 		$class->etime_id = Input::get('block_id');
+		$class->is_tm_final = true;
 		$class->save();
 
 		// Call check on comm library
 		try {
 			$result = Communication::sendCheck($schedule->id);
-
-			return $result;
+			
+			return json_encode($result);
 		}
 		catch (Exception $e)
 		{

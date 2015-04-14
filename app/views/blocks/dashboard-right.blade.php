@@ -16,7 +16,7 @@
 <div class="sched-admin-section">
 	<h3>{{ FA::icon('cog')}}&nbsp;Actions</h3>
 	<button class="btn btn-small sched-action-btn" id="view-sched-btn" 
-	 		data-url="{{ URL::route('view-sched') . '?id=' . $sched->id }}">
+	 		data-url="{{ URL::route('view-sched') . '?id=' . $sched->id . '&dash=3'}}">
 		{{ FA::icon('eye')}}&nbsp;VIEW
 	</button>
 	<button class="btn btn-small sched-action-btn" data-url="{{ URL::route('edit-sched', $sched->id) }}">

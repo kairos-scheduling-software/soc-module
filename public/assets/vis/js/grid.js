@@ -24,7 +24,7 @@ $(document).ready(function () {
     console.log(uri + " : " + JSON.stringify(query));
     
     if(query['dash'] != null) {
-        renderDash(query.dash, query['sch']); 
+        renderDash(query.dash, query['id']); 
     } else {
         //dashboard1.render();
         renderDash('1', 0);

@@ -1,5 +1,6 @@
-(function () {
-    "use strict";
+"use strict";
+    
+$(document).ready(function () {
 
     document.addEventListener("deviceready", function () {
         FastClick.attach(document.body);
@@ -9,44 +10,44 @@
     $('.item-content').click(function () {
         var href = $(this).attr('data-href');
         if (href === "#dashboard/1") {
-            $('#vis-menu').remove();
-            dashboard1.render();
+            renderDash('1');
         } else if (href === "#dashboard/2") {
-            $('#vis-menu').remove();
-            dashboard2.render();
+            renderDash('2');
         } else if (href === "#dashboard/3") {
-            dashboard3.render();
+            renderDash('3');
         }
     });
-
-    dashboard1.render();
+    
+    var uri = new URI(window.location.href);
+    // Get query string
+    var query = URI.parseQuery(uri.query());
+    console.log(uri + " : " + JSON.stringify(query));
+    
+    if(query['dash'] != null) {
+        renderDash(query.dash, query['id']); 
+    } else {
+        //dashboard1.render();
+        renderDash('1', 0);
+    }
 
 }());
 
+function renderDash(dash, sched) {
+    if (dash === "1") {
+        $('#vis-menu').remove();
+        dashboard1.render();
+    } else if (dash === "2") {
+        $('#vis-menu').remove();
+        dashboard2.render();
+    } else if (dash === "3") {
+        dashboard3.render(sched);
+    }
+}
+
 var visDays = ["U", "M", "T", "W", "H", "F", "S"];
 
-function visGetSchedData(sched_name) {
-    /*
-    $.ajax({
-        dataType: "json",
-        url: 'vis/8/0',
-        success: function (data) {
-            var newDays;
-            $.each(data, function (i, d) {
-                newDays = [];
-                var pd = jQuery.parseJSON(d.days);
-                for (var j = 0; j < pd.length; j++) {
-                    newDays[j] = visDays[pd[j]];
-                }
-                data[i].days = newDays;
-            });
-        }
-    });
-    */
-    console.log(sched_name);
-    if (sched_name == "None") {
-        return [];
-    }
-
-    return vis_data[sched_name];
-}
+window.onresize = function (event) {
+    var navbar_height = $('#custom_navbar').height() || 0;
+    $("#left-nav").css("top", navbar_height + "px");
+    $("#content").css("top", navbar_height + "px");
+};

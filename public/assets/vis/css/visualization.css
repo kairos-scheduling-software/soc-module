@@ -121,7 +121,8 @@
     margin: 0 0 0 0;
     padding: 0 0 0 0;
     z-index: 999;
-    /*min-width: 1200px;*/
+    min-width: 1280px;
+    min-height: 700px;
 }
 
 .chart {
@@ -316,5 +317,10 @@ text.axis-worktime {
 }
 
 #vis-menu {
-    overflow: auto;
+    /*overflow: auto;*/
+    /*min-height: 600px;*/
+}
+
+.dropdown-menu {
+    max-width: 175px;
 }

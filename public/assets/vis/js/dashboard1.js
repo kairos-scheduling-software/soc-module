@@ -88,6 +88,8 @@ var dashboard1 = (function () {
     }
 
     function render() {
+        d3.select('#content').style('min-width', '1280px');
+        d3.select('#content').style('min-height', '700px');
         $.ajax({
             dataType: "json",
             url: vis_url + '/0/0',

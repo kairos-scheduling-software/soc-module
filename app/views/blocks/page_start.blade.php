@@ -89,7 +89,7 @@
             });
             
             professors = {{ json_encode($professors) }};
-            // schedule_json = {{ $schedule->to_json() }};
+            // schedule_json = { $schedule->to_json() };
             // load_schedule(schedule_json);
         });
         </script>

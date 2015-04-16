@@ -324,6 +324,30 @@ class ScheduleController extends BaseController {
 		try {
 			$result = Communication::sendCheck($schedule->id);
 			
+			$classes_dict = [];
+			foreach ($result->EVENTS as $ev) {
+				//$cls = Event::find($ev->id);
+				//if (!$cls->is_rm_final) {
+				//	$cls->room_id = $ev->spaceId;
+				//	$cls->save();
+				//}
+				$classes_dict[$ev->id] = $ev;
+			}
+			foreach ($schedule->events as $event) {
+				if (!$event->is_rm_final) {
+					if (!property_exists($classes_dict[$event->id], 'wasFailure')) {
+						$event->room_id = $classes_dict[$event->id]->spaceId;
+						$event->save();
+					}
+				}
+			}
+			if (!$class->is_rm_final) {
+				if (!property_exists($classes_dict[$class->id], 'wasFailure')) {
+					$class->room_id = $classes_dict[$class->id]->spaceId;
+					$class->save();
+				}
+			}
+			
 			return json_encode($result);
 		}
 		catch (Exception $e)

@@ -11,7 +11,7 @@ var dashboard3 = (function () {
     var svgHeight = 1000;
 
     var gridClassSelected = "";
-    var gridClassHighlightColor = "#33FF33"; //'#67C8FF';
+    var gridClassHighlightColor = "#33FF33";
 
     var gridColors = {};
     var gridColorCounter = 0;
@@ -22,6 +22,7 @@ var dashboard3 = (function () {
     var tip;
 
     var diffSelected = false;
+    var isDiff = false;
 
     // Colors
     var scale = chroma.scale(['#99AAFF', '#BBDDCC', '#8888AA', '#887711', '#557755', '#118833', '#7F3F6A', '#992266', '#3D3F4C', '#0027E5']).mode('lab');
@@ -179,7 +180,7 @@ var dashboard3 = (function () {
         var days = {};
         var cnames = {};
 
-        var isDiff = false;
+        isDiff = false;
 
         var data = [];
 
@@ -192,7 +193,7 @@ var dashboard3 = (function () {
         if (!dataset)
             return;
 
-        if (dataset[0].diff !== undefined) {
+        if (!isNull(dataset[0].diff)) {
             isDiff = true;
         }
 
@@ -628,7 +629,11 @@ var dashboard3 = (function () {
                 $('#po-d3').css('top', final_y + 'px');
             })
             .on('mouseover', function (d) {
-                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor).style("fill-opacity", 0.6);
+                if (isDiff) {
+                    d3.selectAll(".cls_id_" + d.id).style("fill-opacity", 0.6);
+                } else {
+                    d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor).style("fill-opacity", 0.6);
+                }
 
                 var ctm = this.getCTM();
                 var coords = getGridScreenCoords(d.x, d.y, ctm);
@@ -657,8 +662,11 @@ var dashboard3 = (function () {
             })
             .on('mouseout', function (d) {
                 tip.hide();
-                d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);
-                ;
+                if (isDiff) {
+                    d3.selectAll(".cls_id_" + d.id).style("fill-opacity", 0.3);
+                } else {
+                    d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);
+                }
             })
             .style("stroke-opacity", 0)
             .transition().duration(750)
@@ -775,14 +783,14 @@ var dashboard3 = (function () {
     }
 
     function yearSelectionHandler(sched, d3Select, doInit, sched2) {
-        if (sched != 'None' && sched != '') {
+        if (!isNull(sched)) {
             spin.spin();
             body.append(spin.el);
         }
 
         var schType = 2;
         var url = vis_url + '/' + sched + '/' + schType;
-        if (sched2 != undefined && sched2 != '') {
+        if (!isNull(sched2)) {
             schType = 3;
             url = vis_url + '/' + sched + '/' + schType + '/' + sched2;
         }
@@ -807,6 +815,10 @@ var dashboard3 = (function () {
                 spin.stop();
             }
         });
+    }
+
+    function isNull(val) {
+        return (val === undefined || val === null);
     }
 
     function createSelect(tag_prefix, label, multiple, classes) {
@@ -842,6 +854,7 @@ var dashboard3 = (function () {
     }
 
     function render(sched) {
+        var isAuth = (d3.select('#vis-wrapper').attr('data-auth-status') === '1');
         $('footer').hide();
         $('.top-buffer').hide();
         $("#content").html('');
@@ -855,18 +868,19 @@ var dashboard3 = (function () {
         var visMenu = $('#vis-menu');
         visMenu.hide();
 
-        if (d3.select('#vis-wrapper').attr('data-auth-status') === '1') {
+        if (isAuth) {
             visMenu.append(createSelect('sched-type', 'Type', false, null));
             $('#sched-type-sel').append('<option value="standard">Standard</option><option value="diff">Diff</option>');
         }
 
         visMenu.append(createSelect('sched', 'Schedule', false, null));
+        var schedSel = $('#sched-sel')
         visMenu.append(createSelect('sched1', 'Schedule 2', false, null));
-        
+
         visMenu.append('<button id="vis-go-button" type="button" class="btn btn-default">Go!</button>');
         var goBtn = $('#vis-go-button');
         goBtn.hide();
-        
+
         visMenu.append(createSelect('rooms', 'Room', true, 'd_select'));
         visMenu.append(createSelect('prof', 'Professor', true, 'd_select'));
         visMenu.append(createSelect('class', 'Class', true, 'd_select'));
@@ -877,19 +891,24 @@ var dashboard3 = (function () {
         spin.spin();
         body.append(spin.el);
 
+        $('select').multiselect({
+            maxHeight: 175,
+            buttonWidth: '175px'
+        });
+
         $.ajax({
             dataType: "json",
             url: vis_url + '/list',
             success: function (data) {
                 var result = '';
 
-                if (sched == undefined) {
+                if (isAuth) {
                     for (var i = 0; i < data.length; i++) {
                         result += createOption(data[i]['id'], data[i]['name']);
                         //result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
                     }
                 } else {
-                    // Only add the single item
+                    // Only add the single item, item will be auto-selected
                     for (var i = 0; i < data.length; i++) {
                         if (data[i]['id'] === sched) {
                             result += createOption(data[i]['id'], data[i]['name']);
@@ -898,11 +917,17 @@ var dashboard3 = (function () {
                 }
 
                 // Need to refresh this after adding
-                $('#sched-sel').append(result);
+                schedSel.append(result);
                 $('#sched1-sel').append(result);
 
-                $('#sched-sel').multiselect('rebuild');
-                $('#sched-sel').multiselect('refresh');
+                schedSel.multiselect('rebuild');
+                schedSel.multiselect('refresh');
+
+                if (sched != undefined && sched != null) {
+                    schedSel.multiselect('select', sched);
+                    schedSel.multiselect('refresh');
+                }
+
                 $('#sched1-sel').multiselect('rebuild');
                 $('#sched1-sel').multiselect('refresh');
 
@@ -919,13 +944,8 @@ var dashboard3 = (function () {
             }
         });
 
-        // Outside of function
-        $('select').multiselect({
-            maxHeight: 175,
-            buttonWidth: '175px'
-        });
 
-        $('#sched-sel').multiselect('setOptions', {
+        schedSel.multiselect('setOptions', {
             onChange: function (event) {
                 // Don't trigger event when diff is selected
                 if (!diffSelected) {
@@ -956,6 +976,10 @@ var dashboard3 = (function () {
                 } else {
                     diffSelected = false;
                     setupForStandard();
+
+                    if (!diffSelected) {
+                        yearSelectionHandler($("#sched-sel").val(), '#d3', false);
+                    }
                 }
             }
         });

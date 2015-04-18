@@ -21,7 +21,7 @@ SQL;
             $results = DB::select($sql, array());
             return $results;
     }
-
+    
     /**
      * Display the specified resource.
      *
@@ -100,7 +100,7 @@ from
         e.name,
         e.class_type,
         e.title,
-        group_concat(distinct concat(e.name, ' (', e.title, ')') ORDER BY e.name, e.title SEPARATOR '^') as meets_with,
+        group_concat(concat(e.name, ' (', e.title, ')') ORDER BY e.name, e.title SEPARATOR '^') as meets_with,
         r.`name` as room,
         p.`name` as main_prof,
         count(e.id) as num_classes
@@ -143,7 +143,7 @@ from
         x.name,
         x.class_type,
         x.title,
-        group_concat(distinct concat(x.name, ' (', x.title, ')') ORDER BY x.name, x.title SEPARATOR '^') as meets_with,
+        group_concat(concat(x.name, ' (', x.title, ')') ORDER BY x.name, x.title SEPARATOR '^') as meets_with,
         x.room_id,
         x.professor,
         count(x.id) as num_classes,
@@ -184,7 +184,7 @@ from
         x.name,
         x.class_type,
         x.title,
-        group_concat(distinct concat(x.name, ' (', x.title, ')') ORDER BY x.name, x.title SEPARATOR '^') as meets_with,
+        group_concat(concat(x.name, ' (', x.title, ')') ORDER BY x.name, x.title SEPARATOR '^') as meets_with,
         x.room_id,
         x.professor,
         count(x.id) as num_classes,

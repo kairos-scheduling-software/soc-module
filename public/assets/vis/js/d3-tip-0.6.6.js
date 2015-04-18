@@ -67,7 +67,7 @@
                 left: (coords.left | 0 + poffset[1]) + scrollLeft + 'px'
             })
 
-            nodel.transition(125).style({opacity: 1, 'pointer-events': 'all'});
+            nodel.style({opacity: 1, 'pointer-events': 'all'});
             return tip
         }
 

@@ -24,7 +24,7 @@ Route::group(array('before'=> 'guest'), function()
             'as'=> 'register-post',
             'uses' => 'AccountController@postRegister'
     ));
-
+    
     //used for signing in
     Route::get('/login', array(
          'as' => 'getLogin',
@@ -200,5 +200,4 @@ Route::group(array('before'=> 'auth'), function()
     Route::get('vis/list', 'VisController@index');
     Route::get('vis/{id0}/{id1}', 'VisController@getData');
     Route::get('vis/{id0}/{id1}/{id3}', 'VisController@getData');
-    //Route::resource('vis', 'VisController', ['only' => ['index', 'show']]);
 });

@@ -81,9 +81,9 @@ class TicketController extends BaseController
 	public function add_ticket()
 	{
 		$event_id = Input::get('event_id');
-		$message = Input::get('message');
+		$ticket_message = Input::get('message');
 
-		if(strlen($message) < 5)
+		if(strlen($ticket_message) < 5)
 		{
 			return Response::json(['error' => 'message must be at least 5 characters'], 500);
 		}
@@ -97,7 +97,7 @@ class TicketController extends BaseController
 
 		$ticket = Ticket::firstOrCreate(array(
 			'event_id' => $event->id,
-			'message'  => $message,
+			'message'  => $ticket_message,
 			'resolve'  => 0,
 			'user'	   => Auth::user()->id ? Auth::user()->id : -1
 		));
@@ -105,6 +105,23 @@ class TicketController extends BaseController
 		if(!$ticket)
 		{
 			return Response::json(['error' => 'Could not create the requested ticket'], 500);
+		}
+
+		$user = $event->schedule->users->first();
+		if($user && $user->send_email)
+		{
+			try
+			{
+				Mail::send('emails.ticket', array('email_message' => $ticket_message), 
+					function($message) use ($user, $event)
+					{
+						$message->to($user->email, $user->username)->subject('Ticket Created for ' . htmlspecialchars($event->name));
+					}
+				);
+			}
+			catch(Exception $e){
+				return Response::json(['error' => $e->getMessage()], 500);
+			}
 		}
 
 		return Response::json(['sucess' => "added ticket"], 200);

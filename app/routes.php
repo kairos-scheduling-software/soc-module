@@ -199,5 +199,6 @@ Route::group(array('before'=> 'auth'), function()
 
     Route::get('vis/list', 'VisController@index');
     Route::get('vis/{id0}/{id1}', 'VisController@getData');
+    Route::get('vis/{id0}/{id1}/{id3}', 'VisController@getData');
     //Route::resource('vis', 'VisController', ['only' => ['index', 'show']]);
 });

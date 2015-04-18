@@ -45,6 +45,16 @@ function renderDash(dash, sched) {
 }
 
 var visDays = ["U", "M", "T", "W", "H", "F", "S"];
+var dayMap = 
+    {
+        "U": 0,
+        "M": 1,
+        "T": 2,
+        "W": 3,
+        "H": 4,
+        "F": 5,
+        "S": 6
+    };
 
 window.onresize = function (event) {
     var navbar_height = $('#custom_navbar').height() || 0;

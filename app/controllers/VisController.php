@@ -21,7 +21,7 @@ SQL;
             $results = DB::select($sql, array());
             return $results;
     }
-
+    
     /**
      * Display the specified resource.
      *

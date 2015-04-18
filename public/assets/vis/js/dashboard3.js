@@ -21,6 +21,8 @@ var dashboard3 = (function () {
     var container;
     var tip;
 
+    var diffSelected = false;
+
     // Colors
     var scale = chroma.scale(['#99AAFF', '#BBDDCC', '#8888AA', '#887711', '#557755', '#118833', '#7F3F6A', '#992266', '#3D3F4C', '#0027E5']).mode('lab');
 
@@ -40,13 +42,13 @@ var dashboard3 = (function () {
     }
 
     /* Functions to create the individual charts involved in the dashboard */
-    function init() {
+    function init(selector) {
         var navbar_height = $('#custom_navbar').height() || 0;
         svgWidth = viewportSize.getWidth() - 200 - 1;
         svgHeight = viewportSize.getHeight() - navbar_height - 1;
 
         //Make an SVG Container
-        svg = d3.select("#d3").append("svg")
+        svg = d3.select(selector).append("svg")
             .attr("width", svgWidth)
             .attr("height", svgHeight + gridMargin.top + gridMargin.bottom)
             .append("g")
@@ -153,7 +155,7 @@ var dashboard3 = (function () {
 
     function createChart(selector, dataset, doInit) {
         if (doInit) {
-            init();
+            init(selector);
         }
 
         // Get rid of any multiselect that is still active
@@ -655,7 +657,8 @@ var dashboard3 = (function () {
             })
             .on('mouseout', function (d) {
                 tip.hide();
-                d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);;
+                d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);
+                ;
             })
             .style("stroke-opacity", 0)
             .transition().duration(750)
@@ -820,6 +823,7 @@ var dashboard3 = (function () {
 
     function setupForDiff() {
         $('#sched1-fg').show();
+        $('#vis-go-button').show();
         $('#rooms-fg').hide();
         $('#prof-fg').hide();
         $('#class-fg').hide();
@@ -829,6 +833,7 @@ var dashboard3 = (function () {
 
     function setupForStandard() {
         $('#sched1-fg').hide();
+        $('#vis-go-button').hide();
         $('#rooms-fg').show();
         $('#prof-fg').show();
         $('#class-fg').show();
@@ -847,20 +852,25 @@ var dashboard3 = (function () {
         $('#vis-menu').remove();
         $('#left-nav').append('<div id="vis-menu"></div>');
 
-        var vis_menu = $('#vis-menu');
-        vis_menu.hide();
+        var visMenu = $('#vis-menu');
+        visMenu.hide();
 
-        if (sched == undefined) {
-            vis_menu.append(createSelect('sched-type', 'Type', false, null));
+        if (d3.select('#vis-wrapper').attr('data-auth-status') === '1') {
+            visMenu.append(createSelect('sched-type', 'Type', false, null));
             $('#sched-type-sel').append('<option value="standard">Standard</option><option value="diff">Diff</option>');
         }
 
-        vis_menu.append(createSelect('sched', 'Schedule', false, null));
-        vis_menu.append(createSelect('sched1', 'Schedule 2', false, null));
-        vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
-        vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
-        vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
-        vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
+        visMenu.append(createSelect('sched', 'Schedule', false, null));
+        visMenu.append(createSelect('sched1', 'Schedule 2', false, null));
+        
+        visMenu.append('<button id="vis-go-button" type="button" class="btn btn-default">Go!</button>');
+        var goBtn = $('#vis-go-button');
+        goBtn.hide();
+        
+        visMenu.append(createSelect('rooms', 'Room', true, 'd_select'));
+        visMenu.append(createSelect('prof', 'Professor', true, 'd_select'));
+        visMenu.append(createSelect('class', 'Class', true, 'd_select'));
+        visMenu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
         body = $('body');
         spin = new Spinner();
 
@@ -875,13 +885,14 @@ var dashboard3 = (function () {
 
                 if (sched == undefined) {
                     for (var i = 0; i < data.length; i++) {
-                        result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                        result += createOption(data[i]['id'], data[i]['name']);
+                        //result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
                     }
                 } else {
                     // Only add the single item
                     for (var i = 0; i < data.length; i++) {
                         if (data[i]['id'] === sched) {
-                            result += '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>';
+                            result += createOption(data[i]['id'], data[i]['name']);
                         }
                     }
                 }
@@ -899,9 +910,12 @@ var dashboard3 = (function () {
 
                 $("#content").load("assets/vis/vis3Filt.html", function () {
                     yearSelectionHandler((sched || data[0]['id']), '#d3', true);
-                    vis_menu.show();
+                    visMenu.show();
                     spin.stop();
                 });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Request Error: " + textStatus + "; " + errorThrown);
             }
         });
 
@@ -913,18 +927,15 @@ var dashboard3 = (function () {
 
         $('#sched-sel').multiselect('setOptions', {
             onChange: function (event) {
-                if ($("#sched-type-sel").val() == 'diff') {
-                    yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
-                } else {
+                // Don't trigger event when diff is selected
+                if (!diffSelected) {
                     yearSelectionHandler($("#sched-sel").val(), '#d3', false);
                 }
             }
         });
 
-        $('#sched1-sel').multiselect('setOptions', {
-            onChange: function (event) {
-                yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
-            }
+        goBtn.click(function () {
+            yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
         });
 
         $('.d_select').multiselect('setOptions', {
@@ -940,8 +951,10 @@ var dashboard3 = (function () {
         $('#sched-type-sel').multiselect('setOptions', {
             onChange: function (event) {
                 if ($("#sched-type-sel").val() == 'diff') {
+                    diffSelected = true;
                     setupForDiff();
                 } else {
+                    diffSelected = false;
                     setupForStandard();
                 }
             }

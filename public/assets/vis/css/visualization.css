@@ -313,11 +313,6 @@ text.axis-worktime {
     width: 100%;
 }
 
-#vis-menu {
-    /*overflow: auto;*/
-    /*min-height: 600px;*/
-}
-
 .dropdown-menu {
     max-width: 175px;
 }

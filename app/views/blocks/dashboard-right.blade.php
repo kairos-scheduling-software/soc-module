@@ -2,7 +2,7 @@
 	<a href="#" id="close-btn">&times;</a>
 </div>
 <h2>{{ $sched->name }}</h2>
-<div class="sched-admin-section">
+<div class="sched-admin-section" id="description-section">
 	<h3>{{ FA::icon('file-text-o')}}&nbsp;Description</h3>
 	<div id="description-field" data-url="{{ URL::route('description-update', $sched->id)}}">
 		@if($sched->description)
@@ -13,7 +13,7 @@
 	</div>
 </div>
 <hr>
-<div class="sched-admin-section">
+<div class="sched-admin-section" id="actions-section">
 	<h3>{{ FA::icon('cog')}}&nbsp;Actions</h3>
 	<button class="btn btn-small sched-action-btn" id="view-sched-btn" 
 	 		data-url="{{ URL::route('view-sched') . '?id=' . $sched->id . '&dash=3'}}">
@@ -36,7 +36,7 @@
 	--}}
 </div>
 <hr>
-<div class="sched-admin-section">
+<div class="sched-admin-section" id="tickets-section">
 	<?php
 		$tickets = $sched->tickets(); 
 		$hasTickets = count($tickets);

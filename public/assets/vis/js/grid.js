@@ -1,5 +1,5 @@
 "use strict";
-    
+
 $(document).ready(function () {
 
     document.addEventListener("deviceready", function () {
@@ -17,16 +17,15 @@ $(document).ready(function () {
             renderDash('3');
         }
     });
+
+    var dash = getParameterByName("dash");
+    var id = getParameterByName("id");
     
-    var uri = new URI(window.location.href);
-    // Get query string
-    var query = URI.parseQuery(uri.query());
-    console.log(uri + " : " + JSON.stringify(query));
-    
-    if(query['dash'] != null) {
-        renderDash(query.dash, query['id']); 
+    console.log("Query : dash=" + dash + ", id=" + id +";");
+
+    if (dash !== null && dash !== undefined) {
+        renderDash(dash, id);
     } else {
-        //dashboard1.render();
         renderDash('1', 0);
     }
 
@@ -44,8 +43,13 @@ function renderDash(dash, sched) {
     }
 }
 
+function getParameterByName(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
 var visDays = ["U", "M", "T", "W", "H", "F", "S"];
-var dayMap = 
+var dayMap =
     {
         "U": 0,
         "M": 1,

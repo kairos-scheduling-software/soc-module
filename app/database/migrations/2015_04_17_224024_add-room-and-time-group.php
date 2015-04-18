@@ -21,7 +21,7 @@ class AddRoomAndTimeGroup extends Migration {
 		Schema::create('room_mappings', function($table)
 		{
 			$table->string('name', 10);
-			$table->int('rid')->unsigned();
+			$table->integer('rid')->unsigned();
 			$table->unique(array('name', 'rid'));
 			
 			$table->foreign('name')->references('name')->on('room_groups')->onDelete('cascade');

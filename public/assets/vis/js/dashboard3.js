@@ -11,7 +11,7 @@ var dashboard3 = (function () {
     var svgHeight = 1000;
 
     var gridClassSelected = "";
-    var gridClassHighlightColor = "#33FF33";
+    var gridClassHighlightColor = "#33FF33"; //'#67C8FF';
 
     var gridColors = {};
     var gridColorCounter = 0;
@@ -73,8 +73,7 @@ var dashboard3 = (function () {
                 } else if (document.selection) {  // IE?
                     document.selection.empty();
                 }
-            })
-            .call(d3Zoom);
+            }).call(d3Zoom);
 
         container = svg.append("g");
 
@@ -627,7 +626,7 @@ var dashboard3 = (function () {
                 $('#po-d3').css('top', final_y + 'px');
             })
             .on('mouseover', function (d) {
-                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor);
+                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor).style("fill-opacity", 0.6);
 
                 var ctm = this.getCTM();
                 var coords = getGridScreenCoords(d.x, d.y, ctm);
@@ -656,7 +655,7 @@ var dashboard3 = (function () {
             })
             .on('mouseout', function (d) {
                 tip.hide();
-                d3.selectAll(".cls_id_" + d.id).style("fill", d.color);
+                d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);;
             })
             .style("stroke-opacity", 0)
             .transition().duration(750)

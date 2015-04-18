@@ -116,9 +116,7 @@ from
         et.starttm,
         et.`length`,
         et.days,
-        e.class_type,
-        r.`name`,
-        p.`name`
+        r.`name`
 ) x;    
 SQL;
             } else if($id1 == 3) {
@@ -176,9 +174,7 @@ from
     ) x
     group by 
         x.etime_id,
-        x.class_type,
-        x.room_id,
-        x.professor
+        x.room_id
 
     union all 
 
@@ -220,9 +216,7 @@ from
     ) x
     group by 
         x.etime_id,
-        x.class_type,
-        x.room_id,
-        x.professor
+        x.room_id
 ) z
 left join etimes et
     on(z.etime_id = et.id)

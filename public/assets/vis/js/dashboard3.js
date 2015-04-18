@@ -7,11 +7,11 @@ var dashboard3 = (function () {
     var spin;
 
     var gridMargin = {top: 20, right: 5, bottom: 5, left: 70};
-    var svgWidth = 1000;  // - gridMargin.left - gridMargin.right;
-    var svgHeight = 1000;  // - gridMargin.top - gridMargin.bottom;
+    var svgWidth = 1000;
+    var svgHeight = 1000;
 
     var gridClassSelected = "";
-    var gridClassHighlightColor = "#33FF33";
+    var gridClassHighlightColor = "#33FF33"; //'#67C8FF';
 
     var gridColors = {};
     var gridColorCounter = 0;
@@ -22,7 +22,7 @@ var dashboard3 = (function () {
     var tip;
 
     // Colors
-    var scale = chroma.scale(['#99AAFF', '#BBDDCC', '#8888AA', '#887711', '#557755', '#118833', '#7F3F6A', '#992266', '#3D3F4C', '#0027E5']).mode('lab'); //chroma.scale(['navy']); //.mode('lab');
+    var scale = chroma.scale(['#99AAFF', '#BBDDCC', '#8888AA', '#887711', '#557755', '#118833', '#7F3F6A', '#992266', '#3D3F4C', '#0027E5']).mode('lab');
 
     // Start with popover hidden
     $('#po-d3').hide();
@@ -34,6 +34,8 @@ var dashboard3 = (function () {
     var weekdays = [['Sunday', 'Su'], ['Monday', 'M'], ['Tuesday', 'T'], ['Wednesday', 'W'], ['Thursday', 'Th'], ['Friday', 'F'], ['Saturday', 'Sa']];
 
     function d3Zoomed() {
+        // Remove the tip when zooming or dragging
+        d3.select('.d3-tip').style('opacity', 0).style('pointer-events', 'none');
         container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 
@@ -45,7 +47,7 @@ var dashboard3 = (function () {
 
         //Make an SVG Container
         svg = d3.select("#d3").append("svg")
-            .attr("width", svgWidth) // + gridMargin.left + gridMargin.right)
+            .attr("width", svgWidth)
             .attr("height", svgHeight + gridMargin.top + gridMargin.bottom)
             .append("g")
             .attr("transform", "translate(" + gridMargin.left + "," + gridMargin.top + ")");
@@ -57,7 +59,21 @@ var dashboard3 = (function () {
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("fill", "#FFFFFF")
-            .call(d3Zoom);
+            .on('click', function () {
+                // Remove active tip
+                d3.select('.d3-tip').style('opacity', 0).style('pointer-events', 'none');
+
+                // Unselect text on click. Really annoying.
+                if (window.getSelection) {
+                    if (window.getSelection().empty) {  // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) {  // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
+                } else if (document.selection) {  // IE?
+                    document.selection.empty();
+                }
+            }).call(d3Zoom);
 
         container = svg.append("g");
 
@@ -66,7 +82,7 @@ var dashboard3 = (function () {
             return  '<table style="width:100%">' +
                 '<tr>' +
                 '<td> Class: </td>' +
-                '<td><span style="color:red">' + d.class.replace("_", " ").replace("_", " ") + '</span></td>' +
+                '<td><span style="color:red">' + d.name + '</span></td>' +
                 '</tr>' +
                 '<tr>' +
                 '<td> Title: </td>' +
@@ -95,10 +111,9 @@ var dashboard3 = (function () {
                 '<tr>' +
                 '<td> Day: </td>' +
                 '<td><span style="color:red">' + d.days + '</span></td>' +
+                (d.num_classes > 1 ? ('</tr><tr><td> Meets With:&nbsp;</td><td><span style="color:red">' + d.meets_with + '</span></td>') : '') +
                 '</tr>' +
-                '</table>'
-
-                ;
+                '</table>';
         });
         svg.call(tip);
 
@@ -157,25 +172,28 @@ var dashboard3 = (function () {
         var prof = new Array();
         var class_types = new Array();
         var room_list = new Array();
-        var room_map = new Array();
         var mprof = {};
         var rooms = {};
         var days = {};
         var cnames = {};
 
+        var isDiff = false;
+
         var data = [];
 
         svg.selectAll('g').remove();
         container = svg.append("g");
-
-        //d3Zoom.scale(1);
-        //d3Zoom.translate([0, 0]);
         container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
 
         data = [];
 
         if (!dataset)
             return;
+
+        if (dataset[0].diff !== undefined) {
+            isDiff = true;
+        }
+
         // loop over data, get room counts
         $.each(dataset, function (i, val) {
             var day;
@@ -192,24 +210,8 @@ var dashboard3 = (function () {
                 }
 
                 for (var j = 0; j < val.days.length; j++) {
-                    // Kind of ugly... This can be done better.
-                    if (val.days[j] === 'M') {
-                        day = 1;
-                    } else if (val.days[j] === 'T') {
-                        day = 2;
-                    } else if (val.days[j] === 'W') {
-                        day = 3;
-                    } else if (val.days[j] === 'H') {
-                        day = 4;
-                    } else if (val.days[j] === 'F') {
-                        day = 5;
-                    } else if (val.days[j] === 'S') {
-                        day = 6;
-                    } else if (val.days[j] === 'U') {
-                        day = 7;
-                    }
+                    day = dayMap[val.days[j]];
 
-                    //console.log(class_name);
                     var cname_ind = class_name.indexOf("-") < 0 ? class_name.length : class_name.indexOf("-");
                     var point = {
                         "id": val.id,
@@ -223,8 +225,14 @@ var dashboard3 = (function () {
                         "room": val.room,
                         "class": class_name,
                         "cname": class_name.substring(0, cname_ind), // Used for colors
-                        "mprof": val.main_prof
+                        "mprof": val.main_prof,
+                        "num_classes": val.num_classes,
+                        "meets_with": brArray(val.meets_with.split('^'))
                     };
+
+                    if (isDiff) {
+                        point['diff'] = val.diff;
+                    }
 
                     if (cnames[point.cname] == null) {
                         cnames[point.cname] = 1;
@@ -247,8 +255,6 @@ var dashboard3 = (function () {
 
         });
 
-        //console.log(JSON.stringify(data));
-
         dayBoxes = roomCounter;
         boxWidth = Math.round((svgWidth / numDays) / roomCounter);
         if (boxWidth < 12) {
@@ -267,7 +273,7 @@ var dashboard3 = (function () {
 
         var rooms_sel = $("#rooms-sel");
         rooms_sel.html('');
-        //console.log(roomCounter);
+
         $.each(room_list, function (key, val) {
             getCol(val);
             rooms_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
@@ -281,6 +287,17 @@ var dashboard3 = (function () {
             val['y'] = ((timeToNumber(val.starttm) - firstTimeOfDay) * boxHeight);
             val['height'] = (minutesToNumber(val.length) * boxHeight);
             //val['id'] = val.id; // <-- this does nothing val['id'] and val.id are the same field in the same object
+
+            if (isDiff) {
+                if (val.diff == 'p') {
+                    val['x'] = val.x + (boxWidth / 2);
+                    val['color'] = 'green';
+                } else if (val.diff == 'm') {
+                    val['color'] = 'red';
+                } else {
+                    val['color'] = 'gray';
+                }
+            }
 
             if (val.day == 0) {
                 val['tipDir'] = 'w';
@@ -321,9 +338,8 @@ var dashboard3 = (function () {
 
         var prof_sel = $("#prof-sel");
         prof_sel.html('');
-        //console.log(roomCounter);
+
         $.each(prof, function (key, val) {
-            //console.log(key, val);
             prof_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
         });
 
@@ -338,9 +354,8 @@ var dashboard3 = (function () {
 
         var class_sel = $("#class-sel");
         class_sel.html('');
-        //console.log(roomCounter);
+
         $.each(classes, function (key, val) {
-            //console.log(key, val);
             class_sel.append('<option value=' + val + '>' + val.replace(/[^A-Z0-9]/g, ' ') + '</option>');
         });
 
@@ -391,7 +406,6 @@ var dashboard3 = (function () {
             .attr("dx", "0em")
             .attr("dy", "-0.5em")
             .attr("text-anchor", "middle")
-            //.attr('class', 'name')
             .text(function (d, i) {
                 return weekdays[(i + daysSkip) - 1][0];
             });
@@ -412,7 +426,6 @@ var dashboard3 = (function () {
             .attr("dx", "0em")
             .attr("dy", "0.35em")
             .attr("text-anchor", "middle")
-            //.attr('class', 'name')
             .text(function (d, i) {
                 return room_list[i % dayBoxes];
             });
@@ -487,17 +500,7 @@ var dashboard3 = (function () {
                 return bottomHeightLimit(d.y, d.height);
             })
             .attr("class", function (d) {
-                //console.log(JSON.stringify(d));
                 return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' cls_id_' + d.id;
-            })
-            .on('mouseover', function (d) {
-                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor);
-                tip.direction(d.tipDir);
-                tip.show(d);
-            })
-            .on('mouseout', function (d) {
-                tip.hide();
-                d3.selectAll(".cls_id_" + d.id).style("fill", d.color);
             });
 
         var gText = blocks
@@ -513,13 +516,22 @@ var dashboard3 = (function () {
                 return (d.height * 0.5);
             })
             .attr("y", function (d) {
-                return 0;
+                if (isDiff) {
+                    if (d['diff'] != 'e') {
+                        return 4;
+                    }
+                }
+
+                if (boxWidth > 12) {
+                    return 1 - ((boxWidth - 12) / 2);
+                }
+                return 1;
             })
             .attr("font-size", 5)
             .attr("dx", "0em")
-            .attr("dy", "-0.75em")
+            .attr("dy", "-1em")
             .text(function (d, i) {
-                return d.class.replace("_", " ").replace("_", " ");
+                return (d.num_classes > 1 ? ('* ' + d.name + ' *') : d.name);
             })
             .style("text-anchor", "middle")
             .style("fill-opacity", 0)
@@ -539,11 +551,17 @@ var dashboard3 = (function () {
             .style("fill-opacity", 0)
             .attr("x", function (d) {
                 return d.x;
+                //return d.x + (boxWidth / 2);
             })
             .attr("y", function (d) {
                 return d.y + 50;
             })
             .attr("width", function (d) {
+                if (isDiff) {
+                    if (d['diff'] != 'e') {
+                        return (boxWidth / 2)
+                    }
+                }
                 return boxWidth;
             })
             .attr("height", function (d) {
@@ -583,8 +601,6 @@ var dashboard3 = (function () {
                     arrow_y = 15;
                 }
 
-                console.log((final_x + 350) + ", " + (final_y + poHeight) + "; " + svgHeight);
-
                 if ((final_y + poHeight) > svgHeight) {
                     final_y = svgHeight - 350;
                 }
@@ -607,11 +623,39 @@ var dashboard3 = (function () {
 
                 // Set popover position
                 $('#po-d3').css('left', final_x + 'px');
-                $('#po-d3').css('top', (final_y) + 'px');
+                $('#po-d3').css('top', final_y + 'px');
+            })
+            .on('mouseover', function (d) {
+                d3.selectAll(".cls_id_" + d.id).style("fill", gridClassHighlightColor).style("fill-opacity", 0.6);
 
-                // Put arrow in correct spot
-                $('#po-d3-arrow').css('top', (arrow_y) + 'px');
-                $('#po-d3-arrow').hide();
+                var ctm = this.getCTM();
+                var coords = getGridScreenCoords(d.x, d.y, ctm);
+
+                var wp = coords.x / svgWidth;
+                var hp = coords.y / svgHeight;
+
+                var tipDir = '';
+
+                if (hp >= 0.85) {
+                    tipDir = 'n';
+                } else if (hp <= 0.15) {
+                    tipDir = 's';
+                } else {
+                    tipDir = 'n';
+                }
+
+                if (wp >= 0.85) {
+                    tipDir += 'w';
+                } else if (wp <= 0.15) {
+                    tipDir += 'e';
+                }
+
+                tip.direction(tipDir);
+                tip.show(d);
+            })
+            .on('mouseout', function (d) {
+                tip.hide();
+                d3.selectAll(".cls_id_" + d.id).style("fill", d.color).style("fill-opacity", 0.3);;
             })
             .style("stroke-opacity", 0)
             .transition().duration(750)
@@ -629,10 +673,6 @@ var dashboard3 = (function () {
             return ((1.666) * minutes) / 100; // 100/60 = 1.666
         }
 
-        function numberToMinutes(n) {
-            return ((1.666) / n) * 100; // 100/60 = 1.666
-        }
-
         function timeToNumber(dtm) {
             var hour = parseFloat(dtm.substring(0, 2));
             var minutes = minutesToNumber(parseFloat(dtm.substring(2)));
@@ -646,15 +686,12 @@ var dashboard3 = (function () {
         }
 
         function getCol(room) {
-            //console.log(room);
             if (room === "")
                 return;
             if (rooms[room] == null) {
                 rooms[room] = roomCounter;
-                //console.log(room + ' ++> ' + rooms[room]);
                 roomCounter++;
             }
-            //console.log(room + ' --> ' + rooms[room]);
             return rooms[room];
         }
 
@@ -682,6 +719,14 @@ var dashboard3 = (function () {
                 return 0; // Class is out of the range
             }
             return blockHeight;
+        }
+
+        function brArray(a) {
+            var result = '';
+            for (var i = 0; i < a.length; i++) {
+                result += (a[i] + '<br>');
+            }
+            return result;
         }
 
         $('#po-d3-ok').click(function (e) {
@@ -726,16 +771,22 @@ var dashboard3 = (function () {
         });
     }
 
-    function yearSelectionHandler(sched, d3Select, doInit) {
+    function yearSelectionHandler(sched, d3Select, doInit, sched2) {
         if (sched != 'None' && sched != '') {
             spin.spin();
             body.append(spin.el);
         }
-        //console.log(d3Select);
+
+        var schType = 2;
+        var url = vis_url + '/' + sched + '/' + schType;
+        if (sched2 != undefined && sched2 != '') {
+            schType = 3;
+            url = vis_url + '/' + sched + '/' + schType + '/' + sched2;
+        }
 
         $.ajax({
             dataType: "json",
-            url: vis_url + '/' + sched + '/2',
+            url: url,
             success: function (data) {
                 var newDays;
                 $.each(data, function (i, d) {
@@ -746,8 +797,10 @@ var dashboard3 = (function () {
                     }
                     data[i].days = newDays;
                 });
-                //console.log(JSON.stringify(data));
                 createChart(d3Select, data, doInit);
+                spin.stop();
+            },
+            error: function (e) {
                 spin.stop();
             }
         });
@@ -758,11 +811,29 @@ var dashboard3 = (function () {
         if (multiple) {
             mult += 'multiple="multiple"';
         }
-        return '<div class="form-group"><label for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + ' class="vis-select ' + classes + '"></select></div>';
+        return '<div id="' + tag_prefix + '-fg" class="form-group"><label id="' + tag_prefix + '-lbl" for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + ' class="vis-select ' + classes + '"></select></div>';
     }
 
     function createOption(key, value) {
         return '<option value="' + key + '">' + value + '</option>';
+    }
+
+    function setupForDiff() {
+        $('#sched1-fg').show();
+        $('#rooms-fg').hide();
+        $('#prof-fg').hide();
+        $('#class-fg').hide();
+        $('#class-type-fg').hide();
+        $('#sched-lbl').html('Schedule 1');
+    }
+
+    function setupForStandard() {
+        $('#sched1-fg').hide();
+        $('#rooms-fg').show();
+        $('#prof-fg').show();
+        $('#class-fg').show();
+        $('#class-type-fg').show();
+        $('#sched-lbl').html('Schedule');
     }
 
     function render(sched) {
@@ -785,11 +856,11 @@ var dashboard3 = (function () {
         }
 
         vis_menu.append(createSelect('sched', 'Schedule', false, null));
+        vis_menu.append(createSelect('sched1', 'Schedule 2', false, null));
         vis_menu.append(createSelect('rooms', 'Room', true, 'd_select'));
         vis_menu.append(createSelect('prof', 'Professor', true, 'd_select'));
         vis_menu.append(createSelect('class', 'Class', true, 'd_select'));
         vis_menu.append(createSelect('class-type', 'Class Type', true, 'd_select'));
-
         body = $('body');
         spin = new Spinner();
 
@@ -817,9 +888,14 @@ var dashboard3 = (function () {
 
                 // Need to refresh this after adding
                 $('#sched-sel').append(result);
+                $('#sched1-sel').append(result);
 
                 $('#sched-sel').multiselect('rebuild');
                 $('#sched-sel').multiselect('refresh');
+                $('#sched1-sel').multiselect('rebuild');
+                $('#sched1-sel').multiselect('refresh');
+
+                $('#sched1-fg').hide();
 
                 $("#content").load("assets/vis/vis3Filt.html", function () {
                     yearSelectionHandler((sched || data[0]['id']), '#d3', true);
@@ -837,8 +913,17 @@ var dashboard3 = (function () {
 
         $('#sched-sel').multiselect('setOptions', {
             onChange: function (event) {
-                //createChart('#d3', visGetSchedData($("#sched-sel").val()));
-                yearSelectionHandler($("#sched-sel").val(), '#d3', false);
+                if ($("#sched-type-sel").val() == 'diff') {
+                    yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
+                } else {
+                    yearSelectionHandler($("#sched-sel").val(), '#d3', false);
+                }
+            }
+        });
+
+        $('#sched1-sel').multiselect('setOptions', {
+            onChange: function (event) {
+                yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
             }
         });
 
@@ -848,6 +933,16 @@ var dashboard3 = (function () {
                     d3.selectAll("." + $(option).val()).style("visibility", "visible");
                 } else {
                     d3.selectAll("." + $(option).val()).style("visibility", "hidden");
+                }
+            }
+        });
+
+        $('#sched-type-sel').multiselect('setOptions', {
+            onChange: function (event) {
+                if ($("#sched-type-sel").val() == 'diff') {
+                    setupForDiff();
+                } else {
+                    setupForStandard();
                 }
             }
         });

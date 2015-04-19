@@ -116,19 +116,22 @@ function create_tutorial()
 				title: '<h2>Creating Schedules</h2>',
 				content: 'You can create a new schedule from scratch, or import your schedule from a CSV file.',
 				selector: '#create-sched-section',
-				position: 'right-center'
+				position: 'right-center',
+				arrowOffset: 15
 			},
 			{
 				title: '<h2>Comparing Schedules</h2>',
 				content: 'Need to see the differences between two of your saved schedules?  This tool makes it easy!',
 				selector: '#comp-sched-section',
-				position: 'right-center'
+				position: 'right-center',
+				arrowOffset: 15
 			},
 			{
 				title: '<h2>Schedule List</h2>',
 				content: '<p>Your saved schedules will show up here.  You can sort this list by clicking on the column headers.</p><p>Clicking on a row will open a panel for interacting with that schedule.</p>',
 				selector: '#schedules-list',
 				position: 'left-top',
+				arrowOffset: 8,
 				onNext: function() {
 					dash_right_next();
 				},
@@ -137,19 +140,22 @@ function create_tutorial()
 				title: '<h2>Schedule Description</h2>',
 				content: 'Enter a brief description of this schedule by clicking "add a description".  You can also edit the description by clicking the text.',
 				selector: '#description-section',
-				position: 'left-top'
+				position: 'left-center',
+				arrowOffset: 15
 			},
 			{
 				title: '<h2>Schedule Actions</h2>',
 				content: 'From here you can:<ul><li>Click <b>"VIEW"</b> to load an interactive visualization of this schedule</li><li>Click <b>"EDIT"</b> to load this schedule into the drag-and-drop editor</li><li>Click <b>"COPY"</b> to create a new schedule with all the same data as this one</li><li>Click <b>"DELETE"</b> to remove this schedule.</li></ul>',
 				selector: '#actions-section',
-				position: 'left-center'
+				position: 'left-center',
+				arrowOffset: 15
 			},
 			{
 				title: '<h2>Support Tickets</h2>',
 				content:  'If there are any open support tickets for this schedule, they will show up here. You will also see a link to navigate to the ticket manager.',
-				position: 'left-top',
-				selector: '#tickets-section'
+				position: 'left-center',
+				selector: '#tickets-section',
+				arrowOffset: 15
 			},
 			{
 				title: '<h2>That\'s it!</h2>',
@@ -158,13 +164,19 @@ function create_tutorial()
 				selector: '#center-slide-anchor'
 			}
 		],
-		onStart: function() {
+		onStart: function(index, data, dom) {
 			$('#custom_navbar').css('box-shadow', '0 0 0 #000');
+
+			$('body').keydown(function(e){
+				if(e.which == 27)
+					$.tutorialize.stop('dash');
+			});
 		},
 		onStop: function() {
 			tour_ended = true;
 			$('#close-btn').first().click();
 			$('body').off('DOMNodeInserted');
+			$('body').off('keydown');
 			$('#custom_navbar').css('box-shadow', nav_shadow).zIndex(999);
 		}
 	}, 'dash');	

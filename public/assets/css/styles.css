@@ -474,6 +474,10 @@ footer {
 	font-weight: bold;
 }
 
+.sched-list-col-header:hover {
+	cursor: pointer;
+}
+
 .sched-name-2 {
 	width: 24%;
 	margin: 10px 6px;

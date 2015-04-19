@@ -49,7 +49,7 @@
 					<h2>No schedules have been created</h2>
 					You can create or import a new schedule by clicking the appropriate button on the left column.
 				@else
-					<div id="header_name_col" class="sched-name-2 sched-list-col-header">
+					<div id="header_name_col" class="sched-name-2 sched-list-col-header" up='false'>
 						Name <i class="fa fa-sort-desc"></i>
 					</div>
 					<div id="header_semester_col" class="semester-col sched-list-col-header" up='false'>

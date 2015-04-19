@@ -42,7 +42,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
 	public function schedules()
 	{
-		return $this->belongsToMany('Schedule', 'schedule_user')->orderBy('name', 'desc');
+		return $this->belongsToMany('Schedule', 'schedule_user')->orderBy('year', 'desc');
 	}
 
 	public function update_schedules_for_year_semester($year, $semester)
@@ -53,9 +53,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
 	public function sortedSchedules($up_name, $up_year, $up_semester, $up_edit, $primary)
 	{
-		$up_name = false;
-		$up_semester = false;
-		$up_year = false;
 		$primary_semester = false;
 		$rest = "";
 		$query = $this->belongsToMany('Schedule', 'schedule_user');

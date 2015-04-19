@@ -1,3 +1,5 @@
+var primary = "header_year_col";
+
 $(function(){
 
 	var modal_top = $(window).height() / 2;
@@ -11,6 +13,42 @@ $(function(){
 	$('#create-sched-btn').click(function(e) {
 		$('#create-sched-form').attr("action", $(this).attr('data-url'));
 		$("#create-sched-modal").modal('show');
+	});
+
+	$('#header_name_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_name_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_name_col");
+		createScheduleRows();
+	});
+
+	$('#header_year_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_year_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_year_col");
+		createScheduleRows();
+	});
+
+	$('#header_semester_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_semester_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_semester_col");
+		createScheduleRows();
+	});
+
+	$('#header_edit_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_edit_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_edit_col");
+		createScheduleRows();
 	});
 
 	$('#hg-right-content').on('click', '#copy-sched-btn', function(e) {
@@ -200,4 +238,72 @@ function add_description(element)
     });
 
     textarea.focus();
+}
+
+function toggleUp(element)
+{
+	var changed = $('#' + element).attr('Up');
+
+	if(changed == 'true')
+	{
+		$('#' + element + " i").replaceWith($('<i class="fa fa-sort-desc"></i>'));
+		$('#' + element).attr('Up', 'false');
+	}
+	else
+	{
+		$('#' + element + " i").replaceWith($('<i class="fa fa-sort-asc"></i>'));
+		$('#' + element).attr('Up', 'true');
+	}
+}
+
+function createScheduleRows()
+{
+	var url = $('#sched-list').attr('data-url');
+	var up_name = ($('#header_name_col').attr('Up') == 'true') ? 1 : 0;
+	var up_year = ($('#header_year_col').attr('Up') == 'true') ? 1 : 0;
+	var up_semester = ($('#header_semester_col').attr('Up') == 'true') ? 1 : 0;
+	var up_edit = ($('#header_edit_col').attr('Up') == 'true') ? 1 : 0;
+
+	$.ajax({
+		url:		url,
+		data:  		{"up_name" : up_name, "up_year" : up_year, "up_semester" : up_semester, "up_edit" : up_edit, "primary" : primary}, 
+		type: 		"POST",
+			success: 	function(data) 
+			{
+				$('#schedules_list_data').html(data);
+				setSchedRow();
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) 
+			{
+				alert(jqXHR.responseText);
+			}
+		});
+}
+
+function setSchedRow()
+{
+	$('.sched-list-row').click(function(e) {
+		e.preventDefault();
+		var url = $(this).attr('data-url');
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			beforeSend: function() {
+				$('#loading-admin-panel').show();
+				$('#ajax-admin-target').hide();
+				$('#hg-right').css('display', 'table-cell');
+			}, 
+			success: 	function(data, textStatus, jqXHR) {
+				$('#loading-admin-panel').hide();
+				$('#ajax-admin-target').show();
+				$('#ajax-admin-target').html(data);
+				$('#hg-right').css('display', 'table-cell');
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Could not load schedule at this time.');
+				// TODO:  bootstrap error message
+			}
+		});
+	});
 }

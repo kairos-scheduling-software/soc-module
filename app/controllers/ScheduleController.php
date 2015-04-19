@@ -419,6 +419,20 @@ class ScheduleController extends BaseController {
 		return Resonse::json(['error' => 'problem updating the schedules'], 500);
 	}
 
+	public function sort_sched_list()
+	{
+		$up_name = Input::get('up_name');
+		$up_year = Input::get('up_year');
+		$up_semester = Input::get('up_semester');
+		$up_edit = Input::get('up_edit');
+		$primary = Input::get('primary');
+		$user =  Auth::user();
+
+		$schedules = $user->sortedSchedules($up_name, $up_year, $up_semester, $up_edit, $primary);
+
+		return View::make('blocks.schedule-list-row')->with(['schedules' => $schedules])->render();
+	}
+
 	public function branch_schedule($idToCopy)
 	{
 

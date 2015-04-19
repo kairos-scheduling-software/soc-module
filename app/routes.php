@@ -88,6 +88,11 @@ Route::group(array('before'=> 'auth'), function()
         'as' => 'update-final-sched',
         'uses' => 'ScheduleController@update_final_sched'
     ));
+
+    Route::post('/sort-sched-list', array(
+        'as' => 'sort-sched-list',
+        'uses' => 'ScheduleController@sort_sched_list'
+    ));
     //import schedule routes
     Route::get('/import-schedule', array(
         'as' => 'import-schedule',

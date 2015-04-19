@@ -24,7 +24,14 @@
 					<a id="data-tools-nav-link" href="{{URL::route('view-sched')}}">{{ FA::icon('line-chart') }} Data Tools</a>
 				</li>
 				<li {{ $page_name == 'HELP' ? 'class="selected_page"' : '' }}>
-					<a id="help-nav-link" href="#help">{{ FA::icon('question-circle') }} Help</a>
+					<a id="help-nav-link" href="#help" data-toggle="dropdown" class="dropdown-toggle">
+						{{ FA::icon('question-circle') }} Help
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="#" id="view-tut-link">View Page Tour</a>
+						</li>
+					</ul>
 				</li>
 		</ul>
 	

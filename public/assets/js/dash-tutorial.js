@@ -1,3 +1,4 @@
+var tour_ended = false;
 $(function() {
 
 	$('#center-slide-anchor').css({
@@ -6,6 +7,25 @@ $(function() {
 		top: $(window).height() / 2 + 'px',
 		left: $(window).width() / 2 + 'px'
 	});
+
+	create_tutorial();
+	
+	$('#view-tut-link').click(function(e) {
+		e.preventDefault();
+		console.log('clicked!');
+		if (tour_ended)
+			create_tutorial();
+
+		$.tutorialize.cleanRemember('dash');
+		$.tutorialize.start('dash');
+	});
+
+	$.tutorialize.start('dash');
+
+});
+
+function create_tutorial()
+{
 
 	var oMode = 'focus';
 	var oOpacity = 0.6;
@@ -79,7 +99,7 @@ $(function() {
 				onNext: function() {
 					$('body').on('DOMNodeInserted', function(e) {
 						var el = $(e.target);
-						if (el.is('#description-section'))
+						if (el.is('.description-section'))
 							$.tutorialize.next('dash');
 					});
 					$('.sched-list-row').first().click();
@@ -109,11 +129,12 @@ $(function() {
 				position: 'center-center',
 				selector: '#center-slide-anchor'
 			}
-		]
+		],
+		onStop: function() {
+			tour_ended = true;
+			$('#close-btn').first().click();
+			$('body').off('DOMNodeInserted');
+		}
 
-	}, 'dash');
-
-	$.tutorialize.cleanRemember('dash');
-	$.tutorialize.start('dash');
-
-});
+	}, 'dash');	
+}

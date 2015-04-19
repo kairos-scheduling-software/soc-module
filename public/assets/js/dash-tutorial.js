@@ -1,4 +1,6 @@
 var tour_ended = false;
+var nav_shadow;
+
 $(function() {
 
 	$('#center-slide-anchor').css({
@@ -9,6 +11,8 @@ $(function() {
 	});
 
 	create_tutorial();
+
+	nav_shadow = $('#custom_navbar').css('box-shadow');
 	
 	$('#view-tut-link').click(function(e) {
 		e.preventDefault();
@@ -54,31 +58,59 @@ function create_tutorial()
 			},
 			{
 				selector: '#dash-nav-link',
-				position: 'bottom-center',
+				position: 'bottom-left',
 				title: '<h2>Dashboard</h2>',
 				content: 'You can easily return to the Dashboard from anywhere by clicking this link.',
-				overlayMode: 'all'
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onSlide: function() {
+					setTimeout(function(){
+						$('#custom_navbar').zIndex(198);
+						$('tutorialize-slide-arrow').zIndex(1000);
+					}, 100);
+				}
 			},
 			{
 				selector: '#data-tools-nav-link',
 				position: 'bottom-center',
 				title: '<h2>Data Tools</h2>',
 				content: 'Kairos has 15 years worth of scheduling data pre-loaded. The Data Tools section provides powerful visualizations that help you analyze that data and make smart decisions about future schedules.',
-				overlayMode: 'all'
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onSlide: function() {
+					setTimeout(function(){
+						$('#custom_navbar').zIndex(198);
+						$('tutorialize-slide-arrow').zIndex(1000);
+					}, 100);
+				}
 			},
 			{
 				selector: '#help-nav-link',
-				position: 'bottom-center',
+				position: 'bottom-left',
 				title: '<h2>Help Link</h2>',
 				content: 'Not sure what to do? Access page tutorials by clicking the help link on any page within Kairos.',
-				overlayMode: 'all'
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onSlide: function() {
+					setTimeout(function(){
+						$('#custom_navbar').zIndex(198);
+						$('tutorialize-slide-arrow').zIndex(1000);
+					}, 100);
+				}
 			},
 			{
 				selector: '#manage-account-nav-link',
 				position: 'bottom-center',
 				title: '<h2>Account Settings</h2>',
 				content: 'Clicking here will take you to your account settings page.  From there you can change your email settings, your password, and your profile picture.',
-				overlayMode: 'all'
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onSlide: function() {
+					setTimeout(function(){
+						$('#custom_navbar').zIndex(198);
+						$('tutorialize-slide-arrow').zIndex(1000);
+					}, 100);
+				}
 			},
 			{
 				title: '<h2>Creating Schedules</h2>',
@@ -126,12 +158,15 @@ function create_tutorial()
 				selector: '#center-slide-anchor'
 			}
 		],
+		onStart: function() {
+			$('#custom_navbar').css('box-shadow', '0 0 0 #000');
+		},
 		onStop: function() {
 			tour_ended = true;
 			$('#close-btn').first().click();
 			$('body').off('DOMNodeInserted');
+			$('#custom_navbar').css('box-shadow', nav_shadow).zIndex(999);
 		}
-
 	}, 'dash');	
 }
 

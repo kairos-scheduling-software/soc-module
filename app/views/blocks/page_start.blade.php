@@ -46,6 +46,7 @@
     </script>
     @endif
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/jquery.tutorialize.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     @if($page_name == 'Schedule View')

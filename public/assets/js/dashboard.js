@@ -275,7 +275,7 @@ function createScheduleRows()
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) 
 			{
-				alert(jqXHR.responseText);
+				alert("Could not sort the data at this time");
 			}
 		});
 }

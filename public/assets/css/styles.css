@@ -294,6 +294,10 @@ html, body {
 	color: #666666;
 }
 
+#hg-right label {
+	color: #666666;
+}
+
 #hg-right h3 > i {
 	font-size: 14pt;
 }
@@ -1203,3 +1207,4 @@ td.prog-label {
     cursor:pointer;
     width: 100%;
 }
+

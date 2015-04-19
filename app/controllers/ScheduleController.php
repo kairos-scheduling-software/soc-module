@@ -393,6 +393,32 @@ class ScheduleController extends BaseController {
 		return Resonse::json(['error' => 'could not find the schedule to update'], 500);
 	}
 
+	public function update_final_sched($sched_id)
+	{
+		$schedule = Schedule::find($sched_id);
+		$user = Auth::user();
+		$checked = Input::get('data');
+
+		if(!$schedule)
+		{
+			return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+		}
+
+		if($checked == 1)
+		{
+			$user->update_schedules_for_year_semester($schedule->year, $schedule->semester);
+		}
+
+		$schedule->final = $checked;
+
+		$saved = $schedule->save();
+		if($saved)
+		{
+			return Response::json(['success' => 'Successfully updated the this schedule to the final for the year'], 200);
+		}
+		return Resonse::json(['error' => 'problem updating the schedules'], 500);
+	}
+
 	public function branch_schedule($idToCopy)
 	{
 

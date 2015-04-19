@@ -45,6 +45,12 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 		return $this->belongsToMany('Schedule', 'schedule_user');
 	}
 
+	public function update_schedules_for_year_semester($year, $semester)
+	{
+		$this->belongsToMany('Schedule', 'schedule_user')->where('year', '=', $year)->where('semester', '=', $semester)->update(array('final' => 0));
+		return;
+	}
+
 	public function full_name()
 	{
 		return $this->first . ' ' . $this->last;

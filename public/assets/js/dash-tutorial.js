@@ -43,10 +43,11 @@ function create_tutorial()
 		labelPrevious: '<i class="fa fa-chevron-left"></i> Previous',
 		rememberOnceOnly: true,
 		remember: true,
+		keyboardNavigation: false,
 		slides: [
 			{
 				title: '<h2>Welcome to the Kairos Dashboard</h2>',
-				content: 'Click "Start" to begin your guided tour.',
+				content: '<p>The Dashboard page is the central hub of the Kairos application.  From here you can access all of the app\'s features. </p><p>Click "Start" to begin your guided tour.</p>',
 				selector: '#center-slide-anchor',
 				overlayMode: 'all',
 				position: 'center-center'
@@ -76,7 +77,7 @@ function create_tutorial()
 				selector: '#manage-account-nav-link',
 				position: 'bottom-center',
 				title: '<h2>Account Settings</h2>',
-				content: 'Clicking here will take you to your account settings page.  From there you can change your email settings, your password, and you profile picture.',
+				content: 'Clicking here will take you to your account settings page.  From there you can change your email settings, your password, and your profile picture.',
 				overlayMode: 'all'
 			},
 			{
@@ -97,13 +98,8 @@ function create_tutorial()
 				selector: '#schedules-list',
 				position: 'left-top',
 				onNext: function() {
-					$('body').on('DOMNodeInserted', function(e) {
-						var el = $(e.target);
-						if (el.is('.description-section'))
-							$.tutorialize.next('dash');
-					});
-					$('.sched-list-row').first().click();
-				}
+					dash_right_next();
+				},
 			},
 			{
 				title: '<h2>Schedule Description</h2>',
@@ -113,7 +109,7 @@ function create_tutorial()
 			},
 			{
 				title: '<h2>Schedule Actions</h2>',
-				content: 'From here you can:<ul><li>Click "view" to load an interactive visualization of this schedule</li><li>Click "Edit" to load this schedule into the drag-and-drop editor</li><li>Click "Copy" to create a new schedule with all the same data as this one</li><li>Click "Delete" to remove this schedule.</li></ul>',
+				content: 'From here you can:<ul><li>Click <b>"VIEW"</b> to load an interactive visualization of this schedule</li><li>Click <b>"EDIT"</b> to load this schedule into the drag-and-drop editor</li><li>Click <b>"COPY"</b> to create a new schedule with all the same data as this one</li><li>Click <b>"DELETE"</b> to remove this schedule.</li></ul>',
 				selector: '#actions-section',
 				position: 'left-center'
 			},
@@ -137,4 +133,19 @@ function create_tutorial()
 		}
 
 	}, 'dash');	
+}
+
+function dash_right_next()
+{
+	if (!$('.description-section').length)
+	{
+		$('body').on('DOMNodeInserted', function(e) {
+			var el = $(e.target);
+			if (el.is('.description-section'))
+				$.tutorialize.next('dash');
+		});
+		$('.sched-list-row').first().click();
+	}
+	else
+		$.tutorialize.next('dash');
 }

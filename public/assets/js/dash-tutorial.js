@@ -51,10 +51,13 @@ function create_tutorial()
 		slides: [
 			{
 				title: '<h2>Welcome to the Kairos Dashboard</h2>',
-				content: '<p>The Dashboard page is the central hub of the Kairos application.  From here you can access all of the app\'s features. </p><p>Click "Start" to begin your guided tour.</p>',
+				content: '<p>Click "Start" to begin your guided tour.</p>',
 				selector: '#center-slide-anchor',
 				overlayMode: 'all',
-				position: 'center-center'
+				position: 'center-center',
+				onSlide: function() {
+					$('#custom_navbar').zIndex(1);
+				}
 			},
 			{
 				selector: '#dash-nav-link',
@@ -117,7 +120,10 @@ function create_tutorial()
 				content: 'You can create a new schedule from scratch, or import your schedule from a CSV file.',
 				selector: '#create-sched-section',
 				position: 'right-center',
-				arrowOffset: 15
+				arrowOffset: 15,
+				onSlide: function() {
+					$('#custom_navbar').zIndex(1);
+				}
 			},
 			{
 				title: '<h2>Comparing Schedules</h2>',

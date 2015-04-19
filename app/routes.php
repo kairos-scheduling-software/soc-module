@@ -84,6 +84,10 @@ Route::group(array('before'=> 'auth'), function()
         'uses' => 'ScheduleController@update_description'
     ));
 
+    Route::post('/update-final-sched/{sched_id}', array(
+        'as' => 'update-final-sched',
+        'uses' => 'ScheduleController@update_final_sched'
+    ));
     //import schedule routes
     Route::get('/import-schedule', array(
         'as' => 'import-schedule',

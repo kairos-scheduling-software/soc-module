@@ -2,6 +2,11 @@
 	<a href="#" id="close-btn">&times;</a>
 </div>
 <h2>{{ $sched->name }}</h2>
+<label>
+	<input id="final" data-url="{{URL::route('update-final-sched', $sched->id)}}" type="checkbox" @if($sched->final) checked @endif"/>
+	Final schedule for the year
+</label>
+
 <div class="sched-admin-section description-section" id="description-section">
 	<h3>{{ FA::icon('file-text-o')}}&nbsp;Description</h3>
 	<div id="description-field" data-url="{{ URL::route('description-update', $sched->id)}}">

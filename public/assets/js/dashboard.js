@@ -18,6 +18,28 @@ $(function(){
 		$("#create-sched-modal").modal('show');
 	});
 
+	$('#hg-right-content').on('click', '#final', function(e) {
+    	var checked  = $('#final').is(':checked');
+    	var url = $('#final').attr("data-url");
+    	if(checked == true)
+    		checked = 1;
+    	else
+    		checked = 0;
+
+    	$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		{"data" : checked},
+			success: 	function(data, textStatus, jqXHR) {
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				$('#final').prop('checked', !checked);
+				alert("could not update this schedule to the final for the year");
+			}
+		});
+
+	});
+
 	$('#cancel-create').click(function(e) {
 		// Reset the create-schedule form
 		$('#create-sched-form').find('input').val("");

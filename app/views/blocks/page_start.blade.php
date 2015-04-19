@@ -36,6 +36,9 @@
     {{-- FA::css() --}}
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
+    <!-- Tutorialize CSS -->
+    <link href="{{ URL::asset('assets/css/tutorialize.css') }}" rel="stylesheet">
+
     <!-- Load scripts -->
     @if($page_name == 'Data Entry')
     <script>
@@ -43,6 +46,8 @@
     </script>
     @endif
     <script src="{{ URL::asset('assets/js/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/jquery.tutorialize.min.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
     @if($page_name == 'Schedule View')
         <link href="{{ URL::asset('assets/vis/css/xcharts.css') }}" rel="stylesheet">

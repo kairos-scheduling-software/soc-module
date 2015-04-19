@@ -1,3 +1,5 @@
+var primary = "header_year_col";
+
 $(function(){
 
 	var modal_top = $(window).height() / 2;
@@ -13,9 +15,67 @@ $(function(){
 		$("#create-sched-modal").modal('show');
 	});
 
+	$('#header_name_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_name_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_name_col");
+		createScheduleRows();
+	});
+
+	$('#header_year_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_year_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_year_col");
+		createScheduleRows();
+	});
+
+	$('#header_semester_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_semester_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_semester_col");
+		createScheduleRows();
+	});
+
+	$('#header_edit_col').click(function()
+	{
+		$('#' + primary).removeAttr('primary');
+		primary = "header_edit_col";
+		$('#' + primary).attr('primary', true);
+		toggleUp("header_edit_col");
+		createScheduleRows();
+	});
+
 	$('#hg-right-content').on('click', '#copy-sched-btn', function(e) {
 		$('#create-sched-form').attr("action", $(this).attr('data-url'));
 		$("#create-sched-modal").modal('show');
+	});
+
+	$('#hg-right-content').on('click', '#final', function(e) {
+    	var checked  = $('#final').is(':checked');
+    	var url = $('#final').attr("data-url");
+    	if(checked == true)
+    		checked = 1;
+    	else
+    		checked = 0;
+
+    	$.ajax({
+			url:		url,
+			type: 		"POST",
+			data: 		{"data" : checked},
+			success: 	function(data, textStatus, jqXHR) {
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				$('#final').prop('checked', !checked);
+				alert("could not update this schedule to the final for the year");
+			}
+		});
+
 	});
 
 	$('#cancel-create').click(function(e) {
@@ -121,44 +181,129 @@ $(function(){
 function add_description(element)
 {
 	var tex = $('#' + element).attr('value').trim();
-    var textarea = $('<textarea style="resize:none;" id="edit-desc-text">' + tex + '</textarea>');
+
+	var html = '<div id="edit-desc-text"><textarea width="100%" style="resize:none;" id="edit-desc-textarea">' + tex + '</textarea>';
+	html += '</br><button class="btn btn-small" id="confirm-desc-btn">Confirm</button>&nbsp';
+	html += '<button class="btn btn-small" id="cancel-desc-btn">Cancel</button></div>';
+
+    var textarea = $(html);
     $('#' + element).replaceWith(textarea);
-    textarea.focus();
-    
-    textarea.blur(function(){
-    	var textFromArea = $('#edit-desc-text').val();
 
-    	if(textFromArea == "" || textFromArea.trim() == "Add a description".trim())
-    	{
-    		var originalDesc = $('<div id="edit-desc" value="" class="edit-description" onclick="add_description(\'edit-desc\')">Add&nbsp;a&nbsp;description&nbsp;<i class="fa fa-plus fa-lg"></i></div>');
-    		textarea.replaceWith(originalDesc);
-    		textFromArea = "";
-    	}
-    	else
-    	{
-    		var newDesc = $('<div id="edit-desc" value="' + textFromArea + '" class="edit-description" onclick="add_description(\'edit-desc\')">' + textFromArea + '</div>');
-    		textarea.replaceWith(newDesc);
-    	}
 
-    	var url = $('#description-field').attr('data-url');
+    $('#confirm-desc-btn').click(
+    	function()
+    	{
+    		var textFromArea = $('#edit-desc-textarea').val().trim();
+    		var url = $('#description-field').attr('data-url');
     		$.ajax({
 				url:		url,
 				data:  		{"data" : textFromArea}, 
 				type: 		"POST",
 				success: 	function(data, textStatus, jqXHR) {
-					var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-					var hours = ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
-					var stamp = new Date(data.data.updated_at);
-					var time_stamp = months[stamp.getMonth()] + " " + (stamp.getDate() < 10 ? "0" + stamp.getDate() : stamp.getDate());
-					time_stamp += ", " + stamp.getFullYear() + " at ";
-					time_stamp += hours[stamp.getHours()] + ":" + (stamp.getMinutes() < 10 ? "0" + stamp.getMinutes() : stamp.getMinutes());
-					time_stamp += " " + (stamp.getHours() > 11 ? "pm" : "am");
-					$('#row_' + data.data.id).find('.sched-list-row').find('.last-edited').html(time_stamp);
-				},
-				error: 		function(jqXHR, textStatus, errorThrown) {
-					alert('Could not update the description at this time.');
-					//TODO: show bootstrap error message
-				}
-			});
+					var textdesc = data.schedule.description;
+
+    				if(textdesc == "")
+    				{
+    					var originalDesc = $('<div id="edit-desc" value="" class="edit-description" onclick="add_description(\'edit-desc\')">Add&nbsp;a&nbsp;description&nbsp;<i class="fa fa-plus fa-lg"></i></div>');
+    					textarea.replaceWith(originalDesc);
+    				}
+    				else
+    				{
+    					var newDesc = $('<div id="edit-desc" value="' + textFromArea + '" class="edit-description" onclick="add_description(\'edit-desc\')">' + textFromArea + '</div>');
+    					textarea.replaceWith(newDesc);
+    				}
+
+				$('#row_' + data.schedule.id).find('.sched-list-row').find('.last-edited').html(data.data);
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Could not update the description at this time.');
+				//TODO: show bootstrap error message
+			}
+		});
     });
+
+    $('#cancel-desc-btn').click(
+    	function()
+    	{
+    		var html = ""
+			if(tex === "")
+			{
+				html = $('<div id="edit-desc" value="" class="edit-description" onclick="add_description(\'edit-desc\')">Add&nbsp;a&nbsp;description&nbsp;<i class="fa fa-plus fa-lg"></i></div>');
+			}
+			else
+			{
+				html = $('<div id="edit-desc" value="' + tex + '" class="edit-description" onclick="add_description(\'edit-desc\')">'+ tex + '</div>');
+			}
+			$('#edit-desc-text').replaceWith(html);
+    });
+
+    textarea.focus();
+}
+
+function toggleUp(element)
+{
+	var changed = $('#' + element).attr('Up');
+
+	if(changed == 'true')
+	{
+		$('#' + element + " i").replaceWith($('<i class="fa fa-sort-desc"></i>'));
+		$('#' + element).attr('Up', 'false');
+	}
+	else
+	{
+		$('#' + element + " i").replaceWith($('<i class="fa fa-sort-asc"></i>'));
+		$('#' + element).attr('Up', 'true');
+	}
+}
+
+function createScheduleRows()
+{
+	var url = $('#sched-list').attr('data-url');
+	var up_name = ($('#header_name_col').attr('Up') == 'true') ? 1 : 0;
+	var up_year = ($('#header_year_col').attr('Up') == 'true') ? 1 : 0;
+	var up_semester = ($('#header_semester_col').attr('Up') == 'true') ? 1 : 0;
+	var up_edit = ($('#header_edit_col').attr('Up') == 'true') ? 1 : 0;
+
+	$.ajax({
+		url:		url,
+		data:  		{"up_name" : up_name, "up_year" : up_year, "up_semester" : up_semester, "up_edit" : up_edit, "primary" : primary}, 
+		type: 		"POST",
+			success: 	function(data) 
+			{
+				$('#schedules_list_data').html(data);
+				setSchedRow();
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) 
+			{
+				alert("Could not sort the data at this time");
+			}
+		});
+}
+
+function setSchedRow()
+{
+	$('.sched-list-row').click(function(e) {
+		e.preventDefault();
+		var url = $(this).attr('data-url');
+
+		$.ajax({
+			url:		url,
+			type: 		"POST",
+			beforeSend: function() {
+				$('#loading-admin-panel').show();
+				$('#ajax-admin-target').hide();
+				$('#hg-right').css('display', 'table-cell');
+			}, 
+			success: 	function(data, textStatus, jqXHR) {
+				$('#loading-admin-panel').hide();
+				$('#ajax-admin-target').show();
+				$('#ajax-admin-target').html(data);
+				$('#hg-right').css('display', 'table-cell');
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				alert('Could not load schedule at this time.');
+				// TODO:  bootstrap error message
+			}
+		});
+	});
 }

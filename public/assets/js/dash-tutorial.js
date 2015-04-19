@@ -190,7 +190,9 @@ function create_tutorial()
 
 function dash_right_next()
 {
-	if (!$('.description-section').length)
+	var right_panel_open = $('#hg-right').css('display') == 'table-cell';
+
+	if (!$('.description-section').length || !right_panel_open)
 	{
 		$('body').on('DOMNodeInserted', function(e) {
 			var el = $(e.target);

@@ -82,7 +82,14 @@ var dashboard1 = (function () {
         var s = chart2.addSeries("Type", dimple.plot.bar);
         s.addOrderRule("Type", true); 
         chart2.addLegend(0, 0, 650, 0, "right", s);
-
+        /*
+                svg.append("rect")
+            .attr("x", 0 - 0)
+            .attr("y", 0 - 0)
+            .attr("width", 20)
+            .attr("height", "100%")
+            .attr("fill", "#FFFFFF");
+        */
         chart2.draw();
         return chart2;
     }

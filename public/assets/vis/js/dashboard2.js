@@ -186,7 +186,6 @@ var dashboard2 = (function () {
             spin.spin();
             $(d3Select).append(spin.el);
         }
-        console.log(d3Select);
 
         $.ajax({
             dataType: "json",

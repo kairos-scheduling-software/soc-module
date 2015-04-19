@@ -24,7 +24,22 @@ Route::group(array('before'=> 'guest'), function()
             'as'=> 'register-post',
             'uses' => 'AccountController@postRegister'
     ));
-    
+
+    Route::get('/forgot-pass', array(
+            'as'=> 'forgot-pass',
+            'uses' => 'AccountController@forgot_pass'
+    ));
+
+    Route::post('/forgot-pass-post', array(
+            'as'=> 'forgot-pass-post',
+            'uses' => 'AccountController@forgot_pass_post'
+    ));
+
+    Route::get('/password-reset/{code}', array(
+            'as'=> 'password-reset',
+            'uses' => 'AccountController@password_reset'
+    ));
+
     //used for signing in
     Route::get('/login', array(
          'as' => 'getLogin',

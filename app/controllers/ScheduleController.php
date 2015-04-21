@@ -321,6 +321,50 @@ class ScheduleController extends BaseController {
 		//$class->is_tm_final = true;
 		$class->save();
 
+		return api_check_sched($schedule->id);
+	}
+
+	public function e_remove_class()
+	{
+		$id = Input::get('id');
+		$schedule = Schedule::find(Input::get('schedule'));
+
+		$class = models\Event::find($id);
+		$class->delete();
+
+		try {
+			$result = Communication::sendCheck($schedule->id);
+
+			return $result;
+		}
+		catch (Exception $e)
+		{
+				return Response::json(['error' => 'Could not check schedule'], 500);
+		}
+	}
+
+	public function e_update_class()
+	{
+		$id = Input::get('id');
+		$class = models\Event::find($id);
+
+		$schedule = $class->schedule();
+
+		$class->name = Input::get('name');
+		$class->professor = Input::get('professor');
+		$class->room_id = Input::get('room_id');
+		$class->class_type = Input::get('class_type');
+		$class->title = Input::get('title');
+		$class->etime_id = Input::get('etime_id');
+
+		if ($class->save())
+			return api_check_sched($schedule->id);
+		else
+			return Response::json(['error' => 'Could not update the class at this time'], 500);
+	}
+
+	private function api_check_sched($schedule)
+	{
 		// Call check on comm library
 		try {
 			$result = Communication::sendCheck($schedule->id);
@@ -355,25 +399,6 @@ class ScheduleController extends BaseController {
 		{
 			//return Response::json($e, 500);
 			return Response::json(['error' => 'Could not check schedule'], 500);
-		}
-	}
-
-	public function e_remove_class()
-	{
-		$id = Input::get('id');
-		$schedule = Schedule::find(Input::get('schedule'));
-
-		$class = models\Event::find($id);
-		$class->delete();
-
-		try {
-			$result = Communication::sendCheck($schedule->id);
-
-			return $result;
-		}
-		catch (Exception $e)
-		{
-				return Response::json(['error' => 'Could not check schedule'], 500);
 		}
 	}
 

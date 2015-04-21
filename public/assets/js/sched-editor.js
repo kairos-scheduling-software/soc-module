@@ -359,12 +359,12 @@ function resize_all()
 	$('.eighty-min-blk').css('height', (16 * five_min_height));
 	*/
 
-	var sched_height = $(window).height() 
+	var sched_height = Math.max($(window).height() 
 							- $('.top-buffer').outerHeight(true) 
 							- $('#sched-name').outerHeight(true) 
 							- $('#sched-col-headers').outerHeight(true)
 							- $('#bottom-container').outerHeight(true)
-							- parseInt($('#page_footer').css('height'));
+							- parseInt($('#page_footer').css('height')), 576);
 
 	//$('#main-container').css('width', $(window).width() + 'px');
 	time_block_w = 40;//$('#main-container').width() / 35;
@@ -980,6 +980,11 @@ function add_matrix_col(day)
 
 	col_counts[day] = num_cols;
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+}
+
+function edit_class(course, success, fail)
+{
+
 }
 
 function initialize_column_matrix()

@@ -133,6 +133,13 @@ function create_tutorial()
 				arrowOffset: 15
 			},
 			{
+				title: '<h2>Resource Management</h2>',
+				content: 'This tool allows you to add/edit/remove professors or rooms from your database',
+				selector: '#resource-mngmnt-section',
+				position: 'right-center',
+				arrowOffset: 15
+			},
+			{
 				title: '<h2>Schedule List</h2>',
 				content: '<p>Your saved schedules will show up here.  You can sort this list by clicking on the column headers.</p><p>Clicking on a row will open a panel for interacting with that schedule.</p>',
 				selector: '#schedules-list',
@@ -182,7 +189,7 @@ function create_tutorial()
 						$.tutorialize.stop('dash');
 						break;
 					case 39:
-						if(index == 7)
+						if(index == 8)
 							dash_right_next();
 						else
 							$.tutorialize.next('dash');

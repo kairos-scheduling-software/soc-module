@@ -283,7 +283,7 @@
 </script>
 
 <h1 id="sched-name">{{ $schedule->name }}
-	<a href="#"><span id="edit-icon">{{FA::icon('edit')}}</span></a>
+	{{--<a href="#"><span id="edit-icon">{{FA::icon('edit')}}</span></a>--}}
 		<span id="sched-ok">{{ FA::icon('check')}} No conflicts in schedule.</span>
 		<span id="checking-sched">{{ FA::spin('spinner') }} Checking schedule...</span>
 		<span id="sched-bad">{{ FA::icon('warning') }} 

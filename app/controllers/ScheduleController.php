@@ -312,16 +312,16 @@ class ScheduleController extends BaseController {
 		$class->name = Input::get('class_name');
 		$class->enroll_cap = $enroll;
 		$class->professor = $prof->id;
-		$class->schedule_id = $schedule->id;
 		$class->room_id = $room->id;
 		$class->room_group_id = $room->group;
 		$class->is_rm_final = $room->is_final;
 		$class->class_type = "Lecture";
 		$class->etime_id = Input::get('block_id');
 		//$class->is_tm_final = true;
-		$class->save();
+		
+		$schedule->events()->save($class);
 
-		return api_check_sched($schedule->id);
+		return $this->api_check_sched($schedule);
 	}
 
 	public function e_remove_class()
@@ -335,7 +335,7 @@ class ScheduleController extends BaseController {
 		try {
 			$result = Communication::sendCheck($schedule->id);
 
-			return $result;
+			return json_encode($result);
 		}
 		catch (Exception $e)
 		{
@@ -358,7 +358,7 @@ class ScheduleController extends BaseController {
 		$class->etime_id = Input::get('etime_id');
 
 		if ($class->save())
-			return api_check_sched($schedule->id);
+			return $this->api_check_sched($schedule);
 		else
 			return Response::json(['error' => 'Could not update the class at this time'], 500);
 	}
@@ -367,7 +367,14 @@ class ScheduleController extends BaseController {
 	{
 		// Call check on comm library
 		try {
-			$result = Communication::sendCheck($schedule->id);
+			try {
+				$result = Communication::sendCheck($schedule->id);
+				if(property_exists($result, 'Error')) {
+					return json_encode($result);
+				}
+			} catch (Exception $e) {
+				return Response::json(['error' => 'Could not contact solver server'], 500);
+			}
 			
 			$classes_dict = [];
 			foreach ($result->EVENTS as $ev) {
@@ -386,12 +393,12 @@ class ScheduleController extends BaseController {
 					}
 				}
 			}
-			if (!$class->is_rm_final) {
-				if (!property_exists($classes_dict[$class->id], 'wasFailure')) {
-					$class->room_id = $classes_dict[$class->id]->spaceId;
-					$class->save();
-				}
-			}
+			//~ if (!$class->is_rm_final) {
+				//~ if (!property_exists($classes_dict[$class->id], 'wasFailure')) {
+					//~ $class->room_id = $classes_dict[$class->id]->spaceId;
+					//~ $class->save();
+				//~ }
+			//~ }
 			
 			return json_encode($result);
 		}

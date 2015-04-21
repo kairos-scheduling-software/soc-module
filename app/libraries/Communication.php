@@ -19,10 +19,10 @@ class Communication
         //do error checking
         $scheduleResults = json_decode($result);
 
-        if(property_exists($scheduleResults, 'Error'))
-        {
-            throw new Exception('ERROR: ' . $scheduleResults->Error);
-        }
+        //if(property_exists($scheduleResults, 'Error'))
+        //{
+         //   throw new Exception('ERROR: ' . $scheduleResults->Error);
+        //}
 
         return $scheduleResults;
     }

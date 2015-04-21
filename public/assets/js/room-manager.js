@@ -66,6 +66,7 @@ $(function() {
 			console.log(response);
 			console.log(newValue);
 			load_room_groups();
+			return '';
 		}
 	});
 	$('#add-group-btn').editable('option', 'validate', function(v) {

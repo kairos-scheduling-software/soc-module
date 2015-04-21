@@ -17,7 +17,7 @@
 		<p>
 			Choose an option to continue:
 		</p>
-		<a href="#Api" class="btn btn-lg">
+		<a href="http://kairos-api-docs.herokuapp.com" class="btn btn-lg">
 			API documentation
 		</a>
 		<a class="btn btn-lg" data-toggle="modal" href="#login-modal">

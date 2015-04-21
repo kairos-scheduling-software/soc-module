@@ -43,7 +43,7 @@
     <script src="assets/vis/js/fastclick.js" type="text/javascript"></script>
     <script src="assets/vis/js/d3.v3.min.js" type="text/javascript"></script>
     <script src="assets/vis/js/d3-tip-0.6.6.js" type="text/javascript"></script>
-    <script src="assets/vis/js/dimple.v2.1.2.min.js" type="text/javascript"></script>
+    <script src="assets/vis/js/dimple.mod.min.js" type="text/javascript"></script>
     <script src="assets/vis/js/viewportSize.js" type="text/javascript"></script>
     <script src="assets/vis/js/chroma.min.js" type="text/javascript"></script>
     <script src="assets/vis/js/spin.min.js" type="text/javascript"></script>

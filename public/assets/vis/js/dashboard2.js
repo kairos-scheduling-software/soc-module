@@ -186,11 +186,12 @@ var dashboard2 = (function () {
             spin.spin();
             $(d3Select).append(spin.el);
         }
-        console.log(d3Select);
 
+        var nocache = new Date().getTime();
+               
         $.ajax({
             dataType: "json",
-            url: vis_url + '/' + sched + '/2',
+            url: vis_url + '/' + sched + '/2?cache=' + nocache,
             success: function (data) {
                 var newDays;
                 $.each(data, function (i, d) {
@@ -223,9 +224,12 @@ var dashboard2 = (function () {
         spin = new Spinner({top: "342px"});
         d3.select('#content').style('min-width', '1280px');
         d3.select('#content').style('min-height', '600px');
+        
+        var nocache = new Date().getTime();
+               
         $.ajax({
             dataType: "json",
-            url: vis_url + '/list',
+            url: vis_url + '/list?cache=' + nocache,
             success: function (data) {
 
                 var html = '<div class="col-xs-10" style="margin: 20px 20px 20px 50px;">\n\

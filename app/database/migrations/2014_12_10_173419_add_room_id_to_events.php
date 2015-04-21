@@ -14,7 +14,7 @@ class AddRoomIdToEvents extends Migration {
 	{
 		Schema::table('events', function(Blueprint $table)
 		{
-			$table->integer('room_id')->unsigned();
+			$table->integer('room_id')->unsigned()->nullable();
 			$table->foreign('room_id')->references('id')->on('rooms')->onDelete('cascade');
 		});
 	}

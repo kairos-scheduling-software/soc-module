@@ -1,6 +1,7 @@
 @extends('layouts.holy-grail-1col')
 
 @section('top-center-column') 
+<div id="center-slide-anchor"></div>
 <div id="vis-wrapper" data-auth-status="{{Auth::check()}}">
     <div id="vis-container">
         <div id="d3-vis">
@@ -50,6 +51,7 @@
     <script src="assets/vis/js/dashboard2.js" type="text/javascript"></script>
     <script src="assets/vis/js/dashboard3.js" type="text/javascript"></script>
     <script src="assets/vis/js/grid.js" type="text/javascript"></script>
+    <script src="{{ URL::asset('assets/js/vis-tutorial.js') }}"></script>
 
 </div>
 @stop

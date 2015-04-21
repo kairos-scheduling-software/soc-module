@@ -16,7 +16,7 @@ class AddEventEnrollcapRoomGroup extends Migration {
 			$table->integer('enroll_cap')->unsigned()->after('name');
 			$table->integer('room_group_id')->unsigned()->after('room_id');
 			$table->foreign('room_group_id')->references('id')->on('room_groups')->onDelete('cascade');
-			$table->boolean('is_rm_final')->after('description');
+			$table->boolean('is_rm_final')->after('room_group_id');
 		});
 		//
 	}

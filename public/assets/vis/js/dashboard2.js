@@ -9,6 +9,7 @@ var dashboard2 = (function () {
     var days = ["Su", "M", "T", "W", "Th", "F", "S"];
     var times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12a"];
     var colors = ["#ffffff", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
+    var legText = ["#000000", "#111111", "#333333", "#555555", "#dddddd", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
 
     function createChart(selector, data) {
         if (data.length == 0) {
@@ -19,14 +20,31 @@ var dashboard2 = (function () {
             height = 675 - margin.top - margin.bottom,
             gridSize = 40,
             buckets = 9;
-            
+
 
         var shift = (8 - 1) * (gridSize) + 14;
 
+        /*
+         var numBuckets = d3.max(data, function (d) {
+         return d.value;
+         });
+         console.log(numBuckets);
+         
+         var colorScale = d3.scale.quantile()
+         .domain([0, buckets - 1, d3.max(data, function (d) {
+         return d.value;
+         })])
+         .range(colors.slice(0, numBuckets + 1));
+         */
+        /*
         var colorScale = d3.scale.quantile()
             .domain([0, buckets - 1, d3.max(data, function (d) {
                     return d.value;
                 })])
+            .range(colors);
+        */
+        var colorScale = d3.scale.quantile()
+            .domain([0, buckets - 1, 9])
             .range(colors);
 
         var svg = d3.select(selector).append("svg")
@@ -71,12 +89,20 @@ var dashboard2 = (function () {
             //.attr("rx", 4)
             .attr("class", "hour bordered")
             .attr("width", gridSize / 2)
-            .attr("height", gridSize / 2)
+            .attr("height", gridSize / 4)
             .style("fill", colors[0]);
 
         heatMap.transition().duration(1000)
-            .style("fill", function (d) {
-                return colorScale(d.value);
+            .style("fill", function (d) {  
+                if(d.value < 1) return colors[0];
+                if(d.value < 3) return colors[1];
+                if(d.value < 5) return colors[2];
+                if(d.value < 7) return colors[3];
+                if(d.value < 9) return colors[4];
+                if(d.value < 11) return colors[5];
+                if(d.value < 13) return colors[6];
+                if(d.value < 15) return colors[7];
+                return colors[8];
             });
 
         heatMap.append("title").text(function (d) {
@@ -85,9 +111,10 @@ var dashboard2 = (function () {
 
         //if (selector === '#d3-1') {
         var legend = svg.selectAll(".legend")
-            .data([0].concat(colorScale.quantiles()), function (d) {
-                return d;
-            })
+            //.data([0].concat(colorScale.quantiles()), function (d) {
+            //    return d;
+            //})
+            .data(colors)
             .enter().append("g")
             .attr("class", "legend");
 
@@ -104,15 +131,24 @@ var dashboard2 = (function () {
 
         legend.append("text")
             .attr("class", "mono")
-            .text(function (d) {
-                return Math.round(d);
+            .text(function (d, i) {
+                //return Math.round(d);
+                if(i == 0) return 0;
+                return (i * 2) - 1;
             })
             .attr("x", function (d, i) {
-                return (gridSize * 0.5) * i - 14;
+                if(i > 5) {
+                    return (gridSize * 0.5) * i - 16;
+                } else {
+                    return (gridSize * 0.5) * i - 13;
+                }
             })
             .attr("y", 450 + 35)
             .attr("class", function (d, i) {
                 return "timeLabel mono axis axis-worktime";
+            })
+            .style("fill", function (d, i) {
+                return legText[i];
             });
 
         var dayLabels = svg.selectAll(".dayLabel")
@@ -188,7 +224,7 @@ var dashboard2 = (function () {
         }
 
         var nocache = new Date().getTime();
-               
+
         $.ajax({
             dataType: "json",
             url: vis_url + '/' + sched + '/2?cache=' + nocache,
@@ -224,9 +260,9 @@ var dashboard2 = (function () {
         spin = new Spinner({top: "342px"});
         d3.select('#content').style('min-width', '1280px');
         d3.select('#content').style('min-height', '600px');
-        
+
         var nocache = new Date().getTime();
-               
+
         $.ajax({
             dataType: "json",
             url: vis_url + '/list?cache=' + nocache,
@@ -239,7 +275,7 @@ var dashboard2 = (function () {
                     <div id="d3-4" class="col-xs-2" style="min-width: 200px;"></div>\n\
                     <div id="d3-5" class="col-xs-2" style="min-width: 200px;"></div></div>';
                 $("#content").html(html);
-                
+
                 $('#d3-1').append(createSelect('sched1', 'Schedule 1', false));
                 $('#d3-2').append(createSelect('sched2', 'Schedule 2', false));
                 $('#d3-3').append(createSelect('sched3', 'Schedule 3', false));

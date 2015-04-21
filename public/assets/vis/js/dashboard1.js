@@ -17,7 +17,7 @@ var dashboard1 = (function () {
         var svg = dimple.newSvg(selector, 530, 600);
         // Create and Position a Chart
         var chart1 = new dimple.chart(svg, data);
-        chart1.setBounds(80, 40, 420, 450);
+        chart1.setBounds(50, 30, 470, 450);
         var x = chart1.addCategoryAxis("x", "Year");
         chart1.addMeasureAxis("y", "Count");
 
@@ -34,7 +34,7 @@ var dashboard1 = (function () {
         });
         lines.addEventHandler("mouseover", null);
 
-        chart1.addLegend(180, 10, 360, 20, "right");
+        chart1.addLegend(0, 0, 480, 20, "right");
 
         // Draw the chart
         chart1.draw();

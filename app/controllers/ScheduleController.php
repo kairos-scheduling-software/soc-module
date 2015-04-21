@@ -295,7 +295,8 @@ class ScheduleController extends BaseController {
 		$room->id = null;
 		$room->is_final = false;
 		if (strtolower($room_group) != 'all') {
-			$room->group = $room_group;
+			$rm_grp_id = RoomGroup::select('id')->where('name', '=', $room_group)->firstOrFail();
+			$room->group = $rm_grp_id;
 		}
 		if (strtolower($room_name) != 'all') {
 			$rm_id = Room::select('id')->where('name', '=', $room_name)->firstOrFail();
@@ -313,11 +314,11 @@ class ScheduleController extends BaseController {
 		$class->professor = $prof->id;
 		$class->schedule_id = $schedule->id;
 		$class->room_id = $room->id;
-		$class->room_group = $room->group;
+		$class->room_group_id = $room->group;
 		$class->is_rm_final = $room->is_final;
 		$class->class_type = "Lecture";
 		$class->etime_id = Input::get('block_id');
-		$class->is_tm_final = true;
+		//$class->is_tm_final = true;
 		$class->save();
 
 		return api_check_sched($schedule->id);
@@ -396,7 +397,8 @@ class ScheduleController extends BaseController {
 		}
 		catch (Exception $e)
 		{
-				return Response::json(['error' => 'Could not check schedule'], 500);
+			return Response::json($e, 500);
+				//return Response::json(['error' => 'Could not check schedule'], 500);
 		}
 	}
 

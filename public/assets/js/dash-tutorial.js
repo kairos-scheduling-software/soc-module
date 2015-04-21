@@ -174,8 +174,23 @@ function create_tutorial()
 			$('#custom_navbar').css('box-shadow', '0 0 0 #000');
 
 			$('body').keydown(function(e){
-				if(e.which == 27)
-					$.tutorialize.stop('dash');
+				var index = $.tutorialize.getCurrentIndex('dash');
+
+				switch(e.which)
+				{
+					case 27:
+						$.tutorialize.stop('dash');
+						break;
+					case 39:
+						if(index == 7)
+							dash_right_next();
+						else
+							$.tutorialize.next('dash');
+						break;
+					case 37:
+						$.tutorialize.prev('dash');
+						break;
+				}
 			});
 		},
 		onStop: function() {

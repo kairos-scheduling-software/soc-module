@@ -27,7 +27,7 @@
 				Use this tool if you need to see the differences between two of your saved schedules.
 			</p>
 			<p>
-				<button class="btn btn-compare">
+				<button class="btn btn-compare" onclick="window.location='{{ URL::route('view-sched') . '?dash=4'}}'">
 					{{ FA::icon('calendar'); }}
 					{{ FA::rotate90('sort'); }}
 					{{ FA::icon('calendar'); }}

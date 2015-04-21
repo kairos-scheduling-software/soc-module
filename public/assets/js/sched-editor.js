@@ -391,8 +391,9 @@ function resize_all()
 
 function parse_days(json_days)
 {
+	json_days = '' + json_days;
 	var days = [];
-
+	
 	if (json_days.indexOf("1") >= 0)
 		days.push("#mon-col");
 	if (json_days.indexOf("2") >= 0)

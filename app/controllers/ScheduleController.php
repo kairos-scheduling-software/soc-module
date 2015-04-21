@@ -353,7 +353,8 @@ class ScheduleController extends BaseController {
 		}
 		catch (Exception $e)
 		{
-				return Response::json(['error' => 'Could not check schedule'], 500);
+			return Response::json($e, 500);
+				//return Response::json(['error' => 'Could not check schedule'], 500);
 		}
 	}
 

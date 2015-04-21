@@ -200,4 +200,68 @@ class AccountController extends BaseController {
 		}
 	}
 
+	public function forgot_pass()
+	{
+		return View::make('account.forgot-pass')->with('page_name', 'password recovery');
+	}
+
+	public function forgot_pass_post()
+	{
+		$Validator = Validator::make(Input::all(), array(
+			'email' => 'required|email'
+		));
+
+		if($Validator->fails())
+		{
+			return Redirect::route('forgot-pass')->withErrors($Validator)->withInput();
+		}
+		else
+		{
+			$user = User::where('email', '=', Input::get('email'));
+
+			if($user->count())
+			{
+				$user = $user->first();
+
+				$code = str_random(60);
+				$password = str_random(10);
+
+				$user->activation_code = $code;
+				$user->temp_password = Hash::make($password);
+
+				if($user->save())
+				{
+					Mail::send('emails.auth.passRecovery', array('url' => URL::route('password-reset', $code), 'password' => $password), function($message) use ($user)
+					{
+						$message->to($user->email, $user->username)->subject('Kairos password recovery');
+					});
+
+					return Redirect::route('forgot-pass')->with('global', 'A new password has been sent to your email');
+				}
+			}
+		}
+
+		return Redirect::route('forgot-pass')->with('global', 'Error generating password');
+	}
+
+	public function password_reset($code)
+	{
+		$user = User::where('activation_code', '=' , $code)->where('temp_password', '!=', '');
+
+		if($user->count())
+		{
+			$user = $user->first();
+			$user->password = $user->temp_password;
+			$user->temp_password = '';
+			$user->activation_code = '';
+
+			if($user->save())
+			{
+				return Redirect::route('home');
+			}
+		}
+
+		return Redirect::route('forgot-pass')->with('global', 'Could not recover your account');
+	}
+
 }

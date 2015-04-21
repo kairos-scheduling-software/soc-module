@@ -8,7 +8,7 @@
       <p><input type="text" class="form-control" name="username" id="email" placeholder="Username"></p>
       <p><input type="password" class="form-control" name="password" placeholder="Password"></p>
       <p><button type="submit" class="btn btn-login">Log in</button>
-        <a href="#" class="login-link">Forgot Password?</a>
+        <a href="{{URL::route('forgot-pass')}}" class="login-link">Forgot Password?</a>
       </p>
     </form>
   </div>

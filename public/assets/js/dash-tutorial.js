@@ -51,7 +51,7 @@ function create_tutorial()
 		slides: [
 			{
 				title: '<h2>Welcome to the Kairos Dashboard</h2>',
-				content: '<p>Click "Start" to begin your guided tour.</p>',
+				content: '<p>Click "Start" to begin your guided tour.</p><p><small style="font-size: 11px">Press the <b style="font-size: 12px">ESC</b> key at any time to quit the tour.</small></p>',
 				selector: '#center-slide-anchor',
 				overlayMode: 'all',
 				position: 'center-center',

@@ -201,7 +201,7 @@ var dashboard3 = (function () {
         $.each(dataset, function (i, val) {
             var day;
             var class_name;
-            if (val.days[0] != "" && val.room != "") {
+            if (val.days[0] != "" && val.room != "" && val.room !== 'TBD') {
                 // Pre-populate array
                 getCol(val['room']);
 
@@ -794,10 +794,12 @@ var dashboard3 = (function () {
             schType = 3;
             url = vis_url + '/' + sched + '/' + schType + '/' + sched2;
         }
+        
+        var nocache = new Date().getTime();
 
         $.ajax({
             dataType: "json",
-            url: url,
+            url: url + '?cache=' + nocache,
             success: function (data) {
                 var newDays;
                 $.each(data, function (i, d) {
@@ -896,9 +898,11 @@ var dashboard3 = (function () {
             buttonWidth: '175px'
         });
 
+        var nocache = new Date().getTime();
+        
         $.ajax({
             dataType: "json",
-            url: vis_url + '/list',
+            url: vis_url + '/list?cache=' + nocache,
             success: function (data) {
                 var result = '';
 

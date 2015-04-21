@@ -42,9 +42,11 @@ var dashboard1 = (function () {
     }
 
     function yearSelectionHandler(sched) {
+        var nocache = new Date().getTime();
+        
         $.ajax({
             dataType: "json",
-            url: vis_url + '/' + sched + '/1',
+            url: vis_url + '/' + sched + '/1?cache=' + nocache,
             success: function (data) {
                 $('#chart2>.title').html('Total Classes by Prof in ' + data[0]['name']);
                 chart2.data = data;
@@ -97,9 +99,12 @@ var dashboard1 = (function () {
     function render() {
         d3.select('#content').style('min-width', '1280px');
         d3.select('#content').style('min-height', '700px');
+        
+        var nocache = new Date().getTime();
+        
         $.ajax({
             dataType: "json",
-            url: vis_url + '/0/0',
+            url: vis_url + '/0/0?cache=' + nocache,
             success: function (data) {
 
                 var html =

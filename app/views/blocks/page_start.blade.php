@@ -118,6 +118,15 @@
     @if($page_name == 'login' || $page_name == 'register')
         <link href="{{URL::asset('assets/css/account.css')}}" rel="stylesheet">
     @endif
+    @if($page_name == 'Room Manager')
+        <!--Room manager script-->
+        <script src="{{URL::asset('assets/js/bootstrap-editable.min.js')}}"></script>
+        <script src="{{URL::asset('assets/js/room-manager.js')}}"></script>
+        
+        <!--Room manager css-->
+        <link href="{{URL::asset('assets/css/bootstrap-editable.css')}}" rel="stylesheet">
+        <link href="{{URL::asset('assets/css/room-manager.css')}}" rel="stylesheet">
+    @endif
 
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>

@@ -1,0 +1,114 @@
+.btn-room-admin {
+	margin: 5px;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.content-header .editable-checklist {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+#room-list-edit {
+	text-decoration: none;
+	border-bottom: none;
+	margin: 10px;
+	vertical-align: bottom;
+}
+
+#room-list-edit:hover {
+	background-color: #66A1CC;
+}
+
+#new-room-form {
+	display: none;
+}
+
+#new-room-form .new-room-label {
+	width: 45%;
+	display: inline-block;
+	font-size: 14pt;
+	font-weight: bold;
+	margin: 5px;
+}
+
+#new-room-form .new-room-content {
+	width: 45%;
+	display: inline-block;
+}
+
+#new-room-form .new-room-btn {
+	width: 45%;
+	margin: 20px 5px;
+}
+
+.room-group-row.selected {
+	background-color: #E39445;
+}
+
+.col-header {
+	font-size: 14pt;
+	font-weight: bold;
+	display:inline-block;
+}
+
+.row-content:hover {
+	background-color: #E38445;
+}
+
+.row-cell {
+	margin: 10px 5px;
+	display: inline-block;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.row-cell:hover {
+	cursor: pointer;
+}
+
+.room-group-name {
+	width: 85%;
+	font-size: 14pt;
+	font-weight: bold;
+}
+
+.room-group-del {
+	width: 15px;
+	font-size: 14pt;
+	font-weight: bold;
+	visibility: hidden;
+}
+
+.room-group-row:hover .room-group-del {
+	visibility: visible;
+}
+
+#room-list .room-name {
+	width: 45%;
+}
+
+#room-list .room-capacity {
+	width: 45%;
+}
+
+#room-list hr {
+	padding: 0;
+	margin: 0;
+	border-width: 2px;
+	border-color: #666666;
+}
+
+#room-list .room-del {
+	width: 15px;
+	margin: 10px 5px;
+	visibility: hidden;
+}
+
+#room-list .room-list-row:hover .room-del {
+	visibility: visible;
+}

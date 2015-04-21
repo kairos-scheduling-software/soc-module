@@ -14,17 +14,21 @@ class AddRoomAndTimeGroup extends Migration {
 	{
 		Schema::create('room_groups', function($table)
 		{
+			$table->increments('id');
 			$table->string('name', 10)->unique();
 			$table->string('description', 50);
+			$table->timestamps();
 		});
 		
 		Schema::create('room_mappings', function($table)
 		{
-			$table->string('name', 10);
+			$table->integer('id')->unsigned();
 			$table->integer('rid')->unsigned();
-			$table->unique(array('name', 'rid'));
+			$table->timestamps();
 			
-			$table->foreign('name')->references('name')->on('room_groups')->onDelete('cascade');
+			$table->primary(array('id', 'rid'));
+			
+			$table->foreign('id')->references('id')->on('room_groups')->onDelete('cascade');
 			$table->foreign('rid')->references('id')->on('rooms')->onDelete('cascade');
 		});
 	}

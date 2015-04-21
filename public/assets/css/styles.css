@@ -236,6 +236,10 @@ html, body {
 	font-size: 12pt;
 }
 
+#hg-left button.btn-resource {
+	width: 45%;
+}
+
 /*
 #hg-left button {
 	padding: 0 20px;

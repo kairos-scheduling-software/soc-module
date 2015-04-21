@@ -224,4 +224,51 @@ Route::group(array('before'=> 'auth'), function()
     Route::get('vis/list', 'VisController@index');
     Route::get('vis/{id0}/{id1}', 'VisController@getData');
     Route::get('vis/{id0}/{id1}/{id3}', 'VisController@getData');
+    
+    // Resources route
+    Route::get('/resources/rooms', array(
+        'as'    => 'room-manager',
+        'uses'  => 'ResourceController@load_room_manager'
+    ));
+    Route::post('/resources/get-rooms', array(
+        'as'    => 'room-list',
+        'uses'  => 'ResourceController@get_rooms'
+    ));
+    Route::post('/resources/get-room-groups', array(
+        'as'    => 'room-group-list',
+        'uses'  => 'ResourceController@get_room_groups'
+    ));
+    Route::post('/resources/add-room', array(
+        'as'    => 'add-room',
+        'uses'  => 'ResourceController@add_room'
+    ));
+    Route::post('/resources/add-room-group', array(
+        'as'    => 'add-room-group',
+        'uses'  => 'ResourceController@add_room_group'
+    ));
+    Route::post('/resources/edit-room', array(
+        'as'    => 'edit-room',
+        'uses'  => 'ResourceController@edit_room'
+    ));
+    Route::post('/resources/edit-room-group', array(
+        'as'    => 'edit-room-group',
+        'uses'  => 'ResourceController@edit_room_group'
+    ));
+    
+    Route::get('/resources/professors', array(
+        'as'    => 'prof-manager',
+        'uses'  => 'ResourceController@load_prof_manager'
+    ));
+    Route::post('/resources/get-profs', array(
+        'as'    => 'prof-list',
+        'uses'  => 'ResourceController@get_professors'
+    ));
+    Route::post('/resources/add-prof', array(
+        'as'    => 'add-prof',
+        'uses'  => 'ResourceController@add_professor'
+    ));
+    Route::post('/resources/remove-prof', array(
+        'as'    => 'remove-prof',
+        'uses'  => 'ResourceController@remove_professor'
+    ));
 });

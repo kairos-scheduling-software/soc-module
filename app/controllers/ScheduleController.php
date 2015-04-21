@@ -50,7 +50,7 @@ class ScheduleController extends BaseController {
 		
 		$rooms = Room::select('name')->get();
 		$room_groups = DB::table('room_groups')
-				->join('room_mappings', 'room_groups.name', '=', 'room_mappings.name')
+				->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
 				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
 				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
 		$professors = Professor::select('uid', 'name')->get();
@@ -381,7 +381,7 @@ class ScheduleController extends BaseController {
 
 		if(!$schedule)
 		{
-			return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+			return Response::json(['error' => 'could not find the schedule to update'], 500);
 		}
 
 		$schedule->description = Input::get('data');
@@ -390,7 +390,7 @@ class ScheduleController extends BaseController {
 			return Response::json(['success' => 'Successfully updated the description', 'data' => $schedule->last_edited(), 'schedule' => $schedule], 200);
 		}
 
-		return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+		return Response::json(['error' => 'could not find the schedule to update'], 500);
 	}
 
 	public function update_final_sched($sched_id)

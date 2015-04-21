@@ -35,6 +35,24 @@
 				</button>
 			</p>
 		</div>
+		<hr>
+		<div id="resource-mngmnt-section">
+			<h2>Resource Management</h2>
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+				Mauris convallis ligula eu metus posuere, sed.
+			</p>
+			<p>
+				<button class="btn btn-resource" onclick="window.location='{{ URL::route("room-manager") }}'">
+					{{ FA::icon('th'); }}
+					&nbsp;&nbsp;Rooms
+				</button>
+				<button class="btn btn-resource" onclick="window.location='{{ URL::route("room-manager") }}'">
+					{{ FA::icon('user'); }}
+					&nbsp;&nbsp;Professors
+				</button>
+			</p>
+		</div>
 	@stop
 
 	@section('center-column')

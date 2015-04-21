@@ -2,6 +2,7 @@
 
 @section('top-center-column') 
 <div id="center-slide-anchor"></div>
+<div id="first-slide"></div>
 <div id="vis-wrapper" data-auth-status="{{Auth::check()}}">
     <div id="vis-container">
         <div id="d3-vis">

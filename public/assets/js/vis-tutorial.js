@@ -8,6 +8,13 @@ $(function() {
 		left: $(window).width() / 2 + 'px'
 	});
 
+	$('#first-slide').css({
+		position: 'absolute',
+		top: $('#left-nav').offset().top + 'px',
+		left: ($('#left-nav').offset().left + $('#left-nav').width()) + 'px',
+		height: '220px'
+	});
+
 	create_tutorial();
 
 	$('#view-tut-link').click(function(e) {
@@ -28,7 +35,7 @@ $(function() {
 
 function create_tutorial()
 {
-	var oMode = 'focus';
+	var oMode = 'all';
 	var oOpacity = 0.6;
 	var oPadding = 10;
 
@@ -54,11 +61,34 @@ function create_tutorial()
 				position: 'center-center'
 			},
 			{
-				selector: '#left-nav',
-				position: 'left-center',
+				selector: '#first-slide',
+				position: 'right-top',
 				title: '<h2>Visualizations</h2>',
 				content: 'From this menu you can choose which data visualization you want to see.',
-				arrowOffset: -15
+				onSlide: function() {
+					$('.tutorialize-slide-arrow').zIndex($('#left-nav').zIndex() + 1);
+					$('#left-nav').zIndex(200);
+				}
+			},
+			{
+				selector: '#first-slide',
+				position: 'right-center',
+				title: '<h2>Visualizations</h2>',
+				content: 'From this menu you can choose which data visualization you want to see.',
+				onSlide: function() {
+					$('.tutorialize-slide-arrow').zIndex($('#left-nav').zIndex() + 1);
+					$('#left-nav').zIndex(200);
+				}
+			},
+			{
+				selector: '#first-slide',
+				position: 'right-bottom',
+				title: '<h2>Visualizations</h2>',
+				content: 'From this menu you can choose which data visualization you want to see.',
+				onSlide: function() {
+					$('.tutorialize-slide-arrow').zIndex($('#left-nav').zIndex() + 1);
+					$('#left-nav').zIndex(200);
+				}
 			}
 		],
 		onStart: function(index, data, dom) {

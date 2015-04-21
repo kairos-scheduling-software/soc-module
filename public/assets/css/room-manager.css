@@ -4,8 +4,28 @@
 	border-bottom: none;
 }
 
+.content-header .editable-checklist {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
 .hidden {
 	visibility: hidden;
+}
+
+#room-list-edit {
+	text-decoration: none;
+	border-bottom: none;
+	margin: 10px;
+	vertical-align: bottom;
+}
+
+#room-list-edit:hover {
+	background-color: #66A1CC;
+}
+
+#new-room-form {
+	display: none;
 }
 
 #new-room-form .new-room-label {
@@ -24,11 +44,6 @@
 #new-room-form .new-room-btn {
 	width: 45%;
 	margin: 20px 5px;
-}
-
-.room-group-row {
-	font-size: 14pt;
-	font-weight: bold;
 }
 
 .room-group-row.selected {
@@ -56,6 +71,18 @@
 	cursor: pointer;
 }
 
+.room-group-name {
+	width: 85%;
+	font-size: 14pt;
+	font-weight: bold;
+}
+
+.room-group-del {
+	width: 15px;
+	font-size: 14pt;
+	font-weight: bold;
+}
+
 #room-list .room-name {
 	width: 45%;
 }
@@ -71,19 +98,16 @@
 	border-color: #666666;
 }
 
-.room-list-row .room-del {
+#room-list .room-del {
 	width: 15px;
 	margin: 10px 5px;
-	display: inline-block;
 	visibility: hidden;
 }
 
-.room-list-row:hover .room-del {
+#room-list .room-list-row:hover .room-del {
 	visibility: visible;
 }
 
-.room-list-row a {
-	color: #424242;
-	text-decoration: none;
-	border-bottom: none;
+#room-list .room-list-row .room-del:hover {
+	cursor: pointer;
 }

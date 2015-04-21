@@ -20,7 +20,7 @@
 			<div id="room-added">{{ FA::icon('check') }}&nbsp;&nbsp; Room added</div>
 		</div>
 		<hr>
-		<form id="new-room-form" class="hidden" data-url="{{ URL::route('add-room') }}">
+		<form id="new-room-form" data-url="{{ URL::route('add-room') }}">
 			<div class="new-room-label">Room Name</div>
 			<input id="new-room-name" class="new-room-content form-control" name="name" placeholder="Name required" type="text" required></input>
 			<div class="new-room-label">Room Capacity</div>
@@ -40,14 +40,14 @@
 		<div id="content">
 			<div class="content-header">
 				<div class="left">
-					<h1 style="display:inline-block">Rooms&nbsp;&nbsp;</h1>
-					<div id="room-list-edit" class="editable editable-click" data-url="{{ URL::route('edit-room-group') }}" style="display:inline-block">
+					<h1 style="display:inline-block">Rooms&nbsp;</h1>
+					<button id="room-list-edit" class="btn editable editable-click" data-url="{{ URL::route('edit-room-group') }}">
 						edit
-					</div>
+					</button>
 				</div>
 			</div>
 			<div id="room-list" data-list-url="{{ URL::route('room-list') }}" data-edit-url="{{ URL::route('edit-room') }}">
-				<div class="room-del"></div>
+				<div class="room-del col-header"></div>
 				<div class="room-name col-header">
 					Name
 				</div>
@@ -61,14 +61,6 @@
 		</div>
 		<div id="center-slide-anchor"></div>
 		<div class="footer-space"></div>
-	@stop
-
-	@section('right-column')
-	<div class="top-buffer"></div>
-	<div id="loading-admin-panel">
-		<h2>LOADING&nbsp;{{ FA::spin('spinner') }}</h2>
-	</div>
-	<div id="ajax-admin-target"></div>
 	@stop
 	
 @stop

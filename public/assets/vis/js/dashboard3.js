@@ -794,7 +794,7 @@ var dashboard3 = (function () {
             schType = 3;
             url = vis_url + '/' + sched + '/' + schType + '/' + sched2;
         }
-        
+
         var nocache = new Date().getTime();
 
         $.ajax({
@@ -855,7 +855,7 @@ var dashboard3 = (function () {
         $('#sched-lbl').html('Schedule');
     }
 
-    function render(sched) {
+    function render(sched, diff) {
         var isAuth = (d3.select('#vis-wrapper').attr('data-auth-status') === '1');
         $('footer').hide();
         $('.top-buffer').hide();
@@ -899,7 +899,7 @@ var dashboard3 = (function () {
         });
 
         var nocache = new Date().getTime();
-        
+
         $.ajax({
             dataType: "json",
             url: vis_url + '/list?cache=' + nocache,
@@ -938,7 +938,14 @@ var dashboard3 = (function () {
                 $('#sched1-fg').hide();
 
                 $("#content").load("assets/vis/vis3Filt.html", function () {
-                    yearSelectionHandler((sched || data[0]['id']), '#d3', true);
+                    if (diff) {
+                        init('#d3'); // Do init 
+                        diffSelected = true;
+                        setupForDiff();
+                    } else {
+                        yearSelectionHandler((sched || data[0]['id']), '#d3', true);
+                    }
+                    
                     visMenu.show();
                     spin.stop();
                 });
@@ -987,6 +994,7 @@ var dashboard3 = (function () {
                 }
             }
         });
+
     }
 
     return {

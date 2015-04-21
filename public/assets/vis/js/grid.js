@@ -39,7 +39,9 @@ function renderDash(dash, sched) {
         $('#vis-menu').remove();
         dashboard2.render();
     } else if (dash === "3") {
-        dashboard3.render(sched);
+        dashboard3.render(sched, false);
+    } else if (dash === "4") {
+        dashboard3.render(sched, true);
     }
 }
 

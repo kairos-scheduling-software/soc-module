@@ -59,7 +59,7 @@ $sql = <<<SQL
 select
     count(*) as Total,
     s.`name`,
-    e.class_type as Type,
+    upper(e.class_type) as Type,
     p.name as Professor
 from schedules s
 join events e
@@ -72,7 +72,7 @@ group by
     e.class_type,
     p.name
 order by 
-    e.class_type,
+    upper(e.class_type),
     p.name;
 SQL;
             } else if($id1 == 2) {

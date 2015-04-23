@@ -6,8 +6,13 @@ class TicketController extends BaseController
 	{
 		// Fetch all of the current user's schedules
 		$schedules = Auth::user()->schedules;
-		$schedule = Schedule::find($schedule_id);
-
+		
+		if (Auth::user()->schedules->contains($schedule_id)) {
+			$schedule = Schedule::find($schedule_id);
+		} else {
+			$schedule = null;
+		}
+		
 		if(!$schedule)
 			return Redirect::route('dashboard');
 
@@ -25,8 +30,9 @@ class TicketController extends BaseController
 	{
 		$ticket_id  = Input::get('ticket_id');
 		$ticket = Ticket::find($ticket_id);
+		$user = Auth::user();
 
-		if(!$ticket)
+		if(!$ticket || !$user->schedules->contains($ticket->event->schedule->id))
 		{
 			return Response::json(['error' => 'Could not resolve the ticket at this time'], 500);
 		}
@@ -45,8 +51,8 @@ class TicketController extends BaseController
 	{
 		$event_id = Input::get('event_id');
 		$event = models\Event::find($event_id);
-
-		if(!$event)
+		
+		if(!$event || !Auth::user()->schedules->contains($event->schedule->id))
 		{
 			return Response::json(['error' => $event], 500);
 		}
@@ -67,11 +73,14 @@ class TicketController extends BaseController
 
 	public function load_schedule($schedule_id)
 	{
-		$schedule = Schedule::find($schedule_id);
-
-		if(!$schedule)
-		{
-			return Response::json(['error' => 'Could not find the schedule requested'], 500);
+		if (Auth::user()->schedules->contains($schedule_id)) {
+			$schedule = Schedule::find($schedule_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
 		}
 
 		$tickets = $schedule->tickets();

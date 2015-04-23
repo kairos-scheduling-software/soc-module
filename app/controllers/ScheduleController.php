@@ -15,8 +15,12 @@ class ScheduleController extends BaseController {
 
 	public function load_sched_admin($id) 
 	{
-		$sched = Schedule::find($id);
-
+		if (Auth::user()->schedules->contains($id)) {
+			$sched = Schedule::find($id);
+		} else {
+			$sched = null;
+		}
+		
 		if (!$sched)
 			return Response::json(['error' => 'Could not load schedule'], 500);
 		else
@@ -42,17 +46,23 @@ class ScheduleController extends BaseController {
 
 	public function edit_schedule($id)
 	{
-		$schedule = Schedule::find($id);
-		$time_blocks = Etime::where('standard_block', '=', 1)->where('starttm', '!=', '0730')->get();
+		if (Auth::user()->schedules->contains($id)) {
+			$schedule = Schedule::find($id);
+		} else {
+			$schedule = null;
+		}
 
 		if (!$schedule)
 			return Redirect::route('dashboard'); // TODO: redirect to 404
 		
+		$time_blocks = Etime::where('standard_block', '=', 1)->where('starttm', '!=', '0730')->get();
+		
 		$rooms = Room::select('name')->get();
-		$room_groups = DB::table('room_groups')
-				->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
-				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
-				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		$room_groups = RoomGroup::with('room')->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		//~ $room_groups = DB::table('room_groups')
+				//~ ->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
+				//~ ->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
+				//~ ->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
 		$professors = Professor::select('uid', 'name')->get();
 
 		return View::make('editor.sched-editor')->with([
@@ -67,7 +77,16 @@ class ScheduleController extends BaseController {
 
 	public function delete_schedule($id)
 	{
-		$schedule = Schedule::find($id);
+		
+		if (Auth::user()->schedules->contains($id)) {
+			$schedule = Schedule::find($id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		}
 
 		if($schedule->delete())
 			return Response::json(['success' => 'Schedule deleted!'], 200);
@@ -126,7 +145,11 @@ class ScheduleController extends BaseController {
 
 	public function add_class($sched_id)
 	{
-		$schedule = Schedule::find($sched_id);
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
 
 		if($schedule)
 		{
@@ -145,12 +168,23 @@ class ScheduleController extends BaseController {
 			}			
 		}
 		else
-			return Response::json(['error' => 'Could not add class at this time.'], 500);
+			return Response::json(['error' => 'Invalid schedule id'], 500);
 	}
 
 	public function edit_class($sched_id, $class_id)
 	{
-		$schedule = Schedule::find($sched_id);
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		} elseif (!$schedule->events->contains($class_id)) {
+			return Response::json(['error' => 'Invalid class id'], 500);
+		}
+		
 		$class = models\Event::find($class_id);
 		$class->name = Input::get('name');
 
@@ -167,6 +201,18 @@ class ScheduleController extends BaseController {
 
 	public function delete_class($sched_id, $class_id)
 	{
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		} elseif (!$schedule->events->contains($class_id)) {
+			return Response::json(['error' => 'Invalid class id'], 500);
+		}
+		
 		$class = models\Event::find($class_id);
 
 		if($class)
@@ -272,7 +318,17 @@ class ScheduleController extends BaseController {
 	public function e_add_class()
 	{
 		// TODO: add error checking!!
-		$schedule = Schedule::find(Input::get('sched_id'));
+		$sched_id = Input::get('sched_id');
+		
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		}
 		
 		// Add & save the room
 		//$room = Room::firstOrCreate(['name' => Input::get('room_name'), 'schedule_id' => $schedule->id]);
@@ -326,8 +382,20 @@ class ScheduleController extends BaseController {
 
 	public function e_remove_class()
 	{
+		$sched_id = Input::get('schedule');
 		$id = Input::get('id');
-		$schedule = Schedule::find(Input::get('schedule'));
+		
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		} elseif (!$schedule->events->contains($id)) {
+			return Response::json(['error' => 'Invalid class id'], 500);
+		}
 
 		$class = models\Event::find($id);
 		$class->delete();
@@ -347,8 +415,16 @@ class ScheduleController extends BaseController {
 	{
 		$id = Input::get('id');
 		$class = models\Event::find($id);
-
+		
+		if (!$class) {
+			return Response::json(['error' => 'Invalid class id'], 500);
+		}
+		
 		$schedule = $class->schedule();
+		
+		if (!Auth::user()->schedules->contains($schedule->id)) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		}
 
 		$class->name = Input::get('name');
 		$class->professor = Input::get('professor');
@@ -411,13 +487,16 @@ class ScheduleController extends BaseController {
 
 	public function update_description($sched_id)
 	{
-		$schedule = Schedule::find($sched_id);
-
-		if(!$schedule)
-		{
-			return Response::json(['error' => 'could not find the schedule to update'], 500);
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
 		}
-
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		}
+		
 		$schedule->description = Input::get('data');
 		if($schedule->save())
 		{
@@ -429,13 +508,17 @@ class ScheduleController extends BaseController {
 
 	public function update_final_sched($sched_id)
 	{
-		$schedule = Schedule::find($sched_id);
 		$user = Auth::user();
 		$checked = Input::get('data');
-
-		if(!$schedule)
-		{
-			return Resonse::json(['error' => 'could not find the schedule to update'], 500);
+		
+		if ($user->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
 		}
 
 		if($checked == 1)
@@ -469,12 +552,14 @@ class ScheduleController extends BaseController {
 
 	public function branch_schedule($idToCopy)
 	{
-
-		$scheduleToCopy = Schedule::find($idToCopy);
-
-		if(!$scheduleToCopy)
-		{
-			return Resonse::json(['error' => 'could not find the schedule to copy'], 500);
+		if (Auth::user()->schedules->contains($idToCopy)) {
+			$scheduleToCopy = Schedule::find($idToCopy);
+		} else {
+			$scheduleToCopy = null;
+		}
+		
+		if (!$scheduleToCopy) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
 		}
 
 		$name = Input::get('sched_name');

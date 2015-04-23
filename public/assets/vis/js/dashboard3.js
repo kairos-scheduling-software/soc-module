@@ -757,9 +757,10 @@ var dashboard3 = (function () {
         });
 
         //set up the ticket submit button
-        $('#ticket-form').submit(function (e) {
+        $('#ticket-form').on('submit', function (e) {
             e.preventDefault();
-            //var form = $(this);
+            $(this).find(':submit').attr('disabled','disabled');
+            
             var postData = {event_id: $('#event_id').val(), message: $('#message').val()};
             var url = 'tickets/add-ticket'; //form.attr("action");
 
@@ -770,10 +771,11 @@ var dashboard3 = (function () {
                 success: function (data, textStatus, jqXHR)
                 {
                     $('#po-d3').hide();
+                    $('#submit-ticket').attr('disabled', false);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    var message = $.parseJSON(jqXHR.responseText);
-                    alert(message.error);
+                    alert('could not create ticket');
+                    $('#submit-ticket').attr('disabled', false);
                     // TODO:  bootstrap error message
                 }
             });

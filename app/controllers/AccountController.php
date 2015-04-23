@@ -134,9 +134,9 @@ class AccountController extends BaseController {
 		]);
 	}
 
-	public function change_pic($id)
+	public function change_pic()
 	{
-		$user = User::find($id);
+		$user = Auth::user();
 		$img = Input::file('pic');
 		$old_file = $user->avatar;
 
@@ -159,9 +159,9 @@ class AccountController extends BaseController {
 			return Response::json(['error' => 'Could not upload picture'], 500);
 	}
 
-	public function toggle_emails($id)
+	public function toggle_emails()
 	{
-		$user = User::find($id);
+		$user = Auth::user();
 		$user->send_email = !($user->send_email);
 
 		if($user->save())
@@ -170,9 +170,9 @@ class AccountController extends BaseController {
 			return Response::json(['error' => 'Could not update email settings'], 500);
 	}
 
-	public function change_email($id)
+	public function change_email()
 	{
-		$user = User::find($id);
+		$user = Auth::user();
 		$user->email = Input::get('email');
 
 		if($user->save())
@@ -181,9 +181,9 @@ class AccountController extends BaseController {
 			return Response::json(['error' => 'Could not update email settings'], 500);
 	}
 
-	public function change_pw($id)
+	public function change_pw()
 	{
-		$user = User::find($id);
+		$user = Auth::user();
 		$old_pw = Input::get('old_pw');
 		$new_pw = Input::get('new_pw');
 

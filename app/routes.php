@@ -164,22 +164,22 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  =>  'AccountController@manage'
     ));
 
-    Route::post('/account/{id}/toggle-emails', array(
+    Route::post('/account/toggle-emails', array(
         'as'    =>  'toggle-emails',
         'uses'  =>  'AccountController@toggle_emails'
     ));
 
-    Route::post('/account/{id}/change-email', array(
+    Route::post('/account/change-email', array(
         'as'    =>  'change-email',
         'uses'  =>  'AccountController@change_email'
     ));
 
-    Route::post('/account/{id}/change-password', array(
+    Route::post('/account/change-password', array(
         'as'    =>  'change-pw',
         'uses'  =>  'AccountController@change_pw'
     ));
 
-    Route::post('/account/{id}/change-pic', array(
+    Route::post('/account/change-pic', array(
         'as'    =>  'change-pic',
         'uses'  =>  'AccountController@change_pic'
     ));

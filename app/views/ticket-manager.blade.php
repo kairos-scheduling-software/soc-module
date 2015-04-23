@@ -7,17 +7,20 @@
 	<h1>Ticket Manager</h1>
 
 	Schedule:
-	<select id='schedules' name='schedules' onchange="requestSchedule();">
-		<option value=-1> </option>
-		@foreach($schedules as $schedule)
-			<option data-url="{{URL::route('ticket-pull-schedule', $schedule->id)}}" value={{ $schedule->id }} 
-				@if($schedule->id == $selected) 
+	@if(!$schedules->count())
+			h2>No schedules have been created</h2>
+	@else
+		<select id='schedules' name='schedules' onchange="requestSchedule();">
+			@foreach($schedules as $schedule)
+				<option data-url="{{URL::route('ticket-pull-schedule', $schedule->id)}}" value={{ $schedule->id }} 
+					@if($schedule->id == $selected) 
 					selected 
 				@endif> 
 				{{ htmlspecialchars($schedule->name) }} 
 			</option>
 		@endforeach
 	</select>
+	@endif
 </div>
 </br></br>
 

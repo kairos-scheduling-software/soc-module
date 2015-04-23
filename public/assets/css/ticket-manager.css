@@ -91,6 +91,7 @@
 	margin: 0 auto;
 	display: inline-block;
 	font-size: 14pt;
+	word-break: break-all;
 }
 
 .ticket-resolve-row

@@ -4,7 +4,7 @@ var hiddenRows = 0;
 function createTable(tickets)
 {
 	event_counts = {}
-	hiddenRows = 0
+	hiddenRows = 0;
 
 	var dynamic = '';
 	var prevName = '';
@@ -41,11 +41,6 @@ function createTable(tickets)
 		}
 
 		var message = tickets[i]['message'];
-		if(message.length >= 50)
-		{
-			message = message.substring(0, 49) + "...";
-
-		}
 
 		hiddenBuilder = hiddenBuilder + '<div class="container-row-hidden"><div class="ticket-message-row">' + message + '</div>' 
 						+ '<div class="ticket-resolve-row resolve-button-element">' 
@@ -104,9 +99,10 @@ function resolve(element, rows ,ticket_id)
 			if(event_counts[rows] == 0)
 			{
 				hiddenRows--;
+				$("#hidden_" + rows).remove();
 				$('#row_' + rows).remove();
 
-				if(hiddenRows == -1)
+				if(hiddenRows == 0)
 				{
 					$('#ticketsTable').html("<h2>There are no outstanding tickets for this schedule.</h2>");
 				}
@@ -115,7 +111,7 @@ function resolve(element, rows ,ticket_id)
 		},
 		error: 		function(jqXHR, textStatus, errorThrown) 
 		{
-			alert(errorThrown);
+			alert("could not resolve ticket at this time");
 		}
 	});
 }
@@ -135,15 +131,15 @@ function resolveAll(element, rows , event_id)
 			$("#hidden_" + rows).remove();
 			hiddenRows--;
 
-			if(hiddenRows == -1)
+			if(hiddenRows == 0)
 			{
-				$('#ticketsTable').append("<h2>There are no outstanding tickets for this schedule.</h2>");
+				$('#ticketsTable').html("<h2>There are no outstanding tickets for this schedule.</h2>");
 			}
 			
 		},
 		error: 		function(jqXHR, textStatus, errorThrown) 
 		{
-			alert(errorThrown);
+			alert("could not resolve tickets at this time");
 		}
 	});
 }

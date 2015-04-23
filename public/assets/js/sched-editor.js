@@ -175,7 +175,7 @@ $(function(){
 		    		params["day_string"] = $(this).attr('data-days');
 		    		params["v_offset"] = parseInt($(this).attr('data-start'));
 		    		params["time"] = parse_time($(this).data('time'));
-		    		params["b_length"] = parseInt($(this).attr('data-length'));
+		    		params["b_length"] = parseInt($(this).attr('data-length')) / 5;
 		    		params["days"] = [];
 
 		    		if (params["day_string"].indexOf("mon") >=0)
@@ -394,16 +394,20 @@ function parse_days(json_days)
 	json_days = '' + json_days;
 	var days = [];
 	
-	if (json_days.indexOf("1") >= 0)
-		days.push("#mon-col");
-	if (json_days.indexOf("2") >= 0)
-		days.push("#tue-col");
-	if (json_days.indexOf("3") >= 0)
-		days.push("#wed-col");
-	if (json_days.indexOf("4") >= 0)
-		days.push("#thu-col");
-	if (json_days.indexOf("5") >= 0)
-		days.push("#fri-col");
+	if (json_days.search('col') >= 0) {
+		days = json_days.split(',');
+	} else {
+		if (json_days.indexOf("1") >= 0)
+			days.push("#mon-col");
+		if (json_days.indexOf("2") >= 0)
+			days.push("#tue-col");
+		if (json_days.indexOf("3") >= 0)
+			days.push("#wed-col");
+		if (json_days.indexOf("4") >= 0)
+			days.push("#thu-col");
+		if (json_days.indexOf("5") >= 0)
+			days.push("#fri-col");
+	}
 
 	return days;
 }
@@ -542,7 +546,7 @@ function setup_dropzones(key, block_class)
 
 			html_block += " style='left: " + left + "px; top: " + top + "px;' ";
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
-			html_block += "' data-length='" + (block["length"] / 5) + "'";
+			html_block += "' data-length='" + block["length"] + "'";
 			html_block += " data-days='" + block["days"] + "'";
 			html_block += " data-time='" + block["etime"]["starttm"] + "'";
 			html_block += " data-ddd='" + ddd + "'";
@@ -580,7 +584,9 @@ function refresh_scheduled_class_draggables()
 
     		var dragged_block = $(this);
     		var length = dragged_block.data('length');
+		console.log(dragged_block.data('days'));
     		var days = parse_days(dragged_block.data('days'));
+		console.log(days);
     		var drop_height = (length / 5) * five_min_height;
     		var class_html = dragged_block.html();
 
@@ -728,7 +734,7 @@ function scheduled_class_drop_zones(length, days, height)
 
 			html_block += " style='left: " + left + "px; top: " + top + "px; position: absolute' ";
 			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
-			html_block += "' data-length='" + (block["length"] / 5) + "'";
+			html_block += "' data-length='" + block["length"] + "'";
 			html_block += " data-days='" + block["days"] + "'";
 			html_block += " data-time='" + block["etime"]["starttm"] + "'";
 			html_block += " data-ddd='" + ddd + "'";

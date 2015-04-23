@@ -58,11 +58,11 @@ class ScheduleController extends BaseController {
 		$time_blocks = Etime::where('standard_block', '=', 1)->where('starttm', '!=', '0730')->get();
 		
 		$rooms = Room::select('name')->get();
-		$room_groups = RoomGroup::with('room')->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
-		//~ $room_groups = DB::table('room_groups')
-				//~ ->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
-				//~ ->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
-				//~ ->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		//$room_groups = RoomGroup::with('room')->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		$room_groups = DB::table('room_groups')
+				->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
+				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
+				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
 		$professors = Professor::select('uid', 'name')->get();
 
 		return View::make('editor.sched-editor')->with([

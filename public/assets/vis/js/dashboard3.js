@@ -757,7 +757,7 @@ var dashboard3 = (function () {
         });
 
         //set up the ticket submit button
-        $('#submit-ticket').click(function (e) {
+        $('#ticket-form').submit(function (e) {
             e.preventDefault();
             //var form = $(this);
             var postData = {event_id: $('#event_id').val(), message: $('#message').val()};
@@ -778,7 +778,7 @@ var dashboard3 = (function () {
                 }
             });
 
-            return false;
+            //return false;
         });
     }
 

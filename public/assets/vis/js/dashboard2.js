@@ -1,3 +1,12 @@
+/**
+ * Dashboard #2 - Heat Maps
+ * 
+ * Nathan Crandall
+ * Spring 2015
+ * CS 4500
+ * 
+ * @type Function|dashboard2_L14.dashboard2Anonym$9
+ */
 var dashboard2 = (function () {
 
     "use strict";
@@ -245,6 +254,13 @@ var dashboard2 = (function () {
         });
     }
 
+    /**
+     * Generic callback from selectors
+     * 
+     * @param {type} selector
+     * @param {type} d3Select
+     * @returns {undefined}
+     */
     function multiselectCallback(selector, d3Select) {
         $(selector).multiselect('setOptions', {
             onChange: function (event) {
@@ -255,6 +271,11 @@ var dashboard2 = (function () {
 
     }
 
+    /**
+     * Render the object
+     * 
+     * @returns {undefined}
+     */
     function render() {
         body = $('body');
         spin = new Spinner({top: "342px"});

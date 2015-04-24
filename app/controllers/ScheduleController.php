@@ -377,12 +377,15 @@ class ScheduleController extends BaseController {
 		
 		$schedule->events()->save($class);
 
-		return $this->api_check_sched($schedule);
+		$result = $this->api_check_sched($schedule);
+		$result->newId = $class->id;
+		
+		return $result;
 	}
 
 	public function e_remove_class()
 	{
-		$sched_id = Input::get('schedule');
+		$sched_id = Input::get('sched_id');
 		$id = Input::get('id');
 		
 		if (Auth::user()->schedules->contains($sched_id)) {
@@ -442,6 +445,7 @@ class ScheduleController extends BaseController {
 	private function api_check_sched($schedule)
 	{
 		// Call check on comm library
+		$result = new StdClass;
 		try {
 			try {
 				$result = Communication::sendCheck($schedule->id);
@@ -449,7 +453,7 @@ class ScheduleController extends BaseController {
 					return json_encode($result);
 				}
 			} catch (Exception $e) {
-				return Response::json(['error' => 'Could not contact solver server'], 500);
+				return Response::json(['error' => 'Could not contact solver server']);
 			}
 			
 			$classes_dict = [];
@@ -650,4 +654,40 @@ class ScheduleController extends BaseController {
 
 	}
 
+	public function e_edit_schedule() {
+		$sched_id = Input::get('sched_id');
+		if (Auth::user()->schedules->contains($sched_id)) {
+			$schedule = Schedule::find($sched_id);
+		} else {
+			$schedule = null;
+		}
+		
+		if (!$schedule) {
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		}
+		
+		$mode = Input::get('mode');
+		switch ($mode) {
+			case 'add-class':
+				return e_add_class();
+				break;
+			case 'edit-class':
+				$cls_id = Input::get('class_id');
+				if (!$schedule->events->contains($cls_id)) {
+					return Response::json(['error' => 'Invalid class id'], 500);
+				}
+				
+				$time_id = Input::get('time_id');
+				$class = models\Event::find($cls_id);
+				$class->etime_id = $time_id;
+				$class->save();
+				break;
+			case 'remove-class':
+				return e_remove_class();
+				break;
+			case 'edit-name':
+				
+				break;
+		}
+	}
 }

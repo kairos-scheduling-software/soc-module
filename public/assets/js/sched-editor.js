@@ -137,7 +137,7 @@ $(function(){
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
-        	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+		return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
     	},
     	start: function(event, ui)
     	{
@@ -574,7 +574,7 @@ function refresh_scheduled_class_draggables()
 		cursorAt: { bottom: 0, left: 20 },
       	helper: function( event ) 
       	{
-        	return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+		return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
     	},
     	start: function(event, ui)
     	{
@@ -584,25 +584,26 @@ function refresh_scheduled_class_draggables()
 
     		var dragged_block = $(this);
     		var length = dragged_block.data('length');
-		console.log(dragged_block.data('days'));
     		var days = parse_days(dragged_block.data('days'));
-		console.log(days);
     		var drop_height = (length / 5) * five_min_height;
     		var class_html = dragged_block.html();
 
     		scheduled_class_drop_zones(length, days, drop_height);
     		
     		$(".sc_drop_zone").droppable({
-				hoverClass: "time-block-hover",
+			hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
 		    	drop: function(event, ui)
 		    	{
 		    		$('.sc_drop_zone').droppable("destroy");
 
-		    		// Remove the old blocks
-		    		$("div[data-group=" + group_id + "]").remove();
+		    		// Hide the old blocks
+		    		//$("div[data-group=" + group_id + "]").remove();
+		    		var old_block = $("div[data-group=" + group_id + "]");
+		    		old_block.hide();
 
 		    		var blk = $(this);
+		    		blk.data('class', old_block.data('class'));
 		    		var group = blk.data('group');
 
 		    		$('.sc_drop_zone').each(function() {
@@ -622,11 +623,33 @@ function refresh_scheduled_class_draggables()
 						var p = div.height();
 						p = (p - course.outerHeight(true)) / 4;
 
-						if(p >= 7)
-						div.css("padding-top", p + 'px');
+						if(p >= 7) div.css("padding-top", p + 'px');
 					});
 
 		    		$('.sc_drop_zone').remove();
+				
+					var group = blk.data('group');
+					var time_id = group.substring(0, group.indexOf('-'));
+					var edit_class_data = Object.create(null);
+					edit_class_data['sched_id'] = sched_id;
+					edit_class_data['mode'] = 'edit-class';
+					edit_class_data['class_id'] = blk.data('class');
+					edit_class_data['time_id'] = time_id;
+					$.ajax({
+						url: $('#sched-name').data('url'),
+						type: 'post',
+						data: edit_class_data,
+						success: function(data, textStatus, jqXHR) {
+							$('#checking-sched').hide();
+							//var json_data = JSON.parse(data);
+							old_block.remove();
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							console.log(JSON.stringify(jqXHR));
+							blk.remove();
+							old_block.show();
+						}
+					});
 		    	},
 		    	over: function(event, ui)
 		    	{

@@ -58,12 +58,13 @@
         <script src="{{ URL::asset('assets/js/account-settings.js') }}"></script>
     @endif
     @if($page_name == 'Schedule Editor')
-        <!-- Editor stylesheet -->
+        <!-- Editor stylesheets -->
         <link href="{{ URL::asset('assets/css/sched-editor.css') }}" rel="stylesheet">
+        <link href="{{ URL::asset('assets/css/bootstrap-timepicker.min.css') }}" rel="stylesheet">
 
-        <!-- Editor script -->
+        <!-- Editor scripts -->
         <script src="{{ URL::asset('assets/js/jquery-ui.min.js') }}"></script>
-        
+        <script src="{{ URL::asset('assets/js/bootstrap-timepicker.min.js') }}"></script>
         <script src="{{ URL::asset('assets/js/sched-editor.js') }}"></script>
         <script>
         $(function() {

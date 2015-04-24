@@ -159,6 +159,15 @@ a:hover, a:focus {
 	margin-left: 20px;
 }
 
+#custom-times td {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#start-time-clock, #end-time-clock, #cust-start-time, #cust-end-time {
+	cursor: pointer;
+}
+
 .day-checkbox {
 	display: inline-block;
 	padding-left: 10px;
@@ -166,8 +175,6 @@ a:hover, a:focus {
 }
 
 #custom-block-form-container .form-control {
-	width: 30%;
-	display: inline-block;
 	text-align: center;
 }
 

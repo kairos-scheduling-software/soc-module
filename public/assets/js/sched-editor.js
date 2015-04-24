@@ -95,13 +95,6 @@ $(function(){
 	});
 
 	resize_all();
-	/*
-	$(window).resize(function(){
-		setTimeout(function() {
-			resize_all();
-		}, 500);		
-	});
-*/
 	load_schedule();
 
 	$('.panel-collapse').on('show.bs.collapse', function() {
@@ -239,25 +232,31 @@ $(function(){
     	hoverClass: "trash-hover"
     });
 
-	$('#add-time-btn').click(function(e){
-		var input = $('#custom-duration-input');
-		var value = parseInt(input.val());
+    $('#cust-start-time').timepicker({
+    	minuteStep: 5,
+    	showInputs: false,
+    	disableFocus: true
+    }).on('show.timepicker', function(e) {
+    	$('i.icon-chevron-up').addClass('fa fa-chevron-up');
+    	$('i.icon-chevron-down').addClass('fa fa-chevron-down');
+    });
 
-		if (value < 480)
-			input.val(value + 5);
-		else
-			return;
-	});
+    $('#cust-end-time').timepicker({
+    	minuteStep: 5,
+    	showInputs: false,
+    	disableFocus: true
+    }).on('show.timepicker', function(e) {
+    	$('i.icon-chevron-up').addClass('fa fa-chevron-up');
+    	$('i.icon-chevron-down').addClass('fa fa-chevron-down');
+    });
 
-	$('#remove-time-btn').click(function(e) {
-		var input = $('#custom-duration-input');
-		var value = parseInt(input.val());
+    $('#start-time-clock').click(function(e) {
+    	$('#cust-start-time').timepicker('showWidget');
+    });
 
-		if (value > 50)
-			input.val(value - 5);
-		else
-			return;
-	});
+    $('#end-time-clock').click(function(e) {
+    	$('#cust-end-time').timepicker('showWidget');
+    });
 
 	// Listen for 'ctrl + f' and override the browser's default search
 	$(window).keydown(function(e) {

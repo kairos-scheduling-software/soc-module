@@ -10,6 +10,10 @@
 		<div class="top-buffer"></div>
 		@yield('main-column')	
 	</div>
+	<div id="right-side-bar">
+		<div class="top-buffer"></div>
+		@yield('right-column')
+	</div>
 </div>
 
 @include('blocks/footer')

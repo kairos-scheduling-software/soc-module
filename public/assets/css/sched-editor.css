@@ -12,6 +12,23 @@
 	box-shadow: inset -2px 0 2px #363636;
 }
 
+#right-side-bar {
+	display: none;
+	float: right;
+	padding-left: 15px;
+	padding-right: 15px;
+	background-color: #808080;
+	box-shadow: -6px 0 15px #363636;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	right: 0;
+}
+
+#edit-class-panel {
+	width: 320px;
+}
+
 #toggle-container {
 	background-color: #808080;
 	color: white;
@@ -44,7 +61,7 @@
 	display: inline-block;
 	float: left;
 	overflow-x: hidden;
-	margin-left: 50px;
+	padding-left: 50px;
 	text-align: center;
 	width: 100%;
 }
@@ -314,6 +331,10 @@ ul.ui-autocomplete > li {
   	transform: translateY(-50%);
 }
 */
+
+.class-name-container a {
+	color: white;
+}
 
 .time-block-active {
 	position: absolute;

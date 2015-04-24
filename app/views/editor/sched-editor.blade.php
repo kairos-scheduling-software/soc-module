@@ -362,3 +362,46 @@
 </div>
 
 @stop
+
+@section('right-column')
+
+<div id="edit-class-panel">
+</div>
+
+<script>
+	var right_panel_open = false;
+	$('.toggle-right-column').click(function(e) {
+		e.preventDefault();
+		if (panel_is_open)
+		{
+			$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+			$('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>');
+			panel_is_open = false;
+		}
+		
+		if (right_panel_open)
+			return false;
+
+		setTimeout(function() {
+			$('#right-side-bar').zIndex(10);
+			$('#page_footer').zIndex(11);
+		}, 20);
+		
+		return false;
+	});
+	$('.toggle-right-column').panelslider({
+		side: 'right',
+		onOpen: function() {
+			right_panel_open = true;
+			var z = Math.min($('#custom_navbar').zIndex(), $('page_footer').zIndex());
+			$('#right-side-bar').zIndex(10);
+			//$('#left-side-bar').css('position', 'absolute');
+			//$('#main-column').zIndex(z-2);
+			$('#page_footer').zIndex(11);
+		},
+		clickClose: false
+	});
+
+</script>
+
+@stop

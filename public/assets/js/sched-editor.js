@@ -162,6 +162,10 @@ $(function(){
 		    	hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
 		    	drop: function(event, ui) {
+					if ($('#new-class-form').length > 0) {
+						update_drop_zone();
+						return;
+					}
 		    		//group_counter++;
 		    		var time_id = $(this).data('time');
 		    		
@@ -187,8 +191,6 @@ $(function(){
 		    			params["days"].push('fri');
 
 		    		var content = get_popover_content(time_id, params);
-		    		$(this).attr('data-content', content);
-		    		//$("div[data-group=" + group_id + "]").attr('data-content', content);
 
 		    		// Show popover
 		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
@@ -196,7 +198,8 @@ $(function(){
 
 		    		$(this).popover({
 		    			trigger: "manual",
-		    			html: true
+		    			html: true,
+		    			content: content
 		    		}).on('shown.bs.popover', function() {
 		    			if(parseInt($('.popover').css('top')) < 0)
 	    				{
@@ -395,7 +398,6 @@ function resize_all()
 	$('.class-name-container').each(function() {
 		var course = $(this);
 		var div = course.closest('div.scheduled-class');
-		//console.log("div: " + div.attr('data-group'));
 		var p = div.height();
 		p = (p - course.outerHeight(true)) / 4;
 
@@ -578,7 +580,6 @@ function update_scheduled_class_draggables(sched_classes)
 		    		$('.class-name-container').each(function() {
 						var course = $(this);
 						var div = course.closest('div.scheduled-class');
-						//console.log("div: " + div.attr('data-group'));
 						var p = div.height();
 						p = (p - course.outerHeight(true)) / 4;
 
@@ -1184,9 +1185,11 @@ function get_class(class_id) {
 function update_drop_zone(time_id) {
 	$('.drop-zone').droppable("destroy");
 	
-	var blocks = $(".drop-zone[data-time=" + time_id + "]");
-	blocks.removeClass('time-block-hover time-block-active drop-zone ui-droppable');
-	blocks.addClass('scheduled-class new-block');
+	if (time_id != undefined) {
+		var blocks = $(".drop-zone[data-time=" + time_id + "]");
+		blocks.removeClass('time-block-hover time-block-active drop-zone ui-droppable');
+		blocks.addClass('scheduled-class new-block');
+	}
 	
 	$('.drop-zone').remove();
 	

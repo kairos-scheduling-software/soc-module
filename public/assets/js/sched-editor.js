@@ -316,13 +316,15 @@ $(function(){
 
 			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
 			right_panel_open = true;
+
+			// TODO: Get content from data attributes of clicked class
 		}
 	});
 
 	$('#close-right-panel').click(function(e) {
 		e.preventDefault();
 
-		$('#right-side-bar').hide('slide', {direction: 'right'});
+		$('#right-side-bar').hide('slide', {direction: 'right', duration: 200});
 		right_panel_open = false;
 	});
 });

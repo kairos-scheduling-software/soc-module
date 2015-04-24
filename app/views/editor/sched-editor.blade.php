@@ -415,7 +415,7 @@
 					<tr><th>Key:</th><th colspan="2">Value:</th></tr>
 					<tr>
 						<td>
-							<select class="form-control"><option>No Overlap With</option></select>
+							<select class="form-control"><option>Avoid Overlap With</option></select>
 						</td>
 						<td>
 							<select class="form-control"><option>CS 4540-001</option></select>

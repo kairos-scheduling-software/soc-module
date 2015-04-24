@@ -319,6 +319,12 @@ $(function(){
 
 			// TODO: Get content from data attributes of clicked class
 		}
+		else
+		{
+
+		}
+		var class_name = $(this).text();
+		$('#edit-panel-class-name').val(class_name);
 	});
 
 	$('#close-right-panel').click(function(e) {

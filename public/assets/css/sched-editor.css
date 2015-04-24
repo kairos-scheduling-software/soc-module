@@ -26,7 +26,41 @@
 }
 
 #edit-class-panel {
-	width: 320px;
+	width: 360px;
+}
+
+#edit-class-panel table {
+	width: 100%;
+}
+
+#edit-class-panel td > i {
+	font-size: 14pt;
+	color: #CCCCCC;
+	cursor: pointer;
+}
+
+#edit-class-panel td > i:hover {
+	color: white;
+}
+
+#edit-class-panel td {
+	padding: 5px;
+}
+
+#edit-class-panel button {
+	margin: 5px;
+}
+
+#add-const-btn {
+}
+
+#close-right-panel {
+	text-shadow: 1px 1px 1px #363636, -1px 1px 1px #363636;
+  	color: white;
+}
+
+#close-right-panel:hover {
+	color: #CFCFCF;
 }
 
 #toggle-container {

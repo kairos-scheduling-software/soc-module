@@ -10,6 +10,7 @@ var sched_id;
 var col_counts = [];
 var course_list = [];
 var temp_indices = [];
+var right_panel_open = false;
 
 var rooms;
 var room_groups;
@@ -285,6 +286,32 @@ $(function(){
 	$('.scheduled-class').click(function() {
 		console.log("Column: " + $(this).data('ddd') + $(this).data('col_index'));
 		console.log("Indices: " + $(this).data('indices'));
+	});
+
+	$('.toggle-right-column').click(function(e) {
+		e.preventDefault();
+
+		if(!right_panel_open)
+		{
+			if(panel_is_open)
+			{
+				$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+				$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
+				panel_is_open = false;
+			}
+
+			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
+			right_panel_open = true;
+
+			// TODO: Get content from data attributes of clicked class
+		}
+	});
+
+	$('#close-right-panel').click(function(e) {
+		e.preventDefault();
+
+		$('#right-side-bar').hide('slide', {direction: 'right', duration: 200});
+		right_panel_open = false;
 	});
 });
 

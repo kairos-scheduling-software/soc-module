@@ -303,6 +303,12 @@ $(function(){
 
 			// TODO: Get content from data attributes of clicked class
 		}
+		else
+		{
+
+		}
+		var class_name = $(this).text();
+		$('#edit-panel-class-name').val(class_name);
 	});
 
 	$('#close-right-panel').click(function(e) {
@@ -585,12 +591,19 @@ function update_scheduled_class_draggables(sched_classes)
 					edit_class_data['mode'] = 'edit-class';
 					edit_class_data['class_id'] = class_id;
 					edit_class_data['time_id'] = new_time_id;
+
 					$.ajax({
 						url: $('#sched-name').data('url'),
 						type: 'post',
 						data: edit_class_data,
+						beforeSend: function() {
+							$('#checking-sched').show();
+							$('#sched-bad').hide();
+							$('#sched-ok').hide();
+						},
 						success: function(data, textStatus, jqXHR) {
 							$('#checking-sched').hide();
+							$('#sched-ok').show();
 							//var json_data = JSON.parse(data);
 							update_column_matrix(old_blocks, "empty");
 							update_column_matrix(new_blocks, "busy");
@@ -601,6 +614,8 @@ function update_scheduled_class_draggables(sched_classes)
 							update_scheduled_class_draggables(new_blocks);
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
+							$('#checking-sched').hide();
+							$('#sched-bad').show();
 							console.log(JSON.stringify(jqXHR));
 							new_blocks.remove();
 							old_blocks.show();

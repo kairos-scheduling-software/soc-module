@@ -96,11 +96,9 @@
 					<table class="toolbox-blocks">
 						<tr>
 							<td>50 min:</td>
-							<td>80 min:</td>
 						</tr>
 						<tr>
 							<td><div class="fifty-min-blk draggable three-fifty"></div></td>
-							<td><div class="eighty-min-blk draggable three-eighty"></div></td>
 						</tr>
 					</table>
 				</div>
@@ -157,7 +155,30 @@
 							<div class="day-checkbox"><input type="checkbox"> Th</input></div>
 							<div class="day-checkbox"><input type="checkbox"> F</input></div>
 						</div>
-						<h4>DURATION:</h4>
+						<table id="custom-times">
+							<tr>
+								<td>
+									<h4>Start Time:</h4>
+								</td>
+								<td>
+									<h4>End Time:</h4>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="bootstrap-timepicker input-group">
+										<input id="cust-start-time" type="text" class="form-control">
+										<span id="start-time-clock" class="input-group-addon">{{ FA::icon('clock-o') }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="bootstrap-timepicker input-group">
+										<input id="cust-end-time" type="text" class="form-control">
+										<span id="end-time-clock" class="input-group-addon">{{ FA::icon('clock-o') }}</span>
+									</div>
+								</td>
+							</tr>
+						</table>{{--
 						<div id="custom-duration" class="input-group spinner">
 							<input id="custom-duration-input" type="text" class="form-control" value="50" disabled>
 							<div class="input-group-btn-vertical">
@@ -169,7 +190,7 @@
 								</button>
 							</div>
 							<div id="minutes-label">minutes</div>
-						</div>
+						</div>--}}
 					</div>
 				</div>
 			</div>

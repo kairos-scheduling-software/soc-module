@@ -34,7 +34,7 @@ var dashboard1 = (function () {
         });
         lines.addEventHandler("mouseover", null);
 
-        chart1.addLegend(0, 0, 480, 20, "right");
+        chart1.addLegend(0, 5, 480, 20, "right");
 
         // Draw the chart
         chart1.draw();
@@ -83,7 +83,7 @@ var dashboard1 = (function () {
         chart2.addMeasureAxis("y", "Total");
         var s = chart2.addSeries("Type", dimple.plot.bar);
         s.addOrderRule("Type", true); 
-        chart2.addLegend(0, 0, 650, 0, "right", s);
+        chart2.addLegend(0, 5, 650, 0, "right", s);
         /*
                 svg.append("rect")
             .attr("x", 0 - 0)

@@ -1,48 +1,84 @@
+/**
+ * Dashboard #3 - Schedule explorer
+ * 
+ * Nathan Crandall
+ * Spring 2015
+ * CS 4500
+ *
+ * @type dashboard3_L5.dashboard3Anonym$17|Function
+ */
 var dashboard3 = (function () {
-
     "use strict";
 
+    // Base URL for AJAX request
     var vis_url = 'vis';
+
+    // DOM body element
     var body;
+
+    // Ajax spinner
     var spin;
 
+    // Margins for drawing operations
     var gridMargin = {top: 20, right: 5, bottom: 5, left: 70};
+
+    // Initial hight/width of SVG object. These will be altered during init and on browser resize events
     var svgWidth = 1000;
     var svgHeight = 1000;
 
+    // Varaibles for highlighting classes on the grid
     var gridClassSelected = "";
     var gridClassHighlightColor = "#33FF33";
 
+    // Color collections and indexes
     var gridColors = {};
     var gridColorCounter = 0;
     var gridColorsIndex = {};
 
+    // SVG drawing objects
     var svg;
     var container;
+
+    // Tooltip object
     var tip;
 
+    // Diff indicator
     var diffSelected = false;
     var isDiff = false;
 
     // Colors
     var scale = chroma.scale(['#99AAFF', '#BBDDCC', '#8888AA', '#887711', '#557755', '#118833', '#7F3F6A', '#992266', '#3D3F4C', '#0027E5']).mode('lab');
 
+    // Days of week
+    var weekdays = [['Sunday', 'Su'], ['Monday', 'M'], ['Tuesday', 'T'], ['Wednesday', 'W'], ['Thursday', 'Th'], ['Friday', 'F'], ['Saturday', 'Sa']];
+
     // Start with popover hidden
     $('#po-d3').hide();
 
+    // D3 Zoom object
     var d3Zoom = d3.behavior.zoom()
         .scaleExtent([0.25, 7])
         .on("zoom", d3Zoomed);
 
-    var weekdays = [['Sunday', 'Su'], ['Monday', 'M'], ['Tuesday', 'T'], ['Wednesday', 'W'], ['Thursday', 'Th'], ['Friday', 'F'], ['Saturday', 'Sa']];
-
+    /**
+     * D3 Zoom even callback. 
+     * Performs transfomations on the container object based on current zoom and drag.
+     *  
+     * @returns {undefined}
+     */
     function d3Zoomed() {
         // Remove the tip when zooming or dragging
         d3.select('.d3-tip').style('opacity', 0).style('pointer-events', 'none');
         container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 
-    /* Functions to create the individual charts involved in the dashboard */
+    /**
+     * Init all varaibales needed to draw SVG object. This is run by the createChart function by passing TRUE as the 
+     * third parameter
+     * 
+     * @param {string} selector
+     * @returns {undefined}
+     */
     function init(selector) {
         var navbar_height = $('#custom_navbar').height() || 0;
         svgWidth = viewportSize.getWidth() - 200 - 1;
@@ -80,6 +116,7 @@ var dashboard3 = (function () {
 
         container = svg.append("g");
 
+        // Remove any current tooltips from the DOM, create new tooltip html object
         $(".d3-tip").remove();
         tip = d3.tip().attr('class', 'd3-tip').html(function (d) {
             return  '<table style="width:100%">' +
@@ -120,14 +157,20 @@ var dashboard3 = (function () {
         });
         svg.call(tip);
 
+        // Dynamically resixe SVG when window is resized
         window.onresize = function (event) {
+            // Height of top navbar
             var navbar_height = $('#custom_navbar').height() || 0;
+
+            // SVG size
             svgWidth = viewportSize.getWidth() - 200 - 1;
             svgHeight = viewportSize.getHeight() - navbar_height - 1;
 
+            // Move the vis nav and content div(s) based on the new size of the nav bar
             $("#left-nav").css("top", navbar_height + "px");
             $("#content").css("top", navbar_height + "px");
 
+            // Change the size of the svg based on the new browser size
             svg.attr("width", svgWidth + "px").attr("height", svgHeight + "px");
             d3.select("#d3").attr("width", svgWidth + "px").attr("height", svgHeight + "px").attr("top", navbar_height + "px");
             d3.select("#d3").select('svg').attr("width", svgWidth + "px").attr("height", svgHeight + "px");
@@ -139,37 +182,54 @@ var dashboard3 = (function () {
         return classname.split(" ").join("_");
     }
 
-    // The magic function.
+    /**
+     * Find where we are on the screen within the SVG element. Aka, the magic function.
+     * 
+     * @param {numeric} x
+     * @param {numeric} y
+     * @param {ctm} ctm : D3 CTM object
+     * @returns {dashboard3_L1.getGridScreenCoords.dashboard3Anonym$0}
+     */
     function getGridScreenCoords(x, y, ctm) {
         var xn = ctm.e + x * ctm.a;
         var yn = ctm.f + y * ctm.d;
         return {x: xn, y: yn};
     }
 
-    function getGridColor(cname) {
-        if (!gridColors[cname]) {
-            gridColors[cname] = scale((gridColorsIndex[cname]) / ((gridColorCounter - 1))).hex();
+    /**
+     * Creates unique collection of colors based on based in values
+     * 
+     * @param {string} value
+     * @returns {dashboard3_L1.gridColors}
+     */
+    function getGridColor(value) {
+        if (!gridColors[value]) {
+            gridColors[value] = scale((gridColorsIndex[value]) / ((gridColorCounter - 1))).hex();
         }
-        return gridColors[cname];
+        return gridColors[value];
     }
 
-
+    /**
+     * Draw the Chart
+     * 
+     * @param {string} selector: The CSS selector for the SVG element
+     * @param {collection} dataset : JSON dataset
+     * @param {boolean} doInit : Has the init function been initialized?  (True on updates, false on first run)
+     * @returns {undefined} (nothing)
+     */
     function createChart(selector, dataset, doInit) {
         if (doInit) {
             init(selector);
         }
 
-        // Get rid of any multiselect that is still active
-        //$('select').multiselect('destroy');
-
-        var boxWidth = 12; //10
+        var boxWidth = 12;
         var boxHeight = 50.0;
         var daysSkip = 1;
-        var numDays = 5; // 7
+        var numDays = 5;
         var dayBoxes = 0;
 
-        var firstTimeOfDay = 7.00;
-        var lastTimeOfDay = 21.00;
+        var firstTimeOfDay = 7.00; // 7am
+        var lastTimeOfDay = 21.00; // 9pm
         var roomCounter = 0;
         var classes = new Array();
         var prof = new Array();
@@ -202,20 +262,20 @@ var dashboard3 = (function () {
             var day;
             var class_name;
             if (val.days[0] != "" && val.room != "" && val.room !== 'TBD') {
+
                 // Pre-populate array
                 getCol(val['room']);
 
                 class_name = getClassStringId(val.name);
                 setClassColorIndex(val.class_type);
 
-                if (mprof[val.main_prof] == null) {
-                    mprof[val.main_prof] = 1;
-                }
-
                 for (var j = 0; j < val.days.length; j++) {
                     day = dayMap[val.days[j]];
 
+                    // If the class does not contain a section (indicated using a -), use the entire string
                     var cname_ind = class_name.indexOf("-") < 0 ? class_name.length : class_name.indexOf("-");
+
+                    // Assign values to data point object
                     var point = {
                         "id": val.id,
                         "starttm": val.starttm,
@@ -233,14 +293,22 @@ var dashboard3 = (function () {
                         "meets_with": brArray(val.meets_with.split('^'))
                     };
 
+                    // check if this is a diff dataset, assign var
                     if (isDiff) {
                         point['diff'] = val.diff;
                     }
 
+                    // Add professor name to distinct array (javascript really doesn't have sets)
+                    if (mprof[val.main_prof] == null) {
+                        mprof[val.main_prof] = 1;
+                    }
+
+                    // Add class name to distinct array
                     if (cnames[point.cname] == null) {
                         cnames[point.cname] = 1;
                     }
 
+                    // Append to array
                     data.push(point);
                 }
 
@@ -258,6 +326,8 @@ var dashboard3 = (function () {
 
         });
 
+        // Calculate how many rooms we need to draw, and the width of each of the columns based
+        // on the number of rooms
         dayBoxes = roomCounter;
         boxWidth = Math.round((svgWidth / numDays) / roomCounter);
         if (boxWidth < 12) {
@@ -269,28 +339,105 @@ var dashboard3 = (function () {
             room_list.push(i);
         });
 
+        // Sort for listing in both drop down menu and display inside grid
         room_list.sort();
-
         roomCounter = 0;
+
+        // Null out rooms object
         rooms = {};
 
+        // Add rooms to html selector
         var rooms_sel = $("#rooms-sel");
+
+        // remove all current html inside current selector
         rooms_sel.html('');
 
         $.each(room_list, function (key, val) {
-            getCol(val);
-            rooms_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
+            // getCol(val) needs to be called! If you don't use it in the html, just call the function here
+            rooms_sel.append('<option value="' + 'rm-slct-' + getCol(val) + '">' + val + '</option>');
         });
 
-        // Calculate values so we don't have to do it each time a frame is rendered
+        // Build and refresh rooms selector
+        rooms_sel.multiselect('rebuild');
+        rooms_sel.multiselect('selectAll', false);
+        rooms_sel.multiselect('refresh');
+
+        // Distinct classes object
+        var cnt = 0;
+        $.each(cnames, function (i, val) {
+            cnames[i] = cnt++;
+            classes.push(i);
+        });
+
+        // Sort for html selector
+        classes.sort();
+
+        // remove all current html inside current selector
+        var class_sel = $("#class-sel");
+        class_sel.html('');
+
+        // Add classes to html selector
+        $.each(classes, function (key, val) {
+            class_sel.append('<option value="' + 'cls-slct-' + cnames[val] + '">' + val.replace(/[^A-Z0-9]/g, ' ') + '</option>');
+        });
+
+        // Build and refresh class selector
+        class_sel.multiselect('rebuild');
+        class_sel.multiselect('selectAll', false);
+        class_sel.multiselect('refresh');
+
+        // Distinct professor object
+        cnt = 0;
+        $.each(mprof, function (i, val) {
+            mprof[i] = cnt++;
+            prof.push(i);
+        });
+
+        // Sort for html selector
+        prof.sort();
+
+        // remove all current html inside current selector
+        var prof_sel = $("#prof-sel");
+        prof_sel.html('');
+
+        // Add professors to html selector
+        $.each(prof, function (key, val) {
+            prof_sel.append('<option value="' + 'prof-sel-' + mprof[val] + '">' + val + '</option>');
+        });
+
+        // Build and refresh class selector
+        prof_sel.multiselect('rebuild');
+        prof_sel.multiselect('selectAll', false);
+        prof_sel.multiselect('refresh');
+
+        // Calculate values in advance so we don't have to do it each time a frame is rendered
         $.each(data, function (i, val) {
             val['col'] = getCol(val.room);
             val['color'] = getGridColor(val.class_type);
             val['x'] = (((val.day * dayBoxes) + val['col']) * boxWidth) - (daysSkip * boxWidth * dayBoxes);
             val['y'] = ((timeToNumber(val.starttm) - firstTimeOfDay) * boxHeight);
             val['height'] = (minutesToNumber(val.length) * boxHeight);
-            //val['id'] = val.id; // <-- this does nothing val['id'] and val.id are the same field in the same object
 
+            if (!isNull(cnames[val.cname])) {
+                val['cssClass'] = 'cls-slct-' + cnames[val.cname];
+            }
+
+            if (!isNull(val['col'])) {
+                val['cssClass'] += ' rm-slct-' + val['col'];
+            }
+
+            if (!isNull(gridColorsIndex[val.class_type])) {
+                val['cssClass'] += ' type-sel-' + gridColorsIndex[val.class_type];
+            }
+            
+            if (!isNull(mprof[val.mprof])) {
+                val['cssClass'] += ' prof-sel-' + mprof[val.mprof];
+            }
+            
+            //return  d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_')
+            //console.log(val['cssClass']);
+
+            // Colors for diff
             if (isDiff) {
                 if (val.diff == 'p') {
                     val['x'] = val.x + (boxWidth / 2);
@@ -314,57 +461,27 @@ var dashboard3 = (function () {
 
         });
 
+        // Distinct class types object
         $.each(gridColors, function (i, val) {
             class_types.push(i);
         });
 
+        // Sort for html selector
         class_types.sort();
 
-        // Classes
-        var class_sel = $("#class-type-sel");
-        class_sel.html('');
+        // remove all current html inside current selector
+        var class_types_sel = $("#class-type-sel");
+        class_types_sel.html('');
+
+        // Add classes to html selector
         $.each(class_types, function (i, val) {
-            class_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
-        });
-        class_sel.multiselect('rebuild');
-        class_sel.multiselect('selectAll', false);
-        class_sel.multiselect('refresh');
-
-        rooms_sel.multiselect('rebuild');
-        rooms_sel.multiselect('selectAll', false);
-        rooms_sel.multiselect('refresh');
-
-        $.each(mprof, function (i, val) {
-            prof.push(i);
-        });
-        prof.sort();
-
-        var prof_sel = $("#prof-sel");
-        prof_sel.html('');
-
-        $.each(prof, function (key, val) {
-            prof_sel.append('<option value=' + val.replace(/[^A-Z0-9]/g, '_') + '>' + val + '</option>');
+            class_types_sel.append('<option value=' + 'type-sel-' + gridColorsIndex[val] + '>' + val + '</option>');
         });
 
-        prof_sel.multiselect('rebuild');
-        prof_sel.multiselect('selectAll', false);
-        prof_sel.multiselect('refresh');
-
-        $.each(cnames, function (i, val) {
-            classes.push(i);
-        });
-        classes.sort();
-
-        var class_sel = $("#class-sel");
-        class_sel.html('');
-
-        $.each(classes, function (key, val) {
-            class_sel.append('<option value=' + val + '>' + val.replace(/[^A-Z0-9]/g, ' ') + '</option>');
-        });
-
-        class_sel.multiselect('rebuild');
-        class_sel.multiselect('selectAll', false);
-        class_sel.multiselect('refresh');
+        // Build and refresh class selector
+        class_types_sel.multiselect('rebuild');
+        class_types_sel.multiselect('selectAll', false);
+        class_types_sel.multiselect('refresh');
 
         // The +0.1 makes it draw the very last bar. +1 causes a little bit of the axis to hang over
         var width = boxWidth * dayBoxes * numDays + 0.1;
@@ -385,6 +502,7 @@ var dashboard3 = (function () {
             })
             .attr("y2", height + 50)
             .attr("stroke", function (x) {
+                // Turn first and last bar of each day black to create an outline
                 if (x % (boxWidth * dayBoxes) == 0) {
                     return "black";
                 }
@@ -397,7 +515,7 @@ var dashboard3 = (function () {
                 return 0.3;
             });
 
-        // X
+        // X Axis
         container.selectAll(".x_axis")
             .data(d3.range(0, width, boxWidth * dayBoxes))
             .enter().append("text")
@@ -410,6 +528,7 @@ var dashboard3 = (function () {
             .attr("dy", "-0.5em")
             .attr("text-anchor", "middle")
             .text(function (d, i) {
+                // Day long name
                 return weekdays[(i + daysSkip) - 1][0];
             });
 
@@ -449,6 +568,7 @@ var dashboard3 = (function () {
                 return d;
             })
             .attr("stroke", function (x, y) {
+                // Turn first and last bar of each section black to create an outline
                 if (x <= 50 || x >= (height + 49)) {
                     return "black";
                 }
@@ -462,6 +582,7 @@ var dashboard3 = (function () {
             })
             ;
 
+        // Y - Time labels
         container.selectAll(".y_axis")
             .data(d3.range(0, height + 50, boxHeight))
             .enter().append("text")
@@ -486,10 +607,11 @@ var dashboard3 = (function () {
         var blocks = container.selectAll("g.data")
             .data(data)
             .enter()
-            .append("g") // SWITCH BACK TO RECT
+            .append("g")
             .filter(function (d) {
+                // Filter out classes with no time assigned to them (NaN != NaN)
                 return (d.x === d.x && d.y === d.y);
-            }) // Filter out classes with no time assigned to them (NaN != NaN)
+            })
             .attr("x", function (d) {
                 return d.x;
             })
@@ -500,15 +622,18 @@ var dashboard3 = (function () {
                 return boxWidth;
             })
             .attr("height", function (d) {
+                // don't let bars hang off bottom of screen
                 return bottomHeightLimit(d.y, d.height);
             })
             .attr("class", function (d) {
-                return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' cls_id_' + d.id;
+                return d.cssClass;
+                //return d.room.replace(/[^A-Z0-9]/g, '_') + ' ' + d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_') + ' cls_id_' + d.id;
             });
 
         var gText = blocks
             .append("g")
             .attr("transform", function (d) {
+                // rotate room labels
                 return "translate(" + d.x + "," + (d.y + 50) + ") rotate(90,0,0)";
             })
             .attr("class", function (d) {
@@ -534,12 +659,13 @@ var dashboard3 = (function () {
             .attr("dx", "0em")
             .attr("dy", "-1em")
             .text(function (d, i) {
+                // Mark classes that have been grouped together
                 return (d.num_classes > 1 ? ('* ' + d.name + ' *') : d.name);
             })
             .style("text-anchor", "middle")
             .style("fill-opacity", 0)
             .style("fill", "#000000")
-            .transition().duration(750)
+            .transition().duration(750) // transition effect
             .style("fill-opacity", 1);
 
         // Set block attributes
@@ -576,6 +702,8 @@ var dashboard3 = (function () {
                 d3.event.stopPropagation();
             })
             .on("dblclick", function (d, i) {
+                // Double click event 
+
                 var xOffset = boxWidth * d3Zoom.scale();
 
                 // Find where the div is located on the screen
@@ -612,7 +740,7 @@ var dashboard3 = (function () {
                     final_x = final_x - $('#po-d3').width() - (xOffset * 3);
                 }
 
-                // ADD CODE HERE TO FLIP WHICH DIRECTION THE POPOVER DISPLAYS ON THE X AXIS
+
                 gridClassSelected = d.name;
                 // Set popover title
                 $('#po-d3-name').html(d.name);
@@ -641,6 +769,7 @@ var dashboard3 = (function () {
                 var wp = coords.x / svgWidth;
                 var hp = coords.y / svgHeight;
 
+                // Set popover direction
                 var tipDir = '';
 
                 if (hp >= 0.85) {
@@ -706,11 +835,11 @@ var dashboard3 = (function () {
             return rooms[room];
         }
 
-        function setClassColorIndex(cname) {
-            if (gridColorsIndex[cname] == null) {
-                gridColorsIndex[cname] = gridColorCounter++;
+        function setClassColorIndex(value) {
+            if (gridColorsIndex[value] == null) {
+                gridColorsIndex[value] = gridColorCounter++;
             }
-            return gridColorsIndex[cname];
+            return gridColorsIndex[value];
         }
 
         function bottomHeightLimit(blockY, blockHeight) {
@@ -740,16 +869,18 @@ var dashboard3 = (function () {
             return result;
         }
 
-        $('#po-d3-ok').click(function (e) {
-            // Submit fields via JSON here.
-
-            // This goes in the AJAX success function
-            $('#po-d3').hide();
-
-            // update the view based on new data received
-            console.log("send: " + JSON.stringify(constraints[gridClassSelected]));
-
-        });
+        /*
+         $('#po-d3-ok').click(function (e) {
+         // Submit fields via JSON here.
+         
+         // This goes in the AJAX success function
+         $('#po-d3').hide();
+         
+         // update the view based on new data received
+         console.log("send: " + JSON.stringify(constraints[gridClassSelected]));
+         
+         });
+         */
 
         // Click close button
         $('#po-d3-close').click(function (e) {
@@ -759,8 +890,8 @@ var dashboard3 = (function () {
         //set up the ticket submit button
         $('#ticket-form').on('submit', function (e) {
             e.preventDefault();
-            $(this).find(':submit').attr('disabled','disabled');
-            
+            $(this).find(':submit').attr('disabled', 'disabled');
+
             var postData = {event_id: $('#event_id').val(), message: $('#message').val()};
             var url = 'tickets/add-ticket'; //form.attr("action");
 
@@ -780,10 +911,18 @@ var dashboard3 = (function () {
                 }
             });
 
-            //return false;
         });
     }
 
+    /**
+     * Do AJAX call for dataset and draw char
+     * 
+     * @param {type} sched : Schedule_Id 1
+     * @param {type} d3Select : CSS selector of SVG element
+     * @param {type} doInit : Do init
+     * @param {type} sched2 : Schedule_Id 2 (for diff)
+     * @returns {undefined}
+     */
     function yearSelectionHandler(sched, d3Select, doInit, sched2) {
         if (!isNull(sched)) {
             spin.spin();
@@ -821,10 +960,25 @@ var dashboard3 = (function () {
         });
     }
 
+    /**
+     * Check if parameter exists or is null
+     * 
+     * @param {type} val
+     * @returns {Boolean}
+     */
     function isNull(val) {
         return (val === undefined || val === null);
     }
 
+    /**
+     * Create select input element
+     * 
+     * @param {type} tag_prefix
+     * @param {type} label
+     * @param {type} multiple
+     * @param {type} classes
+     * @returns {String}
+     */
     function createSelect(tag_prefix, label, multiple, classes) {
         var mult = "";
         if (multiple) {
@@ -833,10 +987,22 @@ var dashboard3 = (function () {
         return '<div id="' + tag_prefix + '-fg" class="form-group"><label id="' + tag_prefix + '-lbl" for="' + tag_prefix + '-sel">' + label + '</label><select id="' + tag_prefix + '-sel" ' + mult + ' class="vis-select ' + classes + '"></select></div>';
     }
 
+    /**
+     * Create option for select input element
+     * 
+     * @param {type} key
+     * @param {type} value
+     * @returns {String}
+     */
     function createOption(key, value) {
         return '<option value="' + key + '">' + value + '</option>';
     }
 
+    /**
+     * Setup HTML on page for diff display
+     * 
+     * @returns {undefined}
+     */
     function setupForDiff() {
         $('#sched1-fg').show();
         $('#vis-go-button').show();
@@ -847,6 +1013,11 @@ var dashboard3 = (function () {
         $('#sched-lbl').html('Schedule 1');
     }
 
+    /**
+     * Setup HTML on page for display of standard schedule
+     * 
+     * @returns {undefined}
+     */
     function setupForStandard() {
         $('#sched1-fg').hide();
         $('#vis-go-button').hide();
@@ -857,8 +1028,17 @@ var dashboard3 = (function () {
         $('#sched-lbl').html('Schedule');
     }
 
+    /**
+     * Render the object
+     * 
+     * @param {type} sched
+     * @param {type} diff
+     * @returns {undefined}
+     */
     function render(sched, diff) {
+        // check if user is in php container
         var isAuth = (d3.select('#vis-wrapper').attr('data-auth-status') === '1');
+
         $('footer').hide();
         $('.top-buffer').hide();
         $("#content").html('');
@@ -947,7 +1127,7 @@ var dashboard3 = (function () {
                     } else {
                         yearSelectionHandler((sched || data[0]['id']), '#d3', true);
                     }
-                    
+
                     visMenu.show();
                     spin.stop();
                 });
@@ -957,7 +1137,7 @@ var dashboard3 = (function () {
             }
         });
 
-
+        // Schedule selector change event
         schedSel.multiselect('setOptions', {
             onChange: function (event) {
                 // Don't trigger event when diff is selected
@@ -967,9 +1147,11 @@ var dashboard3 = (function () {
             }
         });
 
+        // GO button click event
         goBtn.click(function () {
             yearSelectionHandler($("#sched-sel").val(), '#d3', false, $("#sched1-sel").val());
         });
+
 
         $('.d_select').multiselect('setOptions', {
             onChange: function (option, checked, select) {
@@ -981,6 +1163,7 @@ var dashboard3 = (function () {
             }
         });
 
+        // Type selector change event
         $('#sched-type-sel').multiselect('setOptions', {
             onChange: function (event) {
                 if ($("#sched-type-sel").val() == 'diff') {
@@ -1000,6 +1183,7 @@ var dashboard3 = (function () {
     }
 
     return {
+        // Make render non-private
         render: render
     };
 

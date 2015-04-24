@@ -71,6 +71,7 @@ $(function(){
 
 					$(this).data('col_index', col_index);
 					$(this).data('indices', indices);
+					$(this).data('class', json_data['newId']);
 
 					update_column_matrix(col_index, indices, "busy");
 				});
@@ -680,7 +681,7 @@ function refresh_scheduled_class_draggables()
 		    			$.ajax({
 							url:		remove_class_url,
 							type: 		"POST",
-							data: 		{'id':id, 'schedule':sched_id},
+							data: 		{'id':id, 'sched_id':sched_id},
 							dataType: JSON,
 							beforeSend: function() {
 								$('#sched-ok').hide();

@@ -380,7 +380,7 @@ class ScheduleController extends BaseController {
 		$result = $this->api_check_sched($schedule);
 		$result->newId = $class->id;
 		
-		return $result;
+		return json_encode($result);
 	}
 
 	public function e_remove_class()
@@ -437,7 +437,7 @@ class ScheduleController extends BaseController {
 		$class->etime_id = Input::get('etime_id');
 
 		if ($class->save())
-			return $this->api_check_sched($schedule);
+			return json_encode($this->api_check_sched($schedule));
 		else
 			return Response::json(['error' => 'Could not update the class at this time'], 500);
 	}
@@ -450,10 +450,11 @@ class ScheduleController extends BaseController {
 			try {
 				$result = Communication::sendCheck($schedule->id);
 				if(property_exists($result, 'Error')) {
-					return json_encode($result);
+					return $result;
 				}
 			} catch (Exception $e) {
-				return Response::json(['error' => 'Could not contact solver server']);
+				$result->error = 'Could not contact solver server';
+				return $result;
 			}
 			
 			$classes_dict = [];
@@ -480,12 +481,13 @@ class ScheduleController extends BaseController {
 				//~ }
 			//~ }
 			
-			return json_encode($result);
+			return $result;
 		}
 		catch (Exception $e)
 		{
 			//return Response::json($e, 500);
-			return Response::json(['error' => 'Could not check schedule'], 500);
+			$result->error = 'Could not check schedule';
+			return $result;
 		}
 	}
 

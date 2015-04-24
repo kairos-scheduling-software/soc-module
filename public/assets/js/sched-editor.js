@@ -283,7 +283,7 @@ $(function(){
 	
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
-	$('.toggle-right-column').click(function(e) {
+	$('body').on('click', '.toggle-right-column', function(e) {
 		e.preventDefault();
 
 		if(!right_panel_open)

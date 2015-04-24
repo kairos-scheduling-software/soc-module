@@ -3,7 +3,7 @@ var time_block_w;
 var all_blocks = {};
 var day_columns = [];
 var blocks_to_update = [];
-var group_counter = 1;
+//var group_counter = 1;
 var add_class_url;
 var remove_class_url;
 var sched_id;
@@ -19,9 +19,9 @@ $(function(){
 
 	initialize_column_matrix();
 
-	add_class_url = $('#hidden-data').attr('data-addurl');
-	remove_class_url = $('#hidden-data').attr('data-removeurl');
-	sched_id = $('#hidden-data').attr('data-schedid');
+	add_class_url = $('#hidden-data').data('addurl');
+	remove_class_url = $('#hidden-data').data('removeurl');
+	sched_id = $('#hidden-data').data('schedid');
 	var cursor_img = $('#hidden-data').data('cursor');
 
 	$('#search-clear').click(function(){
@@ -35,13 +35,15 @@ $(function(){
 
 	$('body').on('submit', '#new-class-form', function(e) {
 		e.preventDefault();
-		var group_id = $('#new-class-btn').attr('data-group');
 		var form = $(this);
+		var time_id = $('#new-class-btn').data('time');
+		//var blocks = $(".new-block");
+		var blocks = form.data('block');
 		var params = form.data('params');
-		var class_name = $('input[name="class_name"').val();
+		var class_name = form.children('input[name="class_name"]').val();
 
-		$("div[data-group=" + group_id + "]").html("<span class='class-name-container'>" + class_name + "</span");
-		$("div[data-group=" + group_id + "]").popover('destroy');
+		blocks.html("<span class='class-name-container'>" + class_name + "</span");
+		blocks.popover('destroy');
 		
 		var data = form.serializeArray();
 		var url = form.attr('action');
@@ -58,23 +60,16 @@ $(function(){
 			success: 	function(data, textStatus, jqXHR) {
 				$('#checking-sched').hide();
 				var json_data = JSON.parse(data);
-
+				
+				blocks.removeClass('new-block');
+				blocks.data('class', json_data['newId']);
+				
 				// Update the matrix
-				$("div[data-group=" + group_id + "]").each(function() {
-					var col = $(this).data('col');
-					var day = $(this).closest('div.sched-day-column').data('ddd');
-					var col_index = day + col;
-					var indices = [];
-
-					for (i = params["v_offset"]; i < (params["v_offset"] + params["b_length"]); i++)
-						indices.push(i);
-
-					$(this).data('col_index', col_index);
-					$(this).data('indices', indices);
-					$(this).data('class', json_data['newId']);
-
-					update_column_matrix(col_index, indices, "busy");
-				});
+				update_column_matrix(blocks, "busy");
+				
+				// Set-up draggable for the new blocks
+				update_scheduled_class_draggables(blocks);
+				
 				if (json_data['wasFailure'])
 				{
 					console.log('was failure: true');
@@ -91,6 +86,7 @@ $(function(){
 				console.log(JSON.stringify(jqXHR));
 				$('#checking-sched').hide();
 				$('#sched-bad').show();
+				blocks.remove();
 			}
 		});
 
@@ -145,17 +141,17 @@ $(function(){
     		var dragged_block = $(this);
     		
     		if (dragged_block.hasClass('one-fifty'))
-    			setup_dropzones('one-fifty', 'fifty-min-blk');
+    			setup_drop_zones(50, 1);
     		else if (dragged_block.hasClass('one-eighty'))
-    			setup_dropzones('one-eighty', 'eighty-min-blk');
+    			setup_drop_zones(80, 1);
     		else if (dragged_block.hasClass('two-fifty'))
-    			setup_dropzones('two-fifty', 'fifty-min-blk');
+    			setup_drop_zones(50, 2);
     		else if (dragged_block.hasClass('two-eighty'))
-    			setup_dropzones('two-eighty', 'eighty-min-blk');
+    			setup_drop_zones(80, 2);
     		else if (dragged_block.hasClass('three-fifty'))
-    			setup_dropzones('three-fifty', 'fifty-min-blk');
+    			setup_drop_zones(50, 3);
     		else if (dragged_block.hasClass('three-eighty'))
-    			setup_dropzones('three-eighty', 'eighty-min-blk');
+    			setup_drop_zones(80, 3);
 
     		$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
@@ -165,18 +161,17 @@ $(function(){
 		    	hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
 		    	drop: function(event, ui) {
-		    		group_counter++;
-		    		var group_id = $(this).attr('data-group');
-		    		$('.drop-zone').droppable("destroy");
-		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover time-block-active drop-zone ui-droppable');
-		    		$("div[data-group=" + group_id + "]").addClass('scheduled-class not-yet-added');
-
+		    		//group_counter++;
+		    		var time_id = $(this).data('time');
+		    		
+		    		var blocks = update_drop_zone(time_id);
+		    		
 		    		var params = [];
-		    		params["col"] = parseInt($(this).attr('data-col'));
-		    		params["day_string"] = $(this).attr('data-days');
-		    		params["v_offset"] = parseInt($(this).attr('data-start'));
-		    		params["time"] = parse_time($(this).data('time'));
-		    		params["b_length"] = parseInt($(this).attr('data-length')) / 5;
+		    		params["col"] = $(this).data('col_index');
+		    		params["day_string"] = $(this).data('days');
+		    		params["start"] = $(this).attr('data-start');
+		    		params["time_string"] = parse_time(params['start']);
+		    		params["length"] = $(this).data('length');
 		    		params["days"] = [];
 
 		    		if (params["day_string"].indexOf("mon") >=0)
@@ -190,8 +185,9 @@ $(function(){
 		    		if (params["day_string"].indexOf("fri") >=0)
 		    			params["days"].push('fri');
 
-		    		var content = get_popover_content(group_id, params);
-		    		$("div[data-group=" + group_id + "]").attr('data-content', content);
+		    		var content = get_popover_content(time_id, params);
+		    		$(this).attr('data-content', content);
+		    		//$("div[data-group=" + group_id + "]").attr('data-content', content);
 
 		    		// Show popover
 		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
@@ -206,34 +202,24 @@ $(function(){
 	    					$('.popover').css('top', 0);
 	    					$('.arrow').css('top', pos + 'px');
 	    				}
-
+	    				
 	    				$('#new-class-form').data('params', params);
-
+	    				$('#new-class-form').data('block', blocks);
+	    				
 	    				$('#cancel-add-class').click(function() {
 	    					el.popover('destroy');
-	    					$('.not-yet-added').remove();
+	    					$('.new-block').remove();
 	    				});
 
 		    		}).popover('show');
-
-		    		$("div[data-group=" + group_id + "]").html();
-
-		    		$('.drop-zone').remove();	    		
-
-		    		refresh_scheduled_class_draggables();
 		    	},
 		    	over: function(event, ui) {
-		    		var group_id = $(this).attr('data-group');
-		    		$("div[data-group=" + group_id + "]").each(function() {
-		    			if (!$(this).hasClass('scheduled-class'))
-		    				$(this).addClass('time-block-hover');
-		    		});
-		    		//console.log($(this).attr('data-days'));
-		    		//console.log($(this).attr('data-time'));
+		    		var time_id = $(this).data('time');
+		    		$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
 		    	},
 		    	out: function(event, ui) {
-		    		var group_id = $(this).attr('data-group');
-		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover');
+		    		var time_id = $(this).data('time');
+		    		$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
 		    	}
 		    });
     	},
@@ -450,8 +436,6 @@ function get_horizontal_offset(vertical, length, day, loading_mode)
 	{
 		if (day_columns[col_index][i] == "busy")
 		{
-			update = [];
-			//console.log("Location " + col_index + "[" + i + "] is in use.");
 			col_num++;
 			col_index = day + "" + col_num;
 			i = vertical;
@@ -464,15 +448,13 @@ function get_horizontal_offset(vertical, length, day, loading_mode)
 				col_count = col_counts[day];
 			}
 		}
-		else
-			update.push(i);
 	}
 
-	if(loading_mode)
-	{
-		update_column_matrix(col_index, update, "busy");
-		temp_indices = update;
-	}
+	//~ if(loading_mode)
+	//~ {
+		//~ update_column_matrix(col_index, update, "busy");
+		//~ temp_indices = update;
+	//~ }
 
 	//console.log("Col Num: " + col_num);
 	return col_num - 1;
@@ -494,6 +476,7 @@ function process_time_blocks(blocks)
 		new_block["id"] = block["id"];
 		new_block["days"] = parse_days(block["days"]);
 		new_block["offset"] = get_vertical_offset(block["starttm"]);
+		new_block["start"] = block["starttm"];
 		new_block["etime"] = block;
 		new_block["length"] = block["length"];
 
@@ -521,55 +504,9 @@ function process_time_blocks(blocks)
 	});
 }
 
-function setup_dropzones(key, block_class)
+function update_scheduled_class_draggables(sched_classes)
 {
-	$.each(all_blocks[key], function(i, block)
-	{		
-		$.each(block["days"], function(j, day) {
-			var html_block = "<div class='drop-zone " + block_class + " " + key + "'";
-			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
-			var id = day.substring(1) + "-" + block["id"];
-			var ddd = id.substring(0,3); // three char day abbreviation
-			html_block += "id='" + id + "'";
-
-			// Set offsets of the dropzone
-			var left = 0;
-			var top = 0;
-			top += (block["offset"] * five_min_height);
-			var horiz = get_horizontal_offset(block["offset"], block["length"], ddd, false);
-			
-			if (horiz == -1)
-			{
-				console.log("Horizontal failed");
-				return;
-			}
-			left += horiz * time_block_w;
-
-			html_block += " style='left: " + left + "px; top: " + top + "px;' ";
-			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
-			html_block += "' data-length='" + block["length"] + "'";
-			html_block += " data-days='" + block["days"] + "'";
-			html_block += " data-time='" + block["etime"]["starttm"] + "'";
-			html_block += " data-ddd='" + ddd + "'";
-			html_block += "></div>"; // TODO: figure out tool tips
-			$(day).append(html_block);
-		});
-	});
-
-	switch(block_class)
-	{
-		case "fifty-min-blk":
-			$('.fifty-min-blk').css('height', (10 * five_min_height));
-			break;
-		case "eighty-min-blk":
-			$('.eighty-min-blk').css('height', (16 * five_min_height));
-			break;
-	}
-}
-
-function refresh_scheduled_class_draggables()
-{
-	$('.scheduled-class').draggable({
+	sched_classes.draggable({
 		scroll: false,
 		stack: '#sched-container',
 		cursorAt: { bottom: 0, left: 20 },
@@ -579,9 +516,9 @@ function refresh_scheduled_class_draggables()
     	},
     	start: function(event, ui)
     	{
-    		var group_id = $(this).attr('data-group');
-    		var id = $(this).attr('id');
-    		//$("div[data-group=" + group_id + "]:not('#"+id+"')").hide();
+    		var time_id = $(this).data('time');
+    		var class_id = $(this).data('class');
+    		var old_blocks = get_class(class_id);
 
     		var dragged_block = $(this);
     		var length = dragged_block.data('length');
@@ -589,34 +526,27 @@ function refresh_scheduled_class_draggables()
     		var drop_height = (length / 5) * five_min_height;
     		var class_html = dragged_block.html();
 
-    		scheduled_class_drop_zones(length, days, drop_height);
+    		setup_drop_zones(length, days.length);
     		
-    		$(".sc_drop_zone").droppable({
-			hoverClass: "time-block-hover",
+    		$(".drop-zone").droppable({
+				hoverClass: "time-block-hover",
 		    	activeClass: "time-block-active",
 		    	drop: function(event, ui)
 		    	{
-		    		$('.sc_drop_zone').droppable("destroy");
-
 		    		// Hide the old blocks
-		    		//$("div[data-group=" + group_id + "]").remove();
-		    		var old_block = $("div[data-group=" + group_id + "]");
-		    		old_block.hide();
-
-		    		var blk = $(this);
-		    		blk.data('class', old_block.data('class'));
-		    		var group = blk.data('group');
-
-		    		$('.sc_drop_zone').each(function() {
-		    			var this_block = $(this);
-		    			if (this_block.data('group') == group)
-		    			{
-		    				this_block.removeClass('time-block-hover time-block-active drop-zone ui-droppable sc_drop_zone');
-		    				this_block.addClass('scheduled-class not-yet-added');
-		    				this_block.html(class_html);
-		    			}
-		    		});
-
+		    		var new_time_id = $(this).data('time');
+		    		if (new_time_id == time_id) {
+						$('.drop-zone').remove();
+						return;
+					}
+					
+					old_blocks.hide();
+					
+		    		var new_blocks = update_drop_zone(new_time_id);
+					
+		    		new_blocks.data('class', class_id);
+					new_blocks.html(class_html);
+		    		
 		    		$('.class-name-container').each(function() {
 						var course = $(this);
 						var div = course.closest('div.scheduled-class');
@@ -626,16 +556,12 @@ function refresh_scheduled_class_draggables()
 
 						if(p >= 7) div.css("padding-top", p + 'px');
 					});
-
-		    		$('.sc_drop_zone').remove();
-				
-					var group = blk.data('group');
-					var time_id = group.substring(0, group.indexOf('-'));
+					
 					var edit_class_data = Object.create(null);
 					edit_class_data['sched_id'] = sched_id;
 					edit_class_data['mode'] = 'edit-class';
-					edit_class_data['class_id'] = blk.data('class');
-					edit_class_data['time_id'] = time_id;
+					edit_class_data['class_id'] = class_id;
+					edit_class_data['time_id'] = new_time_id;
 					$.ajax({
 						url: $('#sched-name').data('url'),
 						type: 'post',
@@ -643,26 +569,29 @@ function refresh_scheduled_class_draggables()
 						success: function(data, textStatus, jqXHR) {
 							$('#checking-sched').hide();
 							//var json_data = JSON.parse(data);
-							old_block.remove();
+							update_column_matrix(old_blocks, "empty");
+							update_column_matrix(new_blocks, "busy");
+							
+							old_blocks.remove();
+							new_blocks.removeClass('new-block');
+							
+							update_scheduled_class_draggables(new_blocks);
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							console.log(JSON.stringify(jqXHR));
-							blk.remove();
-							old_block.show();
+							new_blocks.remove();
+							old_blocks.show();
 						}
 					});
 		    	},
 		    	over: function(event, ui)
 		    	{
-		    		var group_id = $(this).attr('data-group');
-		    		$("div[data-group=" + group_id + "]").each(function() {
-		    			if (!$(this).hasClass('scheduled-class'))
-		    				$(this).addClass('time-block-hover');
-		    		});
+		    		var time_id = $(this).data('time');
+		    		$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
 		    	},
 		    	out: function(event, ui) {
-		    		var group_id = $(this).attr('data-group');
-		    		$("div[data-group=" + group_id + "]").removeClass('time-block-hover');
+		    		var time_id = $(this).data('time');
+		    		$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
 		    	}
     		});
 
@@ -675,20 +604,21 @@ function refresh_scheduled_class_draggables()
 		    		{
 		    			// TODO: update column matrix
 		    			// TODO: send ajax to delete class
-		    			var id = $("div[data-group=" + group_id + "]").data('class');
-		    			$("div[data-group=" + group_id + "]").remove();
+		    			old_blocks.hide();
 
 		    			$.ajax({
 							url:		remove_class_url,
 							type: 		"POST",
-							data: 		{'id':id, 'sched_id':sched_id},
-							dataType: JSON,
+							data: 		{'id':class_id, 'sched_id':sched_id},
 							beforeSend: function() {
 								$('#sched-ok').hide();
 								$('#sched-bad').hide();
 								$('#checking-sched').show();
 							},
-							success: 	function(data, textStatus, jqXHR) {
+							success: function(data, textStatus, jqXHR) {
+								update_column_matrix(old_blocks, "empty");
+								old_blocks.remove();
+								
 								$('#checking-sched').hide();
 								var json_data = JSON.parse(data);
 								$('#checking-sched').hide();
@@ -706,15 +636,16 @@ function refresh_scheduled_class_draggables()
 									$('#conflict-section').hide();
 								}				
 							},
-							error: 		function(jqXHR, textStatus, errorThrown) {
+							error: function(jqXHR, textStatus, errorThrown) {
 								/*
 								console.log(JSON.stringify(jqXHR));
 								$('#checking-sched').hide();
 								$('#sched-bad').show();
 								*/
+								old_blocks.show();
 								$('#checking-sched').hide();
 								$('#conflict-section').hide();
-									$('#sched-ok').show();
+								$('#sched-ok').show();
 							}
 						});
 		    		}
@@ -725,23 +656,21 @@ function refresh_scheduled_class_draggables()
     	},
     	stop: function(event, ui)
     	{
-    		$('.sc_drop_zone').remove();
+    		$('.drop-zone').remove();
     	},
     	revert: 'invalid'
 	});
 }
 
-function scheduled_class_drop_zones(length, days, height)
+function setup_drop_zones(length, days_count)
 {
 	var nums = ['zero', 'one', 'two', 'three', 'four', 'five'];
-	var key = '' + nums[days.length] + '-' + (length == 50 ? 'fifty' : 'eighty');
+	var key = '' + nums[days_count] + '-' + (length == 50 ? 'fifty' : 'eighty');
 	$.each(all_blocks[key], function(i, block){
-		$.each(block["days"], function(i, day) {
-			var html_block = "<div class='sc_drop_zone'";
-			html_block += " data-group='" + block["id"] + "-" + group_counter + "' ";
-			var id = day.substring(1) + "-" + block["id"];
-			var ddd = id.substring(0,3); // three char day abbreviation
-			html_block += "id='" + id + "'";
+		$.each(block["days"], function(j, day) {
+			var html_block = "<div class='drop-zone'";
+			html_block += " data-time='" + block["id"] + "' ";
+			var ddd = day.substring(1,4); // three char day abbreviation
 
 			// Set offsets of the dropzone
 			var left = 0;
@@ -757,25 +686,24 @@ function scheduled_class_drop_zones(length, days, height)
 			left += horiz * time_block_w;
 
 			html_block += " style='left: " + left + "px; top: " + top + "px; position: absolute' ";
-			html_block += "data-col='" + (horiz + 1) + "' data-start='" + block["offset"];
+			html_block += "data-col_index='" + (horiz + 1) + "' data-start='" + block["start"];
 			html_block += "' data-length='" + block["length"] + "'";
 			html_block += " data-days='" + block["days"] + "'";
-			html_block += " data-time='" + block["etime"]["starttm"] + "'";
 			html_block += " data-ddd='" + ddd + "'";
 			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
 		});
 	});
 
-	$('.sc_drop_zone').css({
+	$('.drop-zone').css({
 		width: time_block_w +'px',
-		height: height +'px'
+		height: ((length / 5) * five_min_height) + 'px'
 	});
 }
 
-function get_popover_content(group_id, params)
+function get_popover_content(time_id, params)
 {
-	var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
+	//var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
 	var days = "";
 	var days_arr = [];
 	
@@ -808,10 +736,10 @@ function get_popover_content(group_id, params)
 
 	var html = "<div style='text-align:center'><h4>New Class</h4></div>";
 	html += "<b>Days: </b><em>"+ days +"</em><br>";
-	html += "<b>Time: </b><em>"+ params["time"] +"</em><br>";
-	html += "<b>Duration: </b><em>"+ (params["b_length"] * 5) +" min</em><br><br>";
+	html += "<b>Time: </b><em>"+ params["time_string"] +"</em><br>";
+	html += "<b>Duration: </b><em>"+ params["length"] +" min</em><br><br>";
 	html += "<div><form action='"+add_class_url+"' id='new-class-form' style='display: inline'>";
-	html += "<input type='hidden' name='block_id' value='"+blk_id+"'>";
+	html += "<input type='hidden' name='time_id' value='"+time_id+"'>";
 	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
 	html += "<small><b>Class Name:</b></small><br>";
 	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
@@ -844,7 +772,7 @@ function get_popover_content(group_id, params)
 	});
 	html += "</select>";
 	//html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
-	html += "<button data-group='"+group_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
+	html += "<button data-time='"+time_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
 	html += "</form><button class='btn btn-default' id='cancel-add-class'><i class='fa fa-times'></i> Cancel</button></div>";
 
 	return html;
@@ -882,10 +810,9 @@ function load_schedule()
 		var course = $(this);
 		var days = parse_days("" + course.data('days'));
 		var start = course.data('start');
-		var col = course.data('col');
+		var day = course.data('ddd');
 		var length = course.data('length');
-		var offsets = compute_offsets(start, col, length);
-		var indices = temp_indices;
+		var offsets = compute_offsets(start, day, length);
 
 		var course_name = course.find('span.class-name-container').text();
 
@@ -900,12 +827,13 @@ function load_schedule()
 		});
 
 		course.data('col_index', (offsets["left"]/time_block_w) + 1);
-		course.data('indices', indices);
 
-		$(col).append(course);
+		$('#' + day + '-col').append(course);
+		
+		update_column_matrix(course, "busy");
 	});
 
-	refresh_scheduled_class_draggables();
+	update_scheduled_class_draggables($('.scheduled-class'));
 
 	course_list.sort();
 	
@@ -951,7 +879,7 @@ function compute_offsets(start, day, length)
 	var top = 0;//$(day).offset()["top"];
 	var vert = get_vertical_offset(start);
 	top += (vert * five_min_height);
-	var horiz = get_horizontal_offset(vert, length, day.substring(1,4), true);
+	var horiz = get_horizontal_offset(vert, length, day, true);
 
 	if (horiz == -1)
 	{
@@ -966,10 +894,20 @@ function compute_offsets(start, day, length)
 	};
 }
 
-function update_column_matrix(col, indices, mode)
+// blocks, mode
+function update_column_matrix(blocks, mode)
 {
-	$.each(indices, function(i, index) {
-		day_columns[col][index] = mode;
+	blocks.each(function() {
+		var col = $(this).data('ddd') + $(this).data('col_index');
+		
+		var indices = [];
+		var v_offset = get_vertical_offset($(this).attr('data-start'));
+		var b_length = $(this).data('length')/5;
+		for (i = 0; i < b_length; i++) indices.push(v_offset + i);
+		
+		$.each(indices, function(i, index) {
+			day_columns[col][index] = mode;
+		});
 	});
 }
 
@@ -1198,4 +1136,22 @@ function total_cols()
 	count += col_counts['fri'];
 
 	return count;
+}
+
+function get_class(class_id) {
+	return $('.scheduled-class').filter(function (index) {
+		return $(this).data('class') == class_id;
+	});
+}
+
+function update_drop_zone(time_id) {
+	$('.drop-zone').droppable("destroy");
+	
+	var blocks = $(".drop-zone[data-time=" + time_id + "]");
+	blocks.removeClass('time-block-hover time-block-active drop-zone ui-droppable');
+	blocks.addClass('scheduled-class new-block');
+	
+	$('.drop-zone').remove();
+	
+	return blocks;
 }

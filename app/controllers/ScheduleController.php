@@ -372,7 +372,7 @@ class ScheduleController extends BaseController {
 		$class->room_group_id = $room->group;
 		$class->is_rm_final = $room->is_final;
 		$class->class_type = "Lecture";
-		$class->etime_id = Input::get('block_id');
+		$class->etime_id = Input::get('time_id');
 		//$class->is_tm_final = true;
 		
 		$schedule->events()->save($class);
@@ -400,18 +400,14 @@ class ScheduleController extends BaseController {
 			return Response::json(['error' => 'Invalid class id'], 500);
 		}
 
-		$class = models\Event::find($id);
-		$class->delete();
-
 		try {
-			$result = Communication::sendCheck($schedule->id);
-
-			return json_encode($result);
+			$class = models\Event::find($id);
+			$class->delete();
+		} catch (Exception $e) {
+			return Response::json(['error' => 'Could not delete class'], 500);
 		}
-		catch (Exception $e)
-		{
-				return Response::json(['error' => 'Could not check schedule'], 500);
-		}
+		
+		return json_encode($this->api_check_sched($schedule));
 	}
 
 	public function e_update_class()
@@ -448,7 +444,7 @@ class ScheduleController extends BaseController {
 		$result = new StdClass;
 		try {
 			try {
-				$result = Communication::sendCheck($schedule->id);
+				$result = Communication::sendCheck($schedule);
 				if(property_exists($result, 'Error')) {
 					return $result;
 				}

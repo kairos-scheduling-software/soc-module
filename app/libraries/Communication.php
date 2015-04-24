@@ -2,27 +2,22 @@
 
 class Communication 
 {
-    public static function sendCheck($schedule_id)
+    public static function sendCheck($schedule)
     {
     	$jsonBuilder = [];
-    	$schedule = Schedule::find($schedule_id);
+    	//$schedule = Schedule::find($schedule_id);
 
     	if(is_null($schedule))
     	{
-    		throw new Exception('ERROR: The requested schedule could not be found');
+            $result = new StdClass;
+    		$result->Error = 'The requested schedule could not be found';
+            return $result;
     	}
 
     	$json = Communication::create_backEndJson($schedule);
 
         $result = Communication::sendJsonToCoreService('new', $json, $schedule_id);
-
-        //do error checking
         $scheduleResults = json_decode($result);
-
-        //if(property_exists($scheduleResults, 'Error'))
-        //{
-         //   throw new Exception('ERROR: ' . $scheduleResults->Error);
-        //}
 
         return $scheduleResults;
     }

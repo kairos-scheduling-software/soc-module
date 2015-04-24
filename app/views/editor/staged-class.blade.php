@@ -2,6 +2,10 @@
 	$etime = $class->etime;
 	$day_string = " " . $etime->days;
 	$days = array();
+	$rm_grp = $class->room_group_id;
+	$rm = $class->room_id;
+	if ($rm_grp == null) $rm_grp = -1;
+	if ($rm == null) $rm = -1;
 
 	// Parse the days this class is held
 	if (strpos($day_string, "1"))
@@ -57,9 +61,11 @@
 			if (strpos($day, "fri"))
 				$ddd = "fri";
 		?>
-		<div class="{{ $block_class }} scheduled-class {{$drag_class}}" data-class="{{ $class->id }}" data-ddd="{{ $ddd }}"
-			data-days="{{$etime->days}}" data-time="{{ $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
-			<span class="class-name-container"><a class="toggle-right-column" href="#right-side-bar">{{ $class->name }}</a></span>
+		<div class="{{ $block_class }} scheduled-class {{$drag_class}}" data-id="{{ $class->id }}" data-ddd="{{ $ddd }}"
+			data-days="{{$etime->days}}" data-time="{{ $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}"
+			data-room_id="{{ $rm }}" data-grp_id="{{ $rm_grp }}"
+			data-enroll="{{ $class->enroll_cap }}" data-prof_id="{{ $class->professor }}">
+			{{ $class->name }}
 		</div>
 	@endforeach
 @endif

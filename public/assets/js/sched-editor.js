@@ -3,9 +3,6 @@ var time_block_w;
 var all_blocks = {};
 var day_columns = [];
 var blocks_to_update = [];
-//var group_counter = 1;
-var add_class_url;
-var remove_class_url;
 var sched_id;
 var col_counts = [];
 var course_list = [];
@@ -20,8 +17,6 @@ $(function(){
 
 	initialize_column_matrix();
 
-	add_class_url = $('#hidden-data').data('addurl');
-	remove_class_url = $('#hidden-data').data('removeurl');
 	sched_id = $('#hidden-data').data('schedid');
 	var cursor_img = $('#hidden-data').data('cursor');
 
@@ -37,18 +32,24 @@ $(function(){
 	$('body').on('submit', '#new-class-form', function(e) {
 		e.preventDefault();
 		var form = $(this);
-		var time_id = $('#new-class-btn').data('time');
-		//var blocks = $(".new-block");
 		var blocks = form.data('block');
-		var params = form.data('params');
-		var class_name = form.children('input[name="class_name"]').val();
+		var time_id = blocks.data('time');
+		var class_name = form.children('input[name="class_name"]').val().trim();
 
-		blocks.html("<span class='class-name-container'>" + class_name + "</span");
 		blocks.popover('destroy');
 		
-		var data = form.serializeArray();
-		var url = form.attr('action');
-
+		var url = $('#sched-name').data('url');
+		var data = {
+			sched_id: sched_id,
+			mode: 'add-class',
+			class_name: class_name,
+			time_id: time_id,
+			enroll: form.children('input[name="enroll"]').val(),
+			room_id: form.children('select[name="room"]').val(),
+			grp_id: form.children('select[name="room_group"]').val(),
+			prof_id: form.children('select[name="prof"]').val()
+		};
+		
 		$.ajax({
 			url:		url,
 			type: 		"POST",
@@ -58,12 +59,13 @@ $(function(){
 				$('#sched-bad').hide();
 				$('#checking-sched').show();
 			},
-			success: 	function(data, textStatus, jqXHR) {
+			success: 	function(new_data, textStatus, jqXHR) {
 				$('#checking-sched').hide();
-				var json_data = JSON.parse(data);
+				var json_data = JSON.parse(new_data);
 				
 				blocks.removeClass('new-block');
-				blocks.data('class', json_data['newId']);
+				data['class_id'] = json_data['newId'];
+				update_class_info(blocks, data);
 				
 				// Update the matrix
 				update_column_matrix(blocks, "busy");
@@ -94,6 +96,60 @@ $(function(){
 		return true;
 	});
 
+	$('body').on('submit', '#edit-panel-form', function(e) {
+		e.preventDefault();
+		var form = $(this);
+		var class_data = {
+			sched_id: sched_id,
+			mode: 'edit-class',
+			class_id: form.find('.form-control[name="class_id"]').val(),
+			class_name: form.find('.form-control[name="class_name"]').val(),
+			enroll: form.find('.form-control[name="enroll"]').val(),
+			prof_id: form.find('.form-control[name="prof"]').val(),
+			room_id: form.find('.form-control[name="room"]').val(),
+			grp_id: form.find('.form-control[name="room_group"]').val()
+		};
+		console.log(class_data);
+		$.ajax({
+			url: $('#sched-name').data('url'),
+			type: 'post',
+			data: class_data,
+			beforeSend: function() {
+				$('#sched-ok').hide();
+				$('#sched-bad').hide();
+				$('#checking-sched').show();
+			},
+			success: 	function(data, textStatus, jqXHR) {
+				$('#checking-sched').hide();
+				var json_data;
+				if (data != '') json_data = JSON.parse(data);
+				else json_data = Object.create(null);
+				var blocks = get_class(class_data['class_id']);
+				update_class_info(blocks, class_data);
+				//blocks.click();
+				
+				if (json_data['wasFailure'])
+				{
+					console.log('was failure: true');
+					$('#sched-bad').show();
+					$('#conflict-section').show();
+				}
+				else
+				{
+					console.log('was failure: false');
+					$('#sched-ok').show();
+				}
+			},
+			error: 		function(jqXHR, textStatus, errorThrown) {
+				console.log(JSON.stringify(jqXHR));
+				$('#checking-sched').hide();
+				$('#sched-bad').show();
+				$('#cancel-edit-panel').click();
+			}
+		});
+		return true;
+	});
+	
 	resize_all();
 	/*
 	$(window).resize(function(){
@@ -166,31 +222,18 @@ $(function(){
 						update_drop_zone();
 						return;
 					}
-		    		//group_counter++;
-		    		var time_id = $(this).data('time');
 		    		
+		    		var time_id = $(this).data('time');
 		    		var blocks = update_drop_zone(time_id);
 		    		
 		    		var params = [];
 		    		params["col"] = $(this).data('col_index');
-		    		params["day_string"] = $(this).data('days');
+		    		params["days"] = ('' + $(this).data('days')).split('|');
 		    		params["start"] = $(this).attr('data-start');
 		    		params["time_string"] = parse_time(params['start']);
 		    		params["length"] = $(this).data('length');
-		    		params["days"] = [];
-
-		    		if (params["day_string"].indexOf("mon") >=0)
-		    			params["days"].push('mon');
-		    		if (params["day_string"].indexOf("tue") >=0)
-		    			params["days"].push('tue');
-		    		if (params["day_string"].indexOf("wed") >=0)
-		    			params["days"].push('wed');
-		    		if (params["day_string"].indexOf("thu") >=0)
-		    			params["days"].push('thu');
-		    		if (params["day_string"].indexOf("fri") >=0)
-		    			params["days"].push('fri');
-
-		    		var content = get_popover_content(time_id, params);
+					
+		    		var content = get_popover_content(params);
 
 		    		// Show popover
 		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
@@ -207,12 +250,11 @@ $(function(){
 	    					$('.arrow').css('top', pos + 'px');
 	    				}
 	    				
-	    				$('#new-class-form').data('params', params);
 	    				$('#new-class-form').data('block', blocks);
 	    				
 	    				$('#cancel-add-class').click(function() {
 	    					el.popover('destroy');
-	    					$('.new-block').remove();
+	    					blocks.remove();
 	    				});
 
 		    		}).popover('show');
@@ -286,7 +328,7 @@ $(function(){
 	
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
-	$('body').on('click', '.toggle-right-column', function(e) {
+	$('body').on('click', '.scheduled-class', function(e) {
 		e.preventDefault();
 
 		if(!right_panel_open)
@@ -307,10 +349,61 @@ $(function(){
 		{
 
 		}
-		var class_name = $(this).text();
-		$('#edit-panel-class-name').val(class_name);
+		var form = $('#edit-panel-form');
+		form.find('input[name="class_id"]').val('');
+		
+		var scheduled_class = $(this);
+		var class_data = get_class_info(scheduled_class);
+		
+		form.find('input[name="class_name"]').val(class_data['class_name']);
+		form.find('input[name="enroll"]').val(class_data['enroll']);
+		form.find('select[name="prof"]').val(class_data['prof_id']);
+		
+		form.find('input[name="class_id"]').val(class_data['class_id']);
+		
+		var grp_select = form.find('select[name="room_group"]');
+		var room_select = form.find('select[name="room"]');
+		var prof_select = form.find('select[name="prof"]');
+		//~ $.ajax({
+			//~ url: grp_select.data('url'),
+			//~ type: 'post',
+			//~ success: function(data, textStatus, jqXHR) {
+				//~ var grps = JSON.parse(data);
+				//~ 
+			//~ }
+		//~ });
+		
+		// Setup initial values for room_group and room select (right-side-bar)
+		var html = '<option value="-1">All</option>';
+		$.each(room_groups, function(grp_id, grp) {
+			html += '<option value="' + grp_id + '">' + grp.name + '</option>';
+		});
+		grp_select.html(html);
+		
+		html = '';
+		$.each(rooms, function(i, rm) {
+			html += '<option value="' + rm['id'] + '">' + rm['name'] + '</option>';
+		});
+		room_select.html(html);
+		
+		html = '';
+		$.each(professors, function(i, prof) {
+			var id = prof['id'];
+			var prof_name = prof['name'];
+			html += '<option value="' + id + '">' + prof_name + '</option>';
+		});
+		prof_select.html(html);
+		
+		prof_select.val(class_data['prof_id']);
+		grp_select.val(class_data['grp_id']);
+		room_select.val(class_data['room_id']);
 	});
-
+	
+	$('#cancel-edit-panel').click(function() {
+		$('#edit-panel-form').find('.form-control').val('');
+		$('#close-right-panel').click();
+	});
+	
 	$('#close-right-panel').click(function(e) {
 		e.preventDefault();
 
@@ -320,20 +413,23 @@ $(function(){
 });
 
 $(document).ready(function () {
-	$('body').on('change', 'select[name="room_grp_name"]', function(e) {
-		var grp_name = $('select[name="room_grp_name"] option:selected')[0].value;
+	// Update room_name on room_group_name changes
+	$('body').on('change', 'select[name="room_group"]', function(e) {
+		var grp_id = $(this).children('option:selected')[0].value;
 		var rm_list;
-		if (grp_name == 'All') {
+		if (grp_id == -1) {
 			rm_list = rooms;
 		} else {
-			rm_list = room_groups[grp_name];
+			rm_list = room_groups[grp_id];
 		}
 		var html = '';
 		$.each(rm_list, function(i, rm) {
-			html += '<option>' + rm + '</option>';
+			html += '<option value="' + rm['id'] + '">' + rm['name'] + '</option>';
 		});
-		$('select[name="room_name"] option').remove();
-		$('select[name="room_name"]').append(html);
+		var grp_select = $(this);
+		var rm_select = grp_select.closest('form').find('select[name="room"]');
+		rm_select.children('option').remove();
+		rm_select.append(html);
 	});
 });
 
@@ -479,14 +575,7 @@ function get_horizontal_offset(vertical, length, day, loading_mode)
 			}
 		}
 	}
-
-	//~ if(loading_mode)
-	//~ {
-		//~ update_column_matrix(col_index, update, "busy");
-		//~ temp_indices = update;
-	//~ }
-
-	//console.log("Col Num: " + col_num);
+	
 	return col_num - 1;
 }
 
@@ -546,15 +635,16 @@ function update_scheduled_class_draggables(sched_classes)
     	},
     	start: function(event, ui)
     	{
-    		var time_id = $(this).data('time');
-    		var class_id = $(this).data('class');
-    		var old_blocks = get_class(class_id);
+			var class_data = get_class_info($(this));
+    		//var time_id = $(this).data('time');
+    		//var class_id = $(this).data('id');
+    		var old_blocks = get_class(class_data['class_id']);
 
     		var dragged_block = $(this);
     		var length = dragged_block.data('length');
     		var days = parse_days(dragged_block.data('days'));
     		var drop_height = (length / 5) * five_min_height;
-    		var class_html = dragged_block.html();
+    		//var class_html = dragged_block.html();
 
     		setup_drop_zones(length, days.length);
     		
@@ -565,7 +655,7 @@ function update_scheduled_class_draggables(sched_classes)
 		    	{
 		    		// Hide the old blocks
 		    		var new_time_id = $(this).data('time');
-		    		if (new_time_id == time_id) {
+		    		if (new_time_id == class_data['time_id']) {
 						$('.drop-zone').remove();
 						return;
 					}
@@ -573,9 +663,7 @@ function update_scheduled_class_draggables(sched_classes)
 					old_blocks.hide();
 					
 		    		var new_blocks = update_drop_zone(new_time_id);
-					
-		    		new_blocks.data('class', class_id);
-					new_blocks.html(class_html);
+					update_class_info(new_blocks, class_data);
 		    		
 		    		$('.class-name-container').each(function() {
 						var course = $(this);
@@ -589,7 +677,7 @@ function update_scheduled_class_draggables(sched_classes)
 					var edit_class_data = Object.create(null);
 					edit_class_data['sched_id'] = sched_id;
 					edit_class_data['mode'] = 'edit-class';
-					edit_class_data['class_id'] = class_id;
+					edit_class_data['class_id'] = class_data['class_id'];
 					edit_class_data['time_id'] = new_time_id;
 
 					$.ajax({
@@ -645,9 +733,9 @@ function update_scheduled_class_draggables(sched_classes)
 		    			old_blocks.hide();
 
 		    			$.ajax({
-							url:		remove_class_url,
-							type: 		"POST",
-							data: 		{'id':class_id, 'sched_id':sched_id},
+							url: $('#sched-name').data('url'),
+							type: "POST",
+							data: {sched_id: sched_id, mode: 'remove-class', id:class_data['class_id']},
 							beforeSend: function() {
 								$('#sched-ok').hide();
 								$('#sched-bad').hide();
@@ -676,10 +764,10 @@ function update_scheduled_class_draggables(sched_classes)
 							},
 							error: function(jqXHR, textStatus, errorThrown) {
 								/*
-								console.log(JSON.stringify(jqXHR));
 								$('#checking-sched').hide();
 								$('#sched-bad').show();
 								*/
+								console.log(JSON.stringify(jqXHR));
 								old_blocks.show();
 								$('#checking-sched').hide();
 								$('#conflict-section').hide();
@@ -726,7 +814,7 @@ function setup_drop_zones(length, days_count)
 			html_block += " style='left: " + left + "px; top: " + top + "px; position: absolute' ";
 			html_block += "data-col_index='" + (horiz + 1) + "' data-start='" + block["start"];
 			html_block += "' data-length='" + block["length"] + "'";
-			html_block += " data-days='" + block["days"] + "'";
+			html_block += " data-days='" + block["etime"]["days"] + "'";
 			html_block += " data-ddd='" + ddd + "'";
 			html_block += "></div>"; // TODO: figure out tool tips
 			$(day).append(html_block);
@@ -739,27 +827,26 @@ function setup_drop_zones(length, days_count)
 	});
 }
 
-function get_popover_content(time_id, params)
+function get_popover_content(params)
 {
-	//var blk_id = parseInt(group_id.substring(0, group_id.indexOf('-')));
 	var days = "";
 	var days_arr = [];
 	
 	$.each(params["days"], function(i, day) {
 		switch(day) {
-			case "mon":
+			case "1":
 				days_arr.push('M');
 				break;
-			case "tue":
+			case "2":
 				days_arr.push('T');
 				break;
-			case "wed":
+			case "3":
 				days_arr.push('W');
 				break;
-			case "thu":
+			case "4":
 				days_arr.push('Th');
 				break;
-			case "fri":
+			case "5":
 				days_arr.push('F');
 				break;
 		}
@@ -776,41 +863,37 @@ function get_popover_content(time_id, params)
 	html += "<b>Days: </b><em>"+ days +"</em><br>";
 	html += "<b>Time: </b><em>"+ params["time_string"] +"</em><br>";
 	html += "<b>Duration: </b><em>"+ params["length"] +" min</em><br><br>";
-	html += "<div><form action='"+add_class_url+"' id='new-class-form' style='display: inline'>";
-	html += "<input type='hidden' name='time_id' value='"+time_id+"'>";
-	html += "<input type='hidden' name='sched_id' value='"+sched_id+"'>";
+	html += "<div><form id='new-class-form' style='display: inline'>";
 	html += "<small><b>Class Name:</b></small><br>";
 	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
 	
 	html += "<small><b>Max Enrollments:</b></small><br/>";
-	html += "<input type='text' class='form-control' name='enrollment' placeholder='Class Enrollment' required>";
+	html += "<input type='text' class='form-control' name='enroll' placeholder='Class Enrollment' required>";
 	
 	html += "<small><b>Room groups:</b></small><br/>";
-	html += "<select class='form-control' name='room_grp_name'>";
+	html += "<select class='form-control' name='room_group'>";
 	html += "<option selected>All</option>";
-	$.each(room_groups, function(grp, obj) {
-		html += "<option>" + grp + "</option>";
+	$.each(room_groups, function(grp_id, grp) {
+		html += '<option value="' + grp_id + '">' + grp.name + '</option>';
 	});
 	html += "</select>";
 	
 	html += "<small><b>Room:</b></small><br/>";
-	html += "<select class='form-control' name='room_name'>";
+	html += "<select class='form-control' name='room'>";
 	$.each(rooms, function(i, rm) {
-		html += "<option>" + rm + "</option>";
+		html += '<option value="' + rm['id'] + '">' + rm['name'] + '</option>';
 	});
 	html += "</select>";
-	//html += "<input type='text' class='form-control' name='room_name' placeholder='Room' required>";
 	
 	html += "<small><b>Professor:</b></small><br/>";
-	html += "<select class='form-control' name='prof_name'>";
+	html += "<select class='form-control' name='prof'>";
 	$.each(professors, function(i, prof) {
-		var uid = prof['uid'];
+		var id = prof['id'];
 		var prof_name = prof['name'];
-		html += "<option value='" + uid + "'>" + prof_name + "</option>";
+		html += '<option value="' + id + '">' + prof_name + '</option>';
 	});
 	html += "</select>";
-	//html += "<input type='text' class='form-control' name='prof_name' placeholder='Professor' required>";
-	html += "<button data-time='"+time_id+"' id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
+	html += "<button id='new-class-btn' class='btn btn-primary'><i class='fa fa-save'></i> Save</button>";
 	html += "</form><button class='btn btn-default' id='cancel-add-class'><i class='fa fa-times'></i> Cancel</button></div>";
 
 	return html;
@@ -846,7 +929,6 @@ function load_schedule()
 	// Move the staged classes to their appropriate place in the grid
 	$('#class-staging > div.scheduled-class').each(function() {
 		var course = $(this);
-		var days = parse_days("" + course.data('days'));
 		var start = course.data('start');
 		var day = course.data('ddd');
 		var length = course.data('length');
@@ -1178,8 +1260,30 @@ function total_cols()
 
 function get_class(class_id) {
 	return $('.scheduled-class').filter(function (index) {
-		return $(this).data('class') == class_id;
+		return $(this).data('id') == class_id;
 	});
+}
+
+function get_class_info(block) {
+	var data = {
+		class_id: block.data('id'),
+		class_name: block.first().text().trim(),
+		time_id: block.data('time'),
+		enroll: block.data('enroll'),
+		prof_id: block.data('prof_id'),
+		room_id: block.data('room_id'),
+		grp_id: block.data('grp_id')
+	};
+	return data;
+}
+
+function update_class_info(new_blocks, data) {
+	new_blocks.data('id', data['class_id']);
+	new_blocks.html(data['class_name']);
+	new_blocks.data('enroll', data['enroll']);
+	new_blocks.data('prof_id', data['prof_id']);
+	new_blocks.data('room_id', data['room_id']);
+	new_blocks.data('grp_id', data['grp_id']);
 }
 
 function update_drop_zone(time_id) {

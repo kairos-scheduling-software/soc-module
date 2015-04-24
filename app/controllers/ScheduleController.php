@@ -57,13 +57,13 @@ class ScheduleController extends BaseController {
 		
 		$time_blocks = Etime::where('standard_block', '=', 1)->where('starttm', '!=', '0730')->get();
 		
-		$rooms = Room::select('name')->get();
-		//$room_groups = RoomGroup::with('room')->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
-		$room_groups = DB::table('room_groups')
-				->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
-				->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
-				->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
-		$professors = Professor::select('uid', 'name')->get();
+		$rooms = Room::select('id', 'name')->get();
+		$room_groups = RoomGroup::with('rooms')->get();
+		//~ $room_groups = DB::table('room_groups')
+				//~ ->join('room_mappings', 'room_groups.id', '=', 'room_mappings.id')
+				//~ ->join('rooms', 'room_mappings.rid', '=', 'rooms.id')
+				//~ ->select('room_groups.name as grp_name', 'rooms.name as rname')->get();
+		$professors = Professor::select('id', 'name')->get();
 
 		return View::make('editor.sched-editor')->with([
 			'page_name'		=>	'Schedule Editor',
@@ -313,74 +313,6 @@ class ScheduleController extends BaseController {
 			]);
 		else
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page		
-	}
-
-	public function e_add_class()
-	{
-		// TODO: add error checking!!
-		$sched_id = Input::get('sched_id');
-		
-		if (Auth::user()->schedules->contains($sched_id)) {
-			$schedule = Schedule::find($sched_id);
-		} else {
-			$schedule = null;
-		}
-		
-		if (!$schedule) {
-			return Response::json(['error' => 'Invalid schedule id'], 500);
-		}
-		
-		// Add & save the room
-		//$room = Room::firstOrCreate(['name' => Input::get('room_name'), 'schedule_id' => $schedule->id]);
-		//$room->capacity = 80;
-		//$room->save();/*
-		//if (!$room)
-		//{
-		//	$room = new Room();
-		//	$room->name = Input::get('room_name');
-		//	$room->capacity = 80;
-		//	$room->schedule_id = $schedule->id;
-		//	$room->save();
-		//}*/
-		$enroll = Input::get('enrollment');
-		
-		$room = new StdClass;
-		$room_name = Input::get('room_name');
-		$room_group = Input::get('room_grp_name');
-		$room->group = null;
-		$room->id = null;
-		$room->is_final = false;
-		if (strtolower($room_group) != 'all') {
-			$rm_grp_id = RoomGroup::select('id')->where('name', '=', $room_group)->firstOrFail();
-			$room->group = $rm_grp_id->id;
-		}
-		if (strtolower($room_name) != 'all') {
-			$rm_id = Room::select('id')->where('name', '=', $room_name)->firstOrFail();
-			$room->id = $rm_id->id;
-			$room->is_final = true;
-		}
-		
-		$prof_uid = Input::get('prof_name');
-		$prof = Professor::select('id')->where('uid', '=', $prof_uid)->firstOrFail();
-
-		// Add & save the class
-		$class = new models\Event();
-		$class->name = Input::get('class_name');
-		$class->enroll_cap = $enroll;
-		$class->professor = $prof->id;
-		$class->room_id = $room->id;
-		$class->room_group_id = $room->group;
-		$class->is_rm_final = $room->is_final;
-		$class->class_type = "Lecture";
-		$class->etime_id = Input::get('time_id');
-		//$class->is_tm_final = true;
-		
-		$schedule->events()->save($class);
-
-		$result = $this->api_check_sched($schedule);
-		$result->newId = $class->id;
-		
-		return json_encode($result);
 	}
 
 	public function e_remove_class()
@@ -667,7 +599,39 @@ class ScheduleController extends BaseController {
 		$mode = Input::get('mode');
 		switch ($mode) {
 			case 'add-class':
-				return e_add_class();
+				$time_id = Input::get('time_id');
+				$enroll = Input::get('enroll');
+				$room_id = Input::get('room_id');
+				$grp_id = Input::get('grp_id');
+				$prof_id = Input::get('prof_id');
+				
+				$is_room_final = false;
+				if (RoomGroup::find($grp_id) == null) $grp_id = null;
+				if (Room::find($room_id) == null) $room_id = null;
+				else $is_room_final = true;
+				
+				if (Professor::find($prof_id) == null) {
+					return Response::json(['error' => 'Invalid professor id'], 500);
+				}
+
+				// Add & save the class
+				$class = new models\Event();
+				$class->name = Input::get('class_name');
+				$class->enroll_cap = $enroll;
+				$class->professor = $prof_id;
+				$class->room_id = $room_id;
+				$class->room_group_id = $grp_id;
+				$class->is_rm_final = $is_room_final;
+				$class->class_type = "Lecture";
+				$class->etime_id = $time_id;
+				//$class->is_tm_final = true;
+				
+				$schedule->events()->save($class);
+
+				$result = $this->api_check_sched($schedule);
+				$result->newId = $class->id;
+				
+				return json_encode($result);
 				break;
 			case 'edit-class':
 				$cls_id = Input::get('class_id');
@@ -675,13 +639,48 @@ class ScheduleController extends BaseController {
 					return Response::json(['error' => 'Invalid class id'], 500);
 				}
 				
-				$time_id = Input::get('time_id');
 				$class = models\Event::find($cls_id);
-				$class->etime_id = $time_id;
-				$class->save();
+				
+				if (Input::has('class_name')) {
+					$class_name = Input::get('class_name');
+					$class->name = $class_name;
+				}
+				
+				if (Input::has('time_id')) {
+					$time_id = Input::get('time_id');
+					$class->etime_id = $time_id;
+				}
+				
+				if (Input::has('enroll')) {
+					$enroll = Input::get('enroll');
+					$class->enroll_cap = $enroll;
+				}
+				
+				if (Input::has('room_id')) {
+					$rm = Input::get('room_id');
+					if (Room::find($rm) == null) $class->room_id = null;
+					else $class->room_id = $rm;
+				}
+				
+				if (Input::has('grp_id')) {
+					$grp_id = Input::get('grp_id');
+					if (RoomGroup::find($grp_id) == null) $class->room_group_id = null;
+					else $class->room_group_id = $grp_id;
+				}
+				
+				if (Input::has('prof_id')) {
+					$prof = Input::get('prof_id');
+					$class->professor = $prof;
+				}
+				
+				try {
+					$class->save();
+				} catch (Exception $e) {
+					return Response::json(['error' => 'Could not update class'], 500);
+				}
 				break;
 			case 'remove-class':
-				return e_remove_class();
+				return $this->e_remove_class();
 				break;
 			case 'edit-name':
 				

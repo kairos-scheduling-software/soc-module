@@ -190,16 +190,6 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  =>  'ScheduleController@e_edit_schedule'
     ));
     
-    Route::post('add-class', array(
-        'as'    =>  'e-add-class',
-        'uses'  =>  'ScheduleController@e_add_class'
-    ));
-
-    Route::post('remove-class', array(
-        'as'    =>  'e-remove-class',
-        'uses'  =>  'ScheduleController@e_remove_class'
-    ));
-
     //ticket manager routes
     Route::get('/tickets/{schedule_id}', array(
         'as'    => 'ticket-manager',

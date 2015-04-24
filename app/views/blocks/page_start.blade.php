@@ -73,24 +73,28 @@
             var grps = {{ json_encode($room_groups) }};
             
             room_groups = Object.create(null);
-            rooms = [];
-            $.each(rms, function(i, rm) {
-                rooms.push(rm['name']);
+            rooms = rms;
+            rooms.sort(function(r1, r2){
+                r1 = r1['name'];
+                r2 = r2['name'];
+                return r1 < r2 ? -1 : (r1 > r2 ? 1 : 0);
             });
-            rooms.sort();
-            rooms.unshift('All');
+            rooms.unshift({id: -1, name: 'All'});
             $.each(grps, function(i, rec) {
-                var grp_name = rec['grp_name'];
-                var rname = rec['rname'];
-                var grp = room_groups[grp_name];
-                if (grp === undefined) {
-                    grp = room_groups[grp_name] = [];
-                }
-                grp.push(rname);
-            });
-            $.each(room_groups, function(grp, rm_list) {
-                rm_list.sort();
-                rm_list.unshift('All');
+                var grp_id = '' + rec['id'];
+                var grp_name = rec['name'];
+                var grp = room_groups[grp_id] = rec['rooms'];
+                //~ $.each(rec['rooms'], function(i, rm) {
+                    //~ grp.push(rm['id'], rm['name']);
+                //~ });
+                //grp = rec['rooms'];
+                grp.sort(function(r1, r2){
+                    r1 = r1['name'];
+                    r2 = r2['name'];
+                    return r1 < r2 ? -1 : (r1 > r2 ? 1 : 0);
+                });
+                grp.unshift({id: -1, name: 'All'});
+                grp.name = grp_name;
             });
             
             professors = {{ json_encode($professors) }};

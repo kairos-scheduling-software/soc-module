@@ -358,8 +358,6 @@
 	</div>
 </div>
 <div id="hidden-data" class="hide"
-	 data-addurl="{{ URL::route('e-add-class') }}"
-	 data-removeurl= "{{ URL::route('e-remove-class') }}"
 	 data-schedid="{{ $schedule->id }}"
 	 data-cursor="{{ URL::asset('assets/images/drag-cursor-sm.png') }}">
 </div>
@@ -377,31 +375,32 @@
 	<div>
 		<h3 style="margin-top: 0">Class Info</h3>
 		<form id="edit-panel-form" action="">
+			<input type="hidden" class="form-control" name="class_id" value=""/>
 			<div class="form-group">
 				<label for="edit-panel-class-name">Class Name:</label>
-				<input type="text" class="form-control" name="edit-panel-class-name" id="edit-panel-class-name" required>
+				<input type="text" class="form-control" name="class_name" id="edit-panel-class-name" required>
 			</div>
 
 			<div class="form-group">
 				<label for="edit-panel-prof-select">Professor:</label><br>
-				<select class="form-control" name="edit-panel-prof-select">
+				<select class="form-control" name="prof">
 				</select>
 			</div>
 
 			<div class="form-group">
 				<label for="edit-panel-roomgroup-select">Max Capacity:</label><br>
-				<input type="text" class="form-control" name="edit-panel-roomgroup-select">
+				<input type="text" class="form-control" name="enroll">
 			</div>
 
 			<div class="form-group">
 				<label for="edit-panel-roomgroup-select">Room Group:</label><br>
-				<select class="form-control" name="edit-panel-roomgroup-select">
+				<select class="form-control" name="room_group" data-url="{{ URL::route('room-group-list') }}">
 				</select>
 			</div>
 
 			<div class="form-group">
 				<label for="edit-panel-room-select">Room:</label><br>
-				<select class="form-control" name="edit-panel-room-select">
+				<select class="form-control" name="room" data-url="{{ URL::route('room-list') }}">
 				</select>
 			</div>
 
@@ -444,7 +443,7 @@
 			</div>
 			<div class="form-group">
 				<button class="btn btn-primary">{{ FA::icon('save') }} SAVE</button>
-				<button class="btn btn-default">{{ FA::icon('times') }} CANCEL</button>
+				<button class="btn btn-default" id="cancel-edit-panel">{{ FA::icon('times') }} CANCEL</button>
 			</div>
 		</form>
 	</div>

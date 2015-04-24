@@ -283,11 +283,6 @@ $(function(){
 	
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
-	$('.scheduled-class').click(function() {
-		console.log("Column: " + $(this).data('ddd') + $(this).data('col_index'));
-		console.log("Indices: " + $(this).data('indices'));
-	});
-
 	$('.toggle-right-column').click(function(e) {
 		e.preventDefault();
 

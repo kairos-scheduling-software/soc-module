@@ -43,10 +43,16 @@ class AccountController extends BaseController {
 			//save the user to the database
 			if($user->save())
 			{
-				/*
-				echo("Email: " . Config::get('mail.username') . "<br>Password: " . Config::get('mail.password'));
-				die();
-				*/
+				$schedule = new Schedule();
+				$schedule->name = 'delete me';
+				$schedule->last_edited_by = $user->id;
+				$schedule->semester = 'Fall';
+				$schedule->year = 2015;
+				$schedule->description = '';
+
+				$schedule->save();
+				$user->schedules()->attach($schedule->id);
+				
 				//send them an activation email
 				try
 				{

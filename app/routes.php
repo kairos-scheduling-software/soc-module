@@ -185,6 +185,11 @@ Route::group(array('before'=> 'auth'), function()
     ));
 
     // Editor routes
+    Route::post('/edit-schedule', array(
+        'as'    =>  'e-edit-schedule',
+        'uses'  =>  'ScheduleController@e_edit_schedule'
+    ));
+    
     Route::post('add-class', array(
         'as'    =>  'e-add-class',
         'uses'  =>  'ScheduleController@e_add_class'

@@ -263,7 +263,7 @@
 			//$('#toggle-container').zIndex($('#left-side-bar').zIndex() - 1);
 			$('#toggle-container').animate({marginLeft: +350}, {duration: 200});
 			panel_is_open = true;
-			
+
 			if(right_panel_open)
 				$('#close-right-panel').click();
 		}
@@ -369,9 +369,85 @@
 @section('right-column')
 
 <div id="edit-class-panel">
-	<h1>
-		<a href="#" id="close-right-panel">&times;</a>
-	</h1>
+	<div style="text-align: right">
+		<h1 style="margin-bottom: 0">
+			<a href="#" id="close-right-panel">&times;</a>
+		</h1>
+	</div>
+	<div>
+		<h3 style="margin-top: 0">Class Info</h3>
+		<form id="edit-panel-form" action="">
+			<div class="form-group">
+				<label for="edit-panel-class-name">Class Name:</label>
+				<input type="text" class="form-control" name="edit-panel-class-name" id="edit-panel-class-name" required>
+			</div>
+
+			<div class="form-group">
+				<label for="edit-panel-prof-select">Professor:</label><br>
+				<select class="form-control" name="edit-panel-prof-select">
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="edit-panel-roomgroup-select">Max Capacity:</label><br>
+				<input type="text" class="form-control" name="edit-panel-roomgroup-select">
+			</div>
+
+			<div class="form-group">
+				<label for="edit-panel-roomgroup-select">Room Group:</label><br>
+				<select class="form-control" name="edit-panel-roomgroup-select">
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="edit-panel-room-select">Room:</label><br>
+				<select class="form-control" name="edit-panel-room-select">
+				</select>
+			</div>
+
+			<hr>
+			<h3>Constraints 
+				<button class="btn btn-sm" id="add-const-btn" title="Add a constraint">{{ FA::icon('plus') }}</button>
+			</h3>
+
+			<div class="form-group">
+				<table>
+					<tr><th>Key:</th><th colspan="2">Value:</th></tr>
+					<tr>
+						<td>
+							<select class="form-control"><option>No Overlap With</option></select>
+						</td>
+						<td>
+							<select class="form-control"><option>CS 4540-001</option></select>
+						</td>
+						<td>{{ FA::icon('trash') }}</td>
+					</tr>
+					<tr>
+						<td>
+							<select class="form-control"></select>
+						</td>
+						<td>
+							<select class="form-control"></select>
+						</td>
+						<td>{{ FA::icon('trash') }}</td>
+					</tr>
+					<tr>
+						<td>
+							<select class="form-control"></select>
+						</td>
+						<td>
+							<select class="form-control"></select>
+						</td>
+						<td>{{ FA::icon('trash') }}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="form-group">
+				<button class="btn btn-primary">{{ FA::icon('save') }} SAVE</button>
+				<button class="btn btn-default">{{ FA::icon('times') }} CANCEL</button>
+			</div>
+		</form>
+	</div>
 </div>
 
 @stop

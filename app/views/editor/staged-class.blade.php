@@ -57,8 +57,8 @@
 			if (strpos($day, "fri"))
 				$ddd = "fri";
 		?>
-		<div class="{{ $block_class }} scheduled-class {{$drag_class}}" data-class="{{ $class->id }}" data-col="{{ $day }}" data-ddd="{{ $ddd }}"
-			data-days="{{$etime->days}}" data-group="{{ $group_count . '-' . $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
+		<div class="{{ $block_class }} scheduled-class {{$drag_class}}" data-class="{{ $class->id }}" data-ddd="{{ $ddd }}"
+			data-days="{{$etime->days}}" data-time="{{ $etime->id }}" data-start="{{ $etime->starttm }}" data-length="{{ $etime->length }}">
 			<span class="class-name-container"><a class="toggle-right-column" href="#right-side-bar">{{ $class->name }}</a></span>
 		</div>
 	@endforeach

@@ -7,7 +7,7 @@ class Communication
     	$jsonBuilder = [];
     	//$schedule = Schedule::find($schedule_id);
 
-    	if(is_null($schedule))
+    	if($schedule == null)
     	{
             $result = new StdClass;
     		$result->Error = 'The requested schedule could not be found';
@@ -16,13 +16,13 @@ class Communication
 
     	$json = Communication::create_backEndJson($schedule);
 
-        $result = Communication::sendJsonToCoreService('new', $json, $schedule_id);
+        $result = Communication::sendJsonToCoreService('new', $json);
         $scheduleResults = json_decode($result);
 
         return $scheduleResults;
     }
 
-    private static function sendJsonToCoreService($mode, $json, $schedule_id)
+    private static function sendJsonToCoreService($mode, $json)
     {
         $host = 'http://scheduling-core-service.herokuapp.com/api/' . $mode;
         //$host = 'localhost:8080/api/' . $mode;

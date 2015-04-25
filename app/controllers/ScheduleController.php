@@ -354,6 +354,7 @@ class ScheduleController extends BaseController {
 				}
 			} catch (Exception $e) {
 				$result->error = 'Could not contact solver server';
+				//$result->message = $e->getMessage();
 				return $result;
 			}
 			

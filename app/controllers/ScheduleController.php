@@ -315,7 +315,7 @@ class ScheduleController extends BaseController {
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page		
 	}
 
-	public function e_remove_class()
+	private function e_remove_class()
 	{
 		$sched_id = Input::get('sched_id');
 		$id = Input::get('id');
@@ -340,34 +340,6 @@ class ScheduleController extends BaseController {
 		}
 		
 		return json_encode($this->api_check_sched($schedule));
-	}
-
-	public function e_update_class()
-	{
-		$id = Input::get('id');
-		$class = models\Event::find($id);
-		
-		if (!$class) {
-			return Response::json(['error' => 'Invalid class id'], 500);
-		}
-		
-		$schedule = $class->schedule();
-		
-		if (!Auth::user()->schedules->contains($schedule->id)) {
-			return Response::json(['error' => 'Invalid schedule id'], 500);
-		}
-
-		$class->name = Input::get('name');
-		$class->professor = Input::get('professor');
-		$class->room_id = Input::get('room_id');
-		$class->class_type = Input::get('class_type');
-		$class->title = Input::get('title');
-		$class->etime_id = Input::get('etime_id');
-
-		if ($class->save())
-			return json_encode($this->api_check_sched($schedule));
-		else
-			return Response::json(['error' => 'Could not update the class at this time'], 500);
 	}
 
 	private function api_check_sched($schedule)
@@ -678,6 +650,7 @@ class ScheduleController extends BaseController {
 				} catch (Exception $e) {
 					return Response::json(['error' => 'Could not update class'], 500);
 				}
+				return json_encode($this->api_check_sched($schedule));
 				break;
 			case 'remove-class':
 				return $this->e_remove_class();

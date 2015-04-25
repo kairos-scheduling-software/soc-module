@@ -124,6 +124,7 @@ $(function(){
 				var json_data;
 				if (data != '') json_data = JSON.parse(data);
 				else json_data = Object.create(null);
+				console.log(json_data);
 				var blocks = get_class(class_data['class_id']);
 				update_class_info(blocks, class_data);
 				//blocks.click();
@@ -358,8 +359,6 @@ $(function(){
 		form.find('input[name="enroll"]').val(class_data['enroll']);
 		form.find('select[name="prof"]').val(class_data['prof_id']);
 		
-		form.find('input[name="class_id"]').val(class_data['class_id']);
-		
 		var grp_select = form.find('select[name="room_group"]');
 		var room_select = form.find('select[name="room"]');
 		var prof_select = form.find('select[name="prof"]');
@@ -394,8 +393,10 @@ $(function(){
 		prof_select.html(html);
 		
 		prof_select.val(class_data['prof_id']);
-		grp_select.val(class_data['grp_id']);
+		grp_select.val(class_data['grp_id']).trigger('change');
 		room_select.val(class_data['room_id']);
+		
+		form.find('input[name="class_id"]').val(class_data['class_id']);
 	});
 	
 	$('#cancel-edit-panel').click(function() {
@@ -691,7 +692,8 @@ function update_scheduled_class_draggables(sched_classes)
 						success: function(data, textStatus, jqXHR) {
 							$('#checking-sched').hide();
 							$('#sched-ok').show();
-							//var json_data = JSON.parse(data);
+							var json_data = JSON.parse(data);
+							console.log(json_data);
 							update_column_matrix(old_blocks, "empty");
 							update_column_matrix(new_blocks, "busy");
 							

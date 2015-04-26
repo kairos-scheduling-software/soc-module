@@ -94,11 +94,12 @@ class Communication
     		if ($event->is_rm_final == true) {
                 $temp->spaceId = $event->room_id;
             } else {
-                $rm_grp = $event->room_group;
+                $rm_grp_id = $event->room_group_id;
                 $rm_list = $rooms;
-                if ($rm_grp != null) {
-                    $rm_list = Room::select('id')->join('room_mappings', 'rooms.id', '=', 'room_mappings.rid')
-                            ->where('room_mappings.name', '=', $rm_grp)->get();
+                if ($rm_grp_id != null) {
+                    //~ $rm_list = Room::select('id')->join('room_mappings', 'rooms.id', '=', 'room_mappings.rid')
+                            //~ ->where('room_mappings.name', '=', $rm_grp)->get();
+                    $rm_list = RoomGroup::find($rm_grp_id)->rooms;
                 }
                 $spaces = [];
                 foreach ($rm_list as $rm) {
@@ -109,8 +110,9 @@ class Communication
             
             
     		$cap = $event->enroll_cap;
-            if ($cap == null || $cap == 0) {
-                $cap = $event->room->capacity;
+            if ($cap == null) {
+                $cap = 0;
+                //$cap = $event->room->capacity;
             }
             $temp->maxParticipants = $cap;
     		$temp->personId = $event->professor;

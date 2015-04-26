@@ -391,12 +391,11 @@ $(function(){
 
 			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
 			right_panel_open = true;
-
-			// TODO: Get content from data attributes of clicked class
 		}
 	});
 	
-	$('#cancel-edit-panel').click(function() {
+	$('#cancel-edit-panel').click(function(e) {
+		e.preventDefault();
 		$('#edit-panel-form').find('.form-control').val('');
 		$('#close-right-panel').click();
 	});

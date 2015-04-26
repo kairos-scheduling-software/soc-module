@@ -331,24 +331,6 @@ $(function(){
 	$('body').on('click', '.scheduled-class', function(e) {
 		e.preventDefault();
 
-		if(!right_panel_open)
-		{
-			if(panel_is_open)
-			{
-				$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
-				$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
-				panel_is_open = false;
-			}
-
-			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
-			right_panel_open = true;
-
-			// TODO: Get content from data attributes of clicked class
-		}
-		else
-		{
-
-		}
 		var form = $('#edit-panel-form');
 		form.find('input[name="class_id"]').val('');
 		
@@ -397,6 +379,21 @@ $(function(){
 		room_select.val(class_data['room_id']);
 		
 		form.find('input[name="class_id"]').val(class_data['class_id']);
+
+		if(!right_panel_open)
+		{
+			if(panel_is_open)
+			{
+				$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+				$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
+				panel_is_open = false;
+			}
+
+			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
+			right_panel_open = true;
+
+			// TODO: Get content from data attributes of clicked class
+		}
 	});
 	
 	$('#cancel-edit-panel').click(function() {

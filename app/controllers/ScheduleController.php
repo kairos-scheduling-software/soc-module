@@ -315,20 +315,9 @@ class ScheduleController extends BaseController {
 			return "<h1>ERROR</h1>"; // TODO: send back a 404 page		
 	}
 
-	private function e_remove_class()
+	private function e_remove_class($schedule, $id)
 	{
-		$sched_id = Input::get('sched_id');
-		$id = Input::get('id');
-		
-		if (Auth::user()->schedules->contains($sched_id)) {
-			$schedule = Schedule::find($sched_id);
-		} else {
-			$schedule = null;
-		}
-		
-		if (!$schedule) {
-			return Response::json(['error' => 'Invalid schedule id'], 500);
-		} elseif (!$schedule->events->contains($id)) {
+		if (!$schedule->events->contains($id)) {
 			return Response::json(['error' => 'Invalid class id'], 500);
 		}
 
@@ -345,7 +334,6 @@ class ScheduleController extends BaseController {
 	private function api_check_sched($schedule)
 	{
 		// Call check on comm library
-		$result = new StdClass;
 		try {
 			try {
 				$result = Communication::sendCheck($schedule);
@@ -353,8 +341,9 @@ class ScheduleController extends BaseController {
 					return $result;
 				}
 			} catch (Exception $e) {
+				$result = new StdClass;
 				$result->error = 'Could not contact solver server';
-				//$result->message = $e->getMessage();
+				$result->message = $e->getMessage();
 				return $result;
 			}
 			
@@ -386,8 +375,9 @@ class ScheduleController extends BaseController {
 		}
 		catch (Exception $e)
 		{
-			//return Response::json($e, 500);
+			$result = new StdClass();
 			$result->error = 'Could not check schedule';
+			//$result->message = $e->getMessage();
 			return $result;
 		}
 	}
@@ -608,11 +598,16 @@ class ScheduleController extends BaseController {
 				break;
 			case 'edit-class':
 				$cls_id = Input::get('class_id');
-				if (!$schedule->events->contains($cls_id)) {
+				$class = $schedule->events->find($cls_id);
+				if ($class == null) {
 					return Response::json(['error' => 'Invalid class id'], 500);
 				}
 				
-				$class = models\Event::find($cls_id);
+				//~ if (!$schedule->events->contains($cls_id)) {
+					//~ return Response::json(['error' => 'Invalid class id'], 500);
+				//~ }
+				//~ 
+				//~ $class = models\Event::find($cls_id);
 				
 				if (Input::has('class_name')) {
 					$class_name = Input::get('class_name');
@@ -654,7 +649,8 @@ class ScheduleController extends BaseController {
 				return json_encode($this->api_check_sched($schedule));
 				break;
 			case 'remove-class':
-				return $this->e_remove_class();
+				$id = Input::get('id');
+				return $this->e_remove_class($schedule, $id);
 				break;
 			case 'edit-name':
 				

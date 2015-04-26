@@ -931,7 +931,7 @@ function load_schedule()
 		var length = course.data('length');
 		var offsets = compute_offsets(start, day, length);
 
-		var course_name = course.find('span.class-name-container').text();
+		var course_name = course.text().trim();
 
 		if (course_list.indexOf(course_name) < 0)
 			course_list.push(course_name);
@@ -957,29 +957,83 @@ function load_schedule()
 	$('#class-search').autocomplete({
 		source: course_list,
 		open: function(event, ui) {
+			$('#class-search').keydown(function(e) {
+				var value = $(this).val();
+				
+				if (value == '')
+				{
+					$('div.scheduled-class').css({
+						backgroundColor: '#0099FF', 
+						opacity: '1', 
+						boxShadow: ''
+					});
+				}
+				else
+				{
+					var valid_name = false;
 
-			$('.ui-menu-item').click(function() {
-				$('#class-search').val($(this).text());
-				var name = $(this).text();
-				console.log('click');
+					$('.scheduled-class').each(function() {
+						if ($(this).text().trim() == value)
+						{
+							valid_name = true;
+							return false;
+						}
+					});
 
-				$('.class-name-container').each(function() {
-					if ($(this).text() == name)
+					if (valid_name)
 					{
-						$(this).closest('div').css({
+						$('.scheduled-class').each(function() {
+							if ($(this).text().trim() == value)
+							{
+								$(this).css({
+									opacity: 1,
+									backgroundColor: '#4D944D',
+									boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
+								});
+							}
+							else
+								$(this).css({
+									opacity: 0.2,
+									backgroundColor: '#0099FF',
+									boxShadow: ''
+								});
+						});
+					}
+				}
+			});
+
+		},
+		select: function(event, ui) {
+
+			var value = ui.item.label;
+			
+			if (value == '')
+			{
+				$('div.scheduled-class').css({
+					backgroundColor: '#0099FF', 
+					opacity: '1', 
+					boxShadow: ''
+				});
+			}
+			else
+			{
+				$('.scheduled-class').each(function() {
+					if ($(this).text().trim() == value)
+					{
+						$(this).css({
 							opacity: 1,
 							backgroundColor: '#4D944D',
 							boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
 						});
 					}
 					else
-						$(this).closest('div').css({
+						$(this).css({
 							opacity: 0.2,
 							backgroundColor: '#0099FF',
 							boxShadow: ''
 						});
 				});
-			});
+			}
 		}
 	});
 

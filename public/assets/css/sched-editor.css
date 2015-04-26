@@ -159,6 +159,10 @@ a:hover, a:focus {
 	margin-left: 20px;
 }
 
+#custom-times {
+	margin-bottom: 10px;
+}
+
 #custom-times td {
 	padding-left: 5px;
 	padding-right: 5px;

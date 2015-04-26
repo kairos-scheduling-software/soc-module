@@ -178,7 +178,11 @@
 									</div>
 								</td>
 							</tr>
-						</table>{{--
+						</table>
+						<button class="btn btn-sm btn-primary" id="add-custom-class-btn">
+							{{ FA::icon('plus') }} Add to Schedule
+						</button>
+						{{--
 						<div id="custom-duration" class="input-group spinner">
 							<input id="custom-duration-input" type="text" class="form-control" value="50" disabled>
 							<div class="input-group-btn-vertical">

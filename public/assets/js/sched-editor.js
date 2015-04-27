@@ -1541,11 +1541,8 @@ function handle_class_conflicts(json_data) {
 	}
 	
 	if (json_data['wasFailure'] == true) {
-		$('#sched-ok').hide();
-		$('#sched-bad').show();
-		$('#conflict-section').show();
-		
 		var conflicts = Object.create(null);
+		var count = 0;
 		
 		if (json_data['EVENTS'] == undefined) return;
 		
@@ -1577,6 +1574,8 @@ function handle_class_conflicts(json_data) {
 			$.each(list, function(other, _) {
 				var blk2 = $('.id-' + other);
 				if (blk2.length == 0) return;
+				
+				count += 1;
 				var e2 = blk2.first().text().trim();
 				html += '<div class="conflict-row" data-id1="' + blk1.data('id') + '" ';
 				html += 'data-id2="' + blk2.data('id') + '"><b>';
@@ -1584,6 +1583,16 @@ function handle_class_conflicts(json_data) {
 			});
 		});
 		el.html(html);
+		
+		if (count > 0) {
+			$('#sched-ok').hide();
+			$('#sched-bad').show();
+			$('#conflict-section').show();
+		} else {
+			$('#conflict-section').hide();
+			$('#sched-bad').hide();
+			$('#sched-ok').show();
+		}
 	} else {
 		$('#conflict-section').hide();
 		$('#sched-bad').hide();

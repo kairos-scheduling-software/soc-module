@@ -2,6 +2,7 @@
 
 @section('left-column')
 <script src="{{ URL::asset('assets/js/jquery.panelslider.min.js') }}"></script>
+<script src="{{ URL::asset('assets/js/editor-tutorial.js') }}"></script>
 <style>
 	.drag-cursor {
 		cursor: url('{{ URL::asset("assets/images/drag-cursor-sm.png") }}'), auto;
@@ -265,6 +266,7 @@
 <div id="toggle-container">
 	<a id="toggle-toolbox" href="#left-side-bar">{{ FA::icon('chevron-right') }}</a>
 </div>
+<div id='center-slide-anchor'></div>
 
 <script>
 	var panel_is_open = false;

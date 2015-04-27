@@ -1001,14 +1001,77 @@ function load_schedule()
 	$('#class-search').autocomplete({
 		source: Object.getOwnPropertyNames(course_list).sort(),
 		open: function(event, ui) {
+			$('#class-search').keydown(function(e) {
+				var value = $(this).val();
+				
+				if (value == '')
+				{
+					$('div.scheduled-class').css({
+						backgroundColor: '#0099FF', 
+						opacity: '1', 
+						boxShadow: ''
+					});
+				}
+				else
+				{
+					var valid_name = false;
 
-			$('.ui-menu-item').click(function() {
-				$('#class-search').val($(this).text());
-				var name = $(this).text();
-				console.log('click');
+					$('.scheduled-class').each(function() {
+						if ($(this).text().trim() == value)
+						{
+							valid_name = true;
+							return false;
+						}
+					});
+					
+					if (valid_name)
+					{
+						$('.scheduled-class').each(function() {
+							if ($(this).text().trim() == value)
+							{
+								$(this).css({
+									opacity: 1,
+									backgroundColor: '#4D944D',
+									boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
+								});
+							}
+							else
+								$(this).css({
+									opacity: 0.2,
+									backgroundColor: '#0099FF',
+									boxShadow: ''
+								});
+						});
+					}
+					else
+					{
+						$('div.scheduled-class').css({
+							backgroundColor: '#0099FF', 
+							opacity: '1', 
+							boxShadow: ''
+						});		
+					}
+				}
+			});
 
+		},
+		select: function(event, ui) 
+		{
+
+			var value = ui.item.label;
+			
+			if (value == '')
+			{
+				$('div.scheduled-class').css({
+					backgroundColor: '#0099FF', 
+					opacity: '1', 
+					boxShadow: ''
+				});
+			}
+			else
+			{
 				$('.scheduled-class').each(function() {
-					if ($(this).text() == name)
+					if ($(this).text().trim() == value)
 					{
 						$(this).css({
 							opacity: 1,
@@ -1017,13 +1080,15 @@ function load_schedule()
 						});
 					}
 					else
+					{
 						$(this).css({
 							opacity: 0.2,
 							backgroundColor: '#0099FF',
 							boxShadow: ''
 						});
+					}
 				});
-			});
+			}
 		}
 	});
 

@@ -999,6 +999,14 @@ function load_schedule()
 								});
 						});
 					}
+					else
+					{
+						$('div.scheduled-class').css({
+							backgroundColor: '#0099FF', 
+							opacity: '1', 
+							boxShadow: ''
+						});		
+					}
 				}
 			});
 

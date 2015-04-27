@@ -332,7 +332,7 @@ $(function(){
 		if (!($('#conflict-list').hasClass('in')))
 			$('#conflict-list').collapse('show');
 	});
-
+	
 	// Listen for 'ctrl + f' and override the browser's default search
 	$(window).keydown(function(e) {
 		if (e.which == "70" && e.ctrlKey)
@@ -359,7 +359,37 @@ $(function(){
 	});
 	
 	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
-
+	
+	$('body').on('click', '.conflict-row', function(e) {
+		var id1 = $(this).data('id1');
+		var id2 = $(this).data('id2');
+		$('.scheduled-class').css({
+			opacity: 0.2,
+			backgroundColor: '#0099FF',
+			boxShadow: ''
+		});
+		
+		$('.id-' + id1).css({
+			opacity: 1,
+			backgroundColor: '#4D944D',
+			boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
+		});
+		
+		$('.id-' + id2).css({
+			opacity: 1,
+			backgroundColor: '#4D944D',
+			boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
+		});
+		
+		setTimeout(function() {
+			$('div.scheduled-class').css({
+				backgroundColor: '#0099FF', 
+				opacity: '1', 
+				boxShadow: ''
+			});
+		}, 2000);
+	});
+	
 	$('body').on('click', '.scheduled-class', function(e) {
 		e.preventDefault();
 
@@ -1539,16 +1569,18 @@ function handle_class_conflicts(json_data) {
 		el.children('div').remove();
 		var html = '';
 		$.each(conflicts, function(id, list) {
-			var blk1 = $('.id-' + id).first();
+			var blk1 = $('.id-' + id);
 			
 			// Classes with length different than 50/80 are omitted
 			if (blk1.length == 0) return;
-			var e1 = blk1.text().trim();
+			var e1 = blk1.first().text().trim();
 			$.each(list, function(other, _) {
-				var blk2 = $('.id-' + other).first();
+				var blk2 = $('.id-' + other);
 				if (blk2.length == 0) return;
-				var e2 = blk2.text().trim();
-				html += '<div><b>' + e1 + '</b> conflicts with <b>' + e2 + '</b></div>';
+				var e2 = blk2.first().text().trim();
+				html += '<div class="conflict-row" data-id1="' + blk1.data('id') + '" ';
+				html += 'data-id2="' + blk2.data('id') + '"><b>';
+				html += e1 + '</b> conflicts with <b>' + e2 + '</b></div>';
 			});
 		});
 		el.html(html);

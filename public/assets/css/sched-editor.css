@@ -578,3 +578,7 @@ ul.ui-autocomplete > li {
   top: 0;
   left: 4px;
 }
+
+.conflict-row:hover {
+	cursor: pointer;
+}

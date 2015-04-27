@@ -247,6 +247,11 @@ ul.ui-autocomplete > li {
 	display: none;
 }
 
+#conflict-list {
+	max-height: 200px;
+	overflow-y: auto;
+}
+
 #scratch-pad {
 	display: inline-block;
 	background-color: #B3B3B3;

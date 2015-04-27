@@ -317,6 +317,21 @@ $(function(){
 		$('#cust-end-time').timepicker('showWidget');
 	});
 
+	$('#view-conflicts').click(function(e) {
+		e.preventDefault();
+
+		if (!panel_is_open)
+			$('#toggle-toolbox').click();
+
+		$('.panel-collapse').each(function() {
+			if ($(this).hasClass('in') && ($(this).attr('id') != 'collapse-seven'))
+				$(this).collapse('hide');
+		});
+
+		if (!($('#conflict-list').hasClass('in')))
+			$('#conflict-list').collapse('show');
+	});
+
 	// Listen for 'ctrl + f' and override the browser's default search
 	$(window).keydown(function(e) {
 		if (e.which == "70" && e.ctrlKey)

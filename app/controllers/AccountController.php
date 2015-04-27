@@ -44,11 +44,11 @@ class AccountController extends BaseController {
 			if($user->save())
 			{
 				$schedule = new Schedule();
-				$schedule->name = 'delete me';
+				$schedule->name = 'Demo Schedule';
 				$schedule->last_edited_by = $user->id;
 				$schedule->semester = 'Fall';
 				$schedule->year = 2015;
-				$schedule->description = '';
+				$schedule->description = 'This schedule is here to allow you to explore the system.  Feel free to delete it at any time.';
 
 				$schedule->save();
 				$user->schedules()->attach($schedule->id);

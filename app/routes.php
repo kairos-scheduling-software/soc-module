@@ -69,11 +69,6 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  =>  'ScheduleController@load_sched_admin'
     ));
 
-    Route::get('/view-schedule', array(
-        'as'    =>  'view-sched',
-        'uses'  =>  'ScheduleController@view_schedule'
-    ));
-
     Route::get('/edit-schedule/{id}', array(
         'as'    =>  'edit-sched',
         'uses'  =>  'ScheduleController@edit_schedule'
@@ -221,8 +216,18 @@ Route::group(array('before'=> 'auth'), function()
     ));
 
     Route::get('vis/list', 'VisController@index');
-    Route::get('vis/{id0}/{id1}', 'VisController@getData');
     Route::get('vis/{id0}/{id1}/{id3}', 'VisController@getData');
+    
+    // Move these three outside of 'before'=> 'auth' function to make sched vis links available to the public
+    // Start
+    Route::get('vis/list/{id0}', 'VisController@index');
+    Route::get('vis/{id0}/{id1}', 'VisController@getData');
+
+    Route::get('/view-schedule', array(
+        'as'    =>  'view-sched',
+        'uses'  =>  'ScheduleController@view_schedule'
+    ));
+    // End
     
     // Resources route
     Route::get('/resources/rooms', array(

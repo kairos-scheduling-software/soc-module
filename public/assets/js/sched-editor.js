@@ -86,6 +86,7 @@ $(function(){
 					//~ console.log('was failure: false');
 					//~ $('#sched-ok').show();
 				//~ }
+				refresh_autocomplete();
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				console.log(JSON.stringify(jqXHR));
@@ -796,6 +797,7 @@ function update_scheduled_class_draggables(sched_classes)
 							success: function(data, textStatus, jqXHR) {
 								update_column_matrix(old_blocks, "empty");
 								delete course_list[old_blocks.first().text().trim()];
+								refresh_autocomplete();
 								old_blocks.remove();
 								
 								//$('#checking-sched').hide();
@@ -1013,6 +1015,99 @@ function load_schedule()
 
 	//course_list.sort();
 	
+	refresh_autocomplete();
+
+	console.log('Total columns: ' + total_cols());
+}
+
+
+function compute_offsets(start, day, length)
+{
+	var left = 0;//$(day).offset()["left"];
+	var top = 0;//$(day).offset()["top"];
+	var vert = get_vertical_offset(start);
+	top += (vert * five_min_height);
+	var horiz = get_horizontal_offset(vert, length, day, true);
+
+	if (horiz == -1)
+	{
+		console.log("Horizontal failed");
+		horiz = 6;
+	}
+	left += horiz * time_block_w;
+
+	return {
+		left: left,
+		top: top
+	};
+}
+
+// blocks, mode
+function update_column_matrix(blocks, mode)
+{
+	blocks.each(function() {
+		var col = $(this).data('ddd') + $(this).data('col_index');
+		
+		var indices = [];
+		var v_offset = get_vertical_offset($(this).attr('data-start'));
+		var b_length = $(this).data('length')/5;
+		for (i = 0; i < b_length; i++) indices.push(v_offset + i);
+		
+		$.each(indices, function(i, index) {
+			day_columns[col][index] = mode;
+		});
+	});
+}
+
+function add_matrix_col(day)
+{
+	//var w = $('#outer-container').width();
+	//$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
+	var index = day + (col_counts[day] + 1);
+	day_columns[index] = [];
+
+	if (typeof day_columns[index] === 'undefined')
+	{
+		for (var j = 0; j < 144; j++)
+			day_columns[index].push("empty");
+	}
+
+	var num_cols = (col_counts[day] + 1);
+
+
+	switch(day)
+	{
+		case 'mon':
+			$('#mon-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			break;
+		case 'tue':
+			$('#tue-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			break;
+		case 'wed':
+			$('#wed-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			break;
+		case 'thu':
+			$('#thu-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			break;
+		case 'fri':
+			$('#fri-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			break;
+	}
+
+	col_counts[day] = num_cols;
+	$('#outer-container').css('width', (total_cols() * (time_block_w + 2) + 60) + 'px');
+}
+
+function edit_class(course, success, fail)
+{
+
+}
+
+function refresh_autocomplete()
+{
+	if ($('#class-search').autocomplete('instance') !== undefined)
+		$('#class-search').autocomplete('destroy');
+
 	$('#class-search').autocomplete({
 		source: Object.getOwnPropertyNames(course_list).sort(),
 		open: function(event, ui) {
@@ -1107,93 +1202,9 @@ function load_schedule()
 		}
 	});
 
-	$('#class-search-container').append($('#ui-id-1'));
+
+	$('#class-search-container').append($('ul.ui-autocomplete').first());
 	$('.ui-helper-hidden-accessible').addClass('hidden');
-
-	console.log('Total columns: ' + total_cols());
-}
-
-
-function compute_offsets(start, day, length)
-{
-	var left = 0;//$(day).offset()["left"];
-	var top = 0;//$(day).offset()["top"];
-	var vert = get_vertical_offset(start);
-	top += (vert * five_min_height);
-	var horiz = get_horizontal_offset(vert, length, day, true);
-
-	if (horiz == -1)
-	{
-		console.log("Horizontal failed");
-		horiz = 6;
-	}
-	left += horiz * time_block_w;
-
-	return {
-		left: left,
-		top: top
-	};
-}
-
-// blocks, mode
-function update_column_matrix(blocks, mode)
-{
-	blocks.each(function() {
-		var col = $(this).data('ddd') + $(this).data('col_index');
-		
-		var indices = [];
-		var v_offset = get_vertical_offset($(this).attr('data-start'));
-		var b_length = $(this).data('length')/5;
-		for (i = 0; i < b_length; i++) indices.push(v_offset + i);
-		
-		$.each(indices, function(i, index) {
-			day_columns[col][index] = mode;
-		});
-	});
-}
-
-function add_matrix_col(day)
-{
-	//var w = $('#outer-container').width();
-	//$('#outer-container').css('width', (w + time_block_w + 20) + 'px');
-	var index = day + (col_counts[day] + 1);
-	day_columns[index] = [];
-
-	if (typeof day_columns[index] === 'undefined')
-	{
-		for (var j = 0; j < 144; j++)
-			day_columns[index].push("empty");
-	}
-
-	var num_cols = (col_counts[day] + 1);
-
-
-	switch(day)
-	{
-		case 'mon':
-			$('#mon-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
-		case 'tue':
-			$('#tue-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
-		case 'wed':
-			$('#wed-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
-		case 'thu':
-			$('#thu-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
-		case 'fri':
-			$('#fri-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
-	}
-
-	col_counts[day] = num_cols;
-	$('#outer-container').css('width', (total_cols() * (time_block_w + 2) + 60) + 'px');
-}
-
-function edit_class(course, success, fail)
-{
-
 }
 
 function initialize_column_matrix()

@@ -168,6 +168,17 @@ a:hover, a:focus {
 	padding-right: 5px;
 }
 
+td.constraint-del {
+	color: #363636;
+  	font-size: 16pt;
+  	margin-top: 5px;
+  	cursor: pointer;
+}
+
+td.constraint-del:hover {
+	color: #E6E6E6;
+}
+
 #start-time-clock, #end-time-clock, #cust-start-time, #cust-end-time {
 	cursor: pointer;
 }

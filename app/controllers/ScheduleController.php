@@ -347,12 +347,13 @@ class ScheduleController extends BaseController {
 			return Response::json(['error' => 'Could not delete class'], 500);
 		}
 		
-		return json_encode($this->api_check_sched($schedule));
+		return json_encode($this->api_check_sched($schedule->id));
 	}
 
-	private function api_check_sched($schedule)
+	private function api_check_sched($sched_id)
 	{
 		// Call check on comm library
+		$schedule = Schedule::find($sched_id);
 		try {
 			try {
 				$result = Communication::sendCheck($schedule);
@@ -610,7 +611,7 @@ class ScheduleController extends BaseController {
 				
 				$schedule->events()->save($class);
 
-				$result = $this->api_check_sched($schedule);
+				$result = $this->api_check_sched($schedule->id);
 				$result->newId = $class->id;
 				
 				return json_encode($result);
@@ -732,6 +733,7 @@ class ScheduleController extends BaseController {
 				
 				try {
 					$class->save();
+					$schedule->events()->save($class);
 				} catch (Exception $e) {
 					$result = new StdClass;
 					$result->error = 'Could not update class';
@@ -739,7 +741,7 @@ class ScheduleController extends BaseController {
 					return Response::json($result, 500);
 					//return Response::json(['error' => 'Could not update class'], 500);
 				}
-				return json_encode($this->api_check_sched($schedule));
+				return json_encode($this->api_check_sched($schedule->id));
 				break;
 			case 'remove-class':
 				$id = Input::get('id');

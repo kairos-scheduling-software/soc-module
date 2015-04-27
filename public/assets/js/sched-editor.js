@@ -344,8 +344,8 @@ $(function(){
 		start_h = parseInt(start_tm.substring(0, 2));
 		start_m = parseInt(start_tm.substring(2));
 		if (start_str.endsWith('PM')) {
-			start_h += 12;
-			start_tm = h + start_tm.substring(2);
+			if (start_h < 12) start_h += 12;
+			start_tm = start_h + start_tm.substring(2);
 		}
 		
 		var end_tm = end_str.substring(0, end_str.indexOf(' ')).replace(':', '');
@@ -353,7 +353,7 @@ $(function(){
 		end_h = parseInt(end_tm.substring(0, 2));
 		end_m = parseInt(end_tm.substring(2));
 		if (end_str.endsWith('PM')) {
-			end_h += 12;
+			if (end_h < 12) end_h += 12;
 		}
 		
 		var length = (end_h - start_h) * 60 + (end_m - start_m);

@@ -325,7 +325,7 @@ $(function(){
 			$('#toggle-toolbox').click();
 
 		$('.panel-collapse').each(function() {
-			if ($(this).hasClass('in') && ($(this).attr('id') != 'collapse-seven'))
+			if ($(this).hasClass('in') && ($(this).attr('id') != 'conflict-list'))
 				$(this).collapse('hide');
 		});
 

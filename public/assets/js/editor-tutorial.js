@@ -61,8 +61,8 @@ function create_tutorial()
 				position: 'right-center',
 				title: '<h2>Open the Toolbox</h2>',
 				content: 'Clicking this tab will display your toolbox.  From there you can add classes, search the schedule, or view any scheduling conflicts.',
-				overlayMode: 'none',
-				arrowOffset: 30,
+				overlayMode: 'all',
+				arrowOffset: 20,
 				onNext: function() {
 					open_toolbox_transition();
 				}
@@ -71,9 +71,63 @@ function create_tutorial()
 				selector: '#toolbox > h3',
 				position: 'right-center',
 				title: '<h2>Adding Classes</h2>',
-				content: 'As most CS classes are either 50 or 80 minutes long, we have included short cuts for adding classes with those lengths. If you wish to add a class with a different length, use the \'Custom Time Block\' option',
-				overlayMode: 'none',
-				arrowOffset: -15
+				content: 'As most CS classes are either 50 or 80 minutes long, we have included short cuts for adding classes with those lengths. If you wish to add a class with a different length, use the \'Custom Time Block\' option.',
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onNext: function() {
+					open_sched_search();
+				},
+				onSlide: function() {
+					$('.tutorialize-slide-overlay').zIndex(9);
+				}
+			},
+			{
+				selector: '#sched-search-h3',
+				position: 'right-center',
+				title: '<h2>Searching the Schedule</h2>',
+				content: 'You can locate a class on the schedule by searching for it here.  You can quickly access the search feature by using the keyboard shortcut <b>CTRL + f</b>.',
+				overlayMode: 'all',
+				arrowOffset: -15,
+				onSlide: function() {
+					$('.tutorialize-slide-overlay').zIndex(9);
+				},
+				onNext: function() {
+					close_toolbox_transition();
+				},
+			},
+			{
+				selector: '.scheduled-class',
+				position: 'right-center',
+				title: '<h2>Editing Classes</h2>',
+				content: 'Clicking on a scheduled class will open a panel for editing that class.',
+				overlayMode: 'focus',
+				arrowOffset: 15,
+				onSlide: function() {
+					$('.tutorialize-slide-overlay').zIndex(198);
+				},
+				onNext: function() {
+					open_right_panel();
+				}
+			},
+			{
+				selector: '#class-info-section',
+				positon: 'center-left',
+				title: '<h2>Class Info</h2>',
+				content: 'Here you can edit any of the properties of this class, including name, room, professor, etc.',
+				overlayMode: 'focus',
+				onSlide: function() {
+					var slide = $('.tutorialize-slide').first();
+					var left = parseInt(slide.css('left'));
+					slide.css('left', (left - 370) + 'px');
+				}
+			},
+			{
+				selector: '#constraints-section',
+				position: 'left-center',
+				title: '<h2>Constraints</h2>',
+				content: 'Here you can add, remove, and modify the constraints that are associated with this class.',
+				overlayMode: 'focus',
+				arrowOffset: 15
 			}
 		],
 		onStart: function(index, data, dom) {
@@ -86,12 +140,27 @@ function create_tutorial()
 						$.tutorialize.stop('editor');
 						break;
 					case 39:
-						if (index == 1)
-							open_toolbox_transition();
-						else
-							$.tutorialize.next('editor');
+						e.preventDefault();
+						switch(index)
+						{
+							case 1:
+								open_toolbox_transition();
+								break;
+							case 2:
+								open_sched_search();
+								break;
+							case 3:
+								close_toolbox_transition();
+								break;
+							case 4:
+								open_right_panel();
+								break;
+							default:
+								$.tutorialize.next('editor');
+						}
 						break;
 					case 37:
+						e.preventDefault();
 						$.tutorialize.prev('editor');
 						break;
 				}
@@ -106,12 +175,49 @@ function create_tutorial()
 }
 
 function open_toolbox_transition()
-{					
+{
 	if(!panel_is_open)
 	{
 		$('#custom_navbar').zIndex(999);
 		$('#toggle-toolbox').click();
 	}
 
+	setTimeout(function() { 
+		$('html').scrollLeft(0);
+		$.tutorialize.next('editor'); 
+	}, 250);
+}
+
+function close_toolbox_transition()
+{
+	if(panel_is_open)
+	{
+		$('#custom_navbar').zIndex(999);
+		$('#toggle-toolbox').click();
+	}
+
 	setTimeout(function() { $.tutorialize.next('editor'); }, 220);
+}
+
+function open_sched_search()
+{
+	$('.panel-collapse').each(function() {
+		if ($(this).hasClass('in') && ($(this).attr('id') != 'collapse-six'))
+			$(this).collapse('hide');
+	});
+
+	if (!($('#collapse-six').hasClass('in')))
+		$('#collapse-six').collapse('show');
+
+	// Place focus in the text input
+	$('#class-search').focus();
+
+	$.tutorialize.next('editor');
+}
+
+function open_right_panel()
+{
+	$('.scheduled-class').first().click();
+
+	setTimeout(function() { $.tutorialize.next('editor'); }, 350);	
 }

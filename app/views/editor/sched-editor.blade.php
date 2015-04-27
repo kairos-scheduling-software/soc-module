@@ -202,7 +202,7 @@
 		</div>
 		{{-- End accordion section --}}
 
-		<h3><span class="view-icon">{{ FA::flipHorizontal('search') }}</span> On the Schedule:</h3>
+		<h3 id="sched-search-h3"><span class="view-icon">{{ FA::flipHorizontal('search') }}</span> On the Schedule:</h3>
 		{{-- Begin accordion section --}}
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -392,59 +392,67 @@
 		</h1>
 	</div>
 	<div>
-		<h3 style="margin-top: 0">Class Info</h3>
+		
 		<form id="edit-panel-form" action="">
-			<input type="hidden" class="form-control" name="class_id" value=""/>
-			<div class="form-group">
-				<label for="edit-panel-class-name">Class Name:</label>
-				<input type="text" class="form-control" name="class_name" id="edit-panel-class-name" required>
-			</div>
+			<div id="class-info-section">
+				<h3 style="margin-top: 0">Class Info</h3>
+				<input type="hidden" class="form-control" name="class_id" value=""/>
+				<div class="form-group">
+					<label for="edit-panel-class-name">Class Name:</label>
+					<input type="text" class="form-control" name="class_name" id="edit-panel-class-name" required>
+				</div>
 
-			<div class="form-group">
-				<label for="edit-panel-prof-select">Professor:</label><br>
-				<select class="form-control" name="prof">
-				</select>
-			</div>
+				<div class="form-group">
+					<label for="edit-panel-prof-select">Professor:</label><br>
+					<select class="form-control" name="prof">
+					</select>
+				</div>
 
-			<div class="form-group">
-				<label for="edit-panel-roomgroup-select">Max Capacity:</label><br>
-				<input type="text" class="form-control" name="enroll">
-			</div>
+				<div class="form-group">
+					<label for="edit-panel-roomgroup-select">Max Capacity:</label><br>
+					<input type="text" class="form-control" name="enroll">
+				</div>
 
-			<div class="form-group">
-				<label for="edit-panel-roomgroup-select">Room Group:</label><br>
-				<select class="form-control" name="room_group" data-url="{{ URL::route('room-group-list') }}">
-				</select>
-			</div>
+				<div class="form-group">
+					<label for="edit-panel-roomgroup-select">Room Group:</label><br>
+					<select class="form-control" name="room_group" data-url="{{ URL::route('room-group-list') }}">
+					</select>
+				</div>
 
-			<div class="form-group">
-				<label for="edit-panel-room-select">Room:</label><br>
-				<select class="form-control" name="room" data-url="{{ URL::route('room-list') }}">
-				</select>
+				<div class="form-group">
+					<label for="edit-panel-room-select">Room:</label><br>
+					<select class="form-control" name="room" data-url="{{ URL::route('room-list') }}">
+					</select>
+				</div>
 			</div>
 
 			<hr>
-			<h3>Constraints 
-				<button class="btn btn-sm" id="add-const-btn" title="Add a constraint">{{ FA::icon('plus') }}</button>
-			</h3>
+			<div id="constraints-section">
+				<h3>Constraints 
+					<button class="btn btn-sm" id="add-const-btn" title="Add a constraint">{{ FA::icon('plus') }}</button>
+				</h3>
 
-			<div class="form-group">
-				<table id="constraint-table">
-					<tr><th>Key:</th><th colspan="2">Value:</th></tr>
-					<tr class="constraint-row">
-						<td>
-							<select class="form-control" name="constraint-key"><option>Avoid Overlap With</option></select>
-						</td>
-						<td>
-							<select class="form-control" name="constraint-val"><option>CS 4540-001</option></select>
-						</td>
-						<td class="constraint-del">{{ FA::icon('trash') }}</td>
-					</tr>
-				</table>
+				<div class="form-group">
+					<table id="constraint-table">
+						<tr><th>Key:</th><th colspan="2">Value:</th></tr>
+						<tr class="constraint-row">
+							<td>
+								<select class="form-control" name="constraint-key"><option>Avoid Overlap With</option></select>
+							</td>
+							<td>
+								<select class="form-control" name="constraint-val"><option>CS 4540-001</option></select>
+							</td>
+							<td class="constraint-del">{{ FA::icon('trash') }}</td>
+						</tr>
+					</table>
+				</div>
 			</div>
-			<div class="form-group">
-				<button class="btn btn-primary">{{ FA::icon('save') }} SAVE</button>
-				<button class="btn btn-default" id="cancel-edit-panel">{{ FA::icon('times') }} CANCEL</button>
+
+			<div id="submit-cancel-buttons">
+				<div class="form-group">
+					<button class="btn btn-primary">{{ FA::icon('save') }} SAVE</button>
+					<button class="btn btn-default" id="cancel-edit-panel">{{ FA::icon('times') }} CANCEL</button>
+				</div>
 			</div>
 		</form>
 	</div>

@@ -1484,7 +1484,7 @@ function add_constraint_row(key, value) {
 	constraint_html += '<option value="" selected></option>';
 	constraint_html += '<option value="<">Must be Before</option>';
 	constraint_html += '<option value=">">Must be After</option>';
-	constraint_html += '<option value="=">Same Time As</option>';
+	constraint_html += '<option value="=">Meeting with</option>';
 	constraint_html += '</select></td>';
 	constraint_html += '<td><select class="form-control" name="constraint-val">';
 	constraint_html += '<option value="" selected></option>';
@@ -1539,9 +1539,15 @@ function handle_class_conflicts(json_data) {
 		el.children('div').remove();
 		var html = '';
 		$.each(conflicts, function(id, list) {
-			var e1 = $('.id-' + id).first().text().trim();
+			var blk1 = $('.id-' + id).first();
+			
+			// Classes with length different than 50/80 are omitted
+			if (blk1.length == 0) return;
+			var e1 = blk1.text().trim();
 			$.each(list, function(other, _) {
-				var e2 = $('.id-' + other).first().text().trim();
+				var blk2 = $('.id-' + other).first();
+				if (blk2.length == 0) return;
+				var e2 = blk2.text().trim();
 				html += '<div><b>' + e1 + '</b> conflicts with <b>' + e2 + '</b></div>';
 			});
 		});

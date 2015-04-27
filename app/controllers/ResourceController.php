@@ -3,13 +3,20 @@
 class ResourceController extends BaseController 
 {
 	public function load_room_manager() {
+		$user = Auth::user();
+		if (!$user->is_admin) {
+			return Redirect::route('dashboard');
+		}
 		return View::make('room-manager')->with([
 			'page_name'	=>	'Room Manager'
 		]);
 	}
 	
 	public function load_prof_manager() {
-		// TODO: Replace with real code
+		$user = Auth::user();
+		if (!$user->is_admin) {
+			return Redirect::route('dashboard');
+		}
 		return View::make('prof-manager')->with([
 			'page_name'	=>	'Professor Manager'
 		]);

@@ -36,11 +36,11 @@
 			</p>
 		</div>
 		<hr>
+		@if($is_admin)
 		<div id="resource-mngmnt-section">
-			<h2>Resource Management</h2>
+			<h2>Administrative</h2>
 			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-				Mauris convallis ligula eu metus posuere, sed.
+				Rooms and Professors management.
 			</p>
 			<p>
 				<button class="btn btn-resource" onclick="window.location='{{ URL::route("room-manager") }}'">
@@ -53,6 +53,7 @@
 				</button>
 			</p>
 		</div>
+		@endif
 	@stop
 
 	@section('center-column')

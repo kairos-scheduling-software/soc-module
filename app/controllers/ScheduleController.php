@@ -9,7 +9,8 @@ class ScheduleController extends BaseController {
 
 		return View::make('dashboard')->with([
 			'page_name'	=>	'DASHBOARD',
-			'schedules'	=>	$schedules
+			'schedules'	=>	$schedules,
+			'is_admin'	=>	Auth::user()->is_admin
 		]);
 	}
 

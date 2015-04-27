@@ -7,7 +7,7 @@ class Professor extends Eloquent
 
 	public function events()
 	{
-		return $this->hasMany('Event');
+		return $this->hasMany('models\Event');
 	}
 
 	public function schedules()

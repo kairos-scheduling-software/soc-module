@@ -9,7 +9,8 @@ class ScheduleController extends BaseController {
 
 		return View::make('dashboard')->with([
 			'page_name'	=>	'DASHBOARD',
-			'schedules'	=>	$schedules
+			'schedules'	=>	$schedules,
+			'is_admin'	=>	Auth::user()->is_admin
 		]);
 	}
 
@@ -42,6 +43,23 @@ class ScheduleController extends BaseController {
 				'schedule'	=>	$schedule
 			]);
 		//}
+	}
+	
+	public function get_schedule()
+	{
+		$id = Input::get('sched_id');
+		if (Auth::user()->schedules->contains($id)) {
+			$schedule = Schedule::find($id);
+			$schedule->load('events.etime');
+			$schedule->events->load('constraints');
+		} else {
+			$schedule = null;
+		}
+
+		if (!$schedule)
+			return Response::json(['error' => 'Invalid schedule id'], 500);
+		
+		return json_encode($schedule);
 	}
 
 	public function edit_schedule($id)
@@ -322,18 +340,20 @@ class ScheduleController extends BaseController {
 		}
 
 		try {
-			$class = models\Event::find($id);
-			$class->delete();
+			//$class = models\Event::find($id);
+			//$class->delete();
+			$schedule->events()->find($id)->delete();
 		} catch (Exception $e) {
 			return Response::json(['error' => 'Could not delete class'], 500);
 		}
 		
-		return json_encode($this->api_check_sched($schedule));
+		return json_encode($this->api_check_sched($schedule->id));
 	}
 
-	private function api_check_sched($schedule)
+	private function api_check_sched($sched_id)
 	{
 		// Call check on comm library
+		$schedule = Schedule::find($sched_id);
 		try {
 			try {
 				$result = Communication::sendCheck($schedule);
@@ -591,7 +611,7 @@ class ScheduleController extends BaseController {
 				
 				$schedule->events()->save($class);
 
-				$result = $this->api_check_sched($schedule);
+				$result = $this->api_check_sched($schedule->id);
 				$result->newId = $class->id;
 				
 				return json_encode($result);
@@ -641,12 +661,87 @@ class ScheduleController extends BaseController {
 					$class->professor = $prof;
 				}
 				
+				$constraints = Input::get('constraints');
+				if ($constraints != null) {
+					$constraints = json_decode($constraints);
+					
+					$existing_vals = [];
+					$existing_vals_dict = new StdClass;
+					foreach($class->constraints as $con) {
+						$val = $con->value;
+						$existing_vals[] = $val;
+						$existing_vals_dict->$val = $con->id;
+					}
+					
+					$new_vals = [];
+					$new_vals_dict = new StdClass;
+					foreach($constraints as $constraint) {
+						//return json_encode($constraint);
+						//$constraint = json_decode(json_encode($constraint));
+						$val = $constraint->value;
+						$new_vals[] = $val;
+						$new_vals_dict->$val = $constraint->key;
+					}
+					
+					$add_vals = array_diff($new_vals, $existing_vals);
+					$delete_vals = array_diff($existing_vals, $new_vals);
+					$same_vals = array_intersect($existing_vals, $new_vals);
+					
+					try {
+						foreach($delete_vals as $val) {
+							$id = $existing_vals_dict->$val;
+							$con = $class->constraints()->find($id)->delete();
+						}
+					} catch (Exception $e) {
+						$result = new StdClass;
+						$result->error = 'Could not delete constraint';
+						$result->message = $e->getMessage();
+						return Response::json($result, 500);
+					}
+					
+					try {
+						foreach($same_vals as $val) {
+							$id = $existing_vals_dict->$val;
+							$con = $class->constraints()->find($id);
+							if ($con != null) {
+								$con->key = $new_vals_dict->$val;
+								$con->save();
+							}
+						}
+					} catch (Exception $e) {
+						$result = new StdClass;
+						$result->error = 'Could not update constraint';
+						$result->message = $e->getMessage();
+						return Response::json($result, 500);
+					}
+					
+					try {
+						foreach($add_vals as $val) {
+							$con = new Constraint();
+							$con->key = $new_vals_dict->$val;
+							$con->value = $val;
+							$con->type = "saved constraint";
+							$class->constraints()->save($con);
+						}
+					} catch (Exception $e) {
+						$result = new StdClass;
+						$result->error = 'Could not add new constraint';
+						$result->message = $e->getMessage();
+						return Response::json($result, 500);
+					}
+				}
+				
 				try {
 					$class->save();
+					$schedule->events()->save($class);
 				} catch (Exception $e) {
-					return Response::json(['error' => 'Could not update class'], 500);
+					$result = new StdClass;
+					$result->error = 'Could not update class';
+					$result->message = $e->getMessage();
+					return Response::json($result, 500);
+					//return Response::json(['error' => 'Could not update class'], 500);
 				}
-				return json_encode($this->api_check_sched($schedule));
+				return json_encode($this->api_check_sched($schedule->id));
 				break;
 			case 'remove-class':
 				$id = Input::get('id');

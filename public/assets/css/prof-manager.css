@@ -1,0 +1,82 @@
+.btn-admin {
+	margin: 5px;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.content-header .editable-checklist {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+#new-prof-form {
+	display: none;
+}
+
+#new-prof-form .new-prof-label {
+	width: 45%;
+	display: inline-block;
+	font-size: 14pt;
+	font-weight: bold;
+	margin: 5px;
+}
+
+#new-prof-form .new-prof-content {
+	width: 45%;
+	display: inline-block;
+}
+
+#new-prof-form .new-prof-btn {
+	width: 45%;
+	margin: 20px 5px;
+}
+
+.col-header {
+	font-size: 14pt;
+	font-weight: bold;
+	display:inline-block;
+}
+
+.row-content:hover {
+	background-color: #E38445;
+}
+
+.row-cell {
+	margin: 10px 5px;
+	display: inline-block;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.row-cell:hover {
+	cursor: pointer;
+}
+
+#prof-list .prof-name {
+	width: 45%;
+}
+
+#prof-list .prof-uid {
+	width: 45%;
+}
+
+#prof-list hr {
+	padding: 0;
+	margin: 0;
+	border-width: 2px;
+	border-color: #666666;
+}
+
+#prof-list .prof-del {
+	width: 15px;
+	margin: 10px 5px;
+	visibility: hidden;
+}
+
+#prof-list .prof-list-row:hover .prof-del {
+	visibility: visible;
+}

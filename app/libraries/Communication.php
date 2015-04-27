@@ -70,6 +70,9 @@ class Communication
             
             $temp->time = new StdClass;
             $temp->time->duration = $timeblock->length;
+            
+            if ($event->class_type == 'LABORATORY')
+                $temp->time->duration -= 15;
     		
             //create the possible start times as a hard constraint
             $possibleStart = [];

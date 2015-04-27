@@ -159,9 +159,24 @@ a:hover, a:focus {
 	margin-left: 20px;
 }
 
+#custom-times {
+	margin-bottom: 10px;
+}
+
 #custom-times td {
 	padding-left: 5px;
 	padding-right: 5px;
+}
+
+td.constraint-del {
+	color: #363636;
+  	font-size: 16pt;
+  	margin-top: 5px;
+  	cursor: pointer;
+}
+
+td.constraint-del:hover {
+	color: #E6E6E6;
 }
 
 #start-time-clock, #end-time-clock, #cust-start-time, #cust-end-time {
@@ -230,6 +245,11 @@ ul.ui-autocomplete > li {
 
 #conflict-section {
 	display: none;
+}
+
+#conflict-list {
+	max-height: 200px;
+	overflow-y: auto;
 }
 
 #scratch-pad {
@@ -357,6 +377,9 @@ ul.ui-autocomplete > li {
 	word-wrap: break-word;
 	text-shadow: 0.5px 0.5px 1px black;
 	line-height: 1;
+	width: 40px;
+	display: flex;
+	align-items: center;
 }
 
 .scheduled-class:hover {
@@ -554,4 +577,8 @@ ul.ui-autocomplete > li {
   position: absolute;
   top: 0;
   left: 4px;
+}
+
+.conflict-row:hover {
+	cursor: pointer;
 }

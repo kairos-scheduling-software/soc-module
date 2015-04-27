@@ -10,6 +10,8 @@
 var dashboard3 = (function () {
     "use strict";
 
+    var currentSchedId = 0;
+
     // Base URL for AJAX request
     var vis_url = 'vis';
 
@@ -87,8 +89,6 @@ var dashboard3 = (function () {
         var navbar_height = $('#custom_navbar').height() || 0;
         svgWidth = viewportSize.getWidth() - 200 - 1;
         svgHeight = viewportSize.getHeight() - navbar_height - 1;
-
-        d3.behavior.zoom().scale(7);
 
         //Make an SVG Container
         svg = d3.select(selector).append("svg")
@@ -493,15 +493,14 @@ var dashboard3 = (function () {
         var width = boxWidth * dayBoxes * numDays + 0.1;
         var height = (lastTimeOfDay - firstTimeOfDay) * boxHeight + 0.1;
 
-        // If this is the first time we have run, set the default zoom
-        //if (doInit) {
-            // If set to init, set zoom here
-            if (svgWidth < width) {
-                //console.log(svgWidth / (width + gridMargin.left + gridMargin.right + 40));
-                //console.log(svgHeight / (height + gridMargin.top + gridMargin.bottom + 40));
-                d3Zoom.scale(svgWidth / (width + gridMargin.left + gridMargin.right + 40));
-            }
-        //}
+        // If set to init, set zoom here
+        if (svgWidth < width) {
+            d3Zoom.scale(svgWidth / (width + gridMargin.left + gridMargin.right + 40));
+        } else {
+            d3Zoom.scale(1);
+        }
+        
+        d3Zoom.translate([0,0]);
 
         // do transform after zoom is set (needs to be outside of if stmt, need to run in all cases)
         container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
@@ -902,6 +901,20 @@ var dashboard3 = (function () {
             .style("fill-opacity", 1)
             ;
 
+        if (!isDiff) {
+            container
+                .append('text')
+                .attr("x", 0)  // space legend
+                .attr("y", height + 65 + 32)
+                .attr("font-size", 10)
+                .text("Schedule URL: " + document.location.protocol + "//"+ window.location.hostname + window.location.pathname + "?id=" + currentSchedId + '&dash=3')
+                .style("fill-opacity", 0)
+                .transition().duration(500)
+                .delay(500)
+                .style("fill-opacity", 1)
+                ;
+        }
+
         function minutesToNumber(minutes) {
             return ((1.666) * minutes) / 100; // 100/60 = 1.666
         }
@@ -1046,9 +1059,11 @@ var dashboard3 = (function () {
                     data[i].days = newDays;
                 });
                 createChart(d3Select, data, doInit);
+                $('.spinner').hide();
                 spin.stop();
             },
             error: function (e) {
+                $('.spinner').hide();
                 spin.stop();
             }
         });
@@ -1121,8 +1136,9 @@ var dashboard3 = (function () {
         $('#class-type-fg').show();
         $('#sched-lbl').html('Schedule');
     }
-    
+
     function stopSpinner() {
+        $('.spinner').hide();
         spin.stop();
     }
 
@@ -1136,6 +1152,8 @@ var dashboard3 = (function () {
     function render(sched, diff) {
         // check if user is in php container
         var isAuth = (d3.select('#vis-wrapper').attr('data-auth-status') === '1');
+
+        currentSchedId = sched;
 
         $('footer').hide();
         $('.top-buffer').hide();
@@ -1224,15 +1242,18 @@ var dashboard3 = (function () {
                         diffSelected = true;
                         setupForDiff();
                     } else {
-                        yearSelectionHandler((sched || data[0]['id']), '#d3', true);
+                        currentSchedId = (sched || data[0]['id']);
+                        yearSelectionHandler(currentSchedId, '#d3', true);
                     }
 
                     visMenu.show();
+                    $('.spinner').hide();
                     spin.stop();
                 });
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("Request Error: " + textStatus + "; " + errorThrown);
+                $('.spinner').hide();
                 spin.stop();
             }
         });
@@ -1242,7 +1263,8 @@ var dashboard3 = (function () {
             onChange: function (event) {
                 // Don't trigger event when diff is selected
                 if (!diffSelected) {
-                    yearSelectionHandler($("#sched-sel").val(), '#d3', false);
+                    currentSchedId = $("#sched-sel").val();
+                    yearSelectionHandler(currentSchedId, '#d3', false);
                 }
             }
         });
@@ -1274,7 +1296,8 @@ var dashboard3 = (function () {
                     setupForStandard();
 
                     if (!diffSelected) {
-                        yearSelectionHandler($("#sched-sel").val(), '#d3', false);
+                        currentSchedId = $("#sched-sel").val();
+                        yearSelectionHandler(currentSchedId, '#d3', false);
                     }
                 }
             }

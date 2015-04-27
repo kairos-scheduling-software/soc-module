@@ -1301,7 +1301,8 @@ function get_class_info(block) {
 		enroll: block.data('enroll'),
 		prof_id: block.data('prof_id'),
 		room_id: block.data('room_id'),
-		grp_id: block.data('grp_id')
+		grp_id: block.data('grp_id'),
+		constraints: block.data('constraints')
 	};
 	return data;
 }

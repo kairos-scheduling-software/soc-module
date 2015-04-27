@@ -35,7 +35,7 @@ $(function(){
 		var blocks = form.data('block');
 		var time_id = blocks.data('time');
 		var class_name = form.children('input[name="class_name"]').val().trim();
-
+		
 		blocks.popover('destroy');
 		
 		var url = $('#edit-class-panel').data('url');
@@ -43,12 +43,17 @@ $(function(){
 			sched_id: sched_id,
 			mode: 'add-class',
 			class_name: class_name,
-			time_id: time_id,
 			enroll: form.children('input[name="enroll"]').val(),
 			room_id: form.children('select[name="room"]').val(),
 			grp_id: form.children('select[name="room_group"]').val(),
 			prof_id: form.children('select[name="prof"]').val()
 		};
+		if (time_id != undefined) data['time_id'] = time_id;
+		else {
+			data['start'] = blocks.data('start');
+			data['length'] = blocks.data('length');
+			data['days'] = blocks.data('days');
+		}
 		
 		$.ajax({
 			url:		url,
@@ -65,6 +70,7 @@ $(function(){
 				
 				blocks.removeClass('new-block');
 				data['class_id'] = json_data['newId'];
+				if (time_id == undefined) data['time_id'] = json_data['newTime'];
 				update_class_info(blocks, data);
 				course_list[data['class_name']] = data['class_id'];
 				
@@ -239,9 +245,9 @@ $(function(){
 					
 					var params = [];
 					params["col"] = $(this).data('col_index');
-					params["days"] = ('' + $(this).data('days')).split('|');
+					params["days"] = '' + $(this).data('days');
 					params["start"] = $(this).attr('data-start');
-					params["time_string"] = parse_time(params['start']);
+					params["start_time"] = params['start'];
 					params["length"] = $(this).data('length');
 					
 					var content = get_popover_content(params);
@@ -317,7 +323,128 @@ $(function(){
 	$('#end-time-clock').click(function(e) {
 		$('#cust-end-time').timepicker('showWidget');
 	});
+	
+	$('#add-custom-class-btn').click(function(e) {
+		if ($('#new-class-form').length > 0) return;
+		var days_arr = [];
+		var count = 0;
+		$.each($('#custom-days').find('input'), function(i, box) {
+			count += 1;
+			if ($(box).prop('checked')) days_arr.push(count);
+			//console.log($(box).prop('checked'));
+		});
+		var days = parse_days(days_arr);
+		var start_str = $('#cust-start-time').val();
+		var end_str = $('#cust-end-time').val();
+		
+		var start_h, start_m, end_h, end_m;
+		
+		var start_tm = start_str.substring(0, start_str.indexOf(' ')).replace(':', '');
+		if (start_tm.length < 4) start_tm = '0' + start_tm;
+		start_h = parseInt(start_tm.substring(0, 2));
+		start_m = parseInt(start_tm.substring(2));
+		if (start_str.endsWith('PM')) {
+			start_h += 12;
+			start_tm = h + start_tm.substring(2);
+		}
+		
+		var end_tm = end_str.substring(0, end_str.indexOf(' ')).replace(':', '');
+		if (end_tm.length < 4) end_tm = '0' + end_tm;
+		end_h = parseInt(end_tm.substring(0, 2));
+		end_m = parseInt(end_tm.substring(2));
+		if (end_str.endsWith('PM')) {
+			end_h += 12;
+		}
+		
+		var length = (end_h - start_h) * 60 + (end_m - start_m);
+		
+		var blocks = [];
+		$.each(days, function(i, day) {
+			var ddd = day.substring(1, 4);
+			//var constraints = ev['constraints'];
+			//if (constraints == null) constraints = [];
+			
+			var left = 0;
+			var top = 0;
+			var v_offset = get_vertical_offset(start_tm);
+			top += (v_offset * five_min_height);
+			var horiz = get_horizontal_offset(v_offset, length, ddd, false);
+			
+			if (horiz == -1)
+			{
+				console.log("Horizontal failed");
+				return;
+			}
+			left += horiz * time_block_w;
+			
+			var el = jQuery('<div></div>', {
+				//text: ev['name'],
+				//'class': 'scheduled-class id-' + ev['id'] + (ev['etime']['length'] == 80 ? ' eighty-min-blk' : ' fifty-min-blk'),
+				'class': 'scheduled-class',
+				//'data-id': ev['id'],
+				//'data-time': ev['etime_id'],
+				'data-days': days_arr.join('|'),
+				'data-ddd': ddd,
+				'data-start': start_tm,
+				'data-length': length,
+				'data-col_index': (horiz + 1),
+				'style': "left: " + left + "px; top: " + top + "px; position: absolute;"
+				//'data-room_id': (ev['room_id'] != null ? ev['room_id'] : -1),
+				//'data-grp_id': (ev['room_group_id'] != null ? ev['room_group_id'] : -1),
+				//'data-enroll': ev['enroll_cap'],
+				//'data-prof_id': ev['professor']
+			});
+			//el.data('constraints', constraints);
+			el.data('constraints', []);
+			el.css({
+				height: (el.data('length') / 5) * five_min_height,
+				width: time_block_w +'px'
+			});
+			blocks.push(el);
+			$(day).append(el);
+		});
+		
+		blocks = $(blocks).map(function () { return this.toArray(); } );
+		$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+		
+		//var time_id = $(this).data('time');
+		var params = [];
+		var block = blocks[0];
+		params["col"] = $(block).data('col_index');
+		params["days"] = '' + $(block).data('days');
+		params["start"] = start_tm;
+		params["start_time"] = start_tm;
+		params["length"] = length;
+		params['custom_time'] = true;
+		
+		var content = get_popover_content(params);
 
+		// Show popover
+		var pos = parseFloat($(block).css('top')) + $(block).height()/2;
+		var el = $(block);
+
+		$(block).popover({
+			trigger: "manual",
+			html: true,
+			content: content
+		}).on('shown.bs.popover', function() {
+			if(parseInt($('.popover').css('top')) < 0)
+			{
+				$('.popover').css('top', 0);
+				$('.arrow').css('top', pos + 'px');
+			}
+			
+			$('#new-class-form').data('block', blocks);
+			
+			$('#cancel-add-class').click(function() {
+				el.popover('destroy');
+				blocks.remove();
+			});
+
+		}).popover('show');
+		
+	});
+	
 	$('#view-conflicts').click(function(e) {
 		e.preventDefault();
 
@@ -562,8 +689,8 @@ function resize_all()
 	$('#time-labels').css('height', sched_height + 'px');
 	five_min_height = $('#inner-container').height() / 144;
 
-	$('.fifty-min-blk').css('height', (10 * five_min_height));
-	$('.eighty-min-blk').css('height', (16 * five_min_height));
+	//$('.fifty-min-blk').css('height', (10 * five_min_height));
+	//$('.eighty-min-blk').css('height', (16 * five_min_height));
 	
 	$.each(['mon', 'tue', 'wed', 'thu', 'fri'], function(i, day) {
 		$('#' + day + '-col').css('width', col_counts[day] * (time_block_w + 2) + 'px');
@@ -919,7 +1046,7 @@ function get_popover_content(params)
 	var days = "";
 	var days_arr = [];
 	
-	$.each(params["days"], function(i, day) {
+	$.each(params["days"].split('|'), function(i, day) {
 		switch(day) {
 			case "1":
 				days_arr.push('M');
@@ -945,12 +1072,14 @@ function get_popover_content(params)
 
 
 	times = "time placeholder";
+	var start_time = parse_time(params['start_time']);
+	var length = params["length"];
 
 	var html = "<div style='text-align:center'><h4>New Class</h4></div>";
 	html += "<b>Days: </b><em>"+ days +"</em><br>";
-	html += "<b>Time: </b><em>"+ params["time_string"] +"</em><br>";
-	html += "<b>Duration: </b><em>"+ params["length"] +" min</em><br><br>";
-	html += "<div><form id='new-class-form' style='display: inline'>";
+	html += "<b>Time: </b><em>"+ start_time +"</em><br>";
+	html += "<b>Duration: </b><em>"+ length +" min</em><br><br>";
+	html += '<div><form id="new-class-form" style="display: inline">';
 	html += "<small><b>Class Name:</b></small><br>";
 	html += "<input type='text' class='form-control' name='class_name' placeholder='Class Name' required>";
 	
@@ -1444,6 +1573,9 @@ function update_class_info(new_blocks, data) {
 	new_blocks.data('id', data['class_id']);
 	new_blocks.addClass('id-' + data['class_id']);
 	new_blocks.html(data['class_name']);
+	
+	if (data['newTime'] != undefined) new_blocks.data('time', data['time_id']);
+	
 	new_blocks.data('enroll', data['enroll']);
 	new_blocks.data('prof_id', data['prof_id']);
 	new_blocks.data('room_id', data['room_id']);
@@ -1499,6 +1631,7 @@ function fetch_schedule(sched_id) {
 						'data-prof_id': ev['professor']
 					});
 					el.data('constraints', constraints);
+					el.css('height', (el.data('length') / 5) * five_min_height);
 					$(day).append(el);
 				});
 			});

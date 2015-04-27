@@ -595,7 +595,22 @@ class ScheduleController extends BaseController {
 		$mode = Input::get('mode');
 		switch ($mode) {
 			case 'add-class':
-				$time_id = Input::get('time_id');
+				$time_id = Input::get('time_id', null);
+				
+				$new_tm = null;
+				if ($time_id == null) {
+					$days = Input::get('days');
+					$start_tm = Input::get('start');
+					$length = Input::get('length');
+					$new_tm = Etime::firstOrCreate(array(
+						'days' => $days,
+						'starttm' => $start_tm,
+						'length' => $length
+					));
+					$new_tm->save();
+					$time_id = $new_tm->id;
+				}
+				
 				$enroll = Input::get('enroll');
 				$room_id = Input::get('room_id');
 				$grp_id = Input::get('grp_id');
@@ -626,6 +641,8 @@ class ScheduleController extends BaseController {
 
 				$result = $this->api_check_sched($schedule->id);
 				$result->newId = $class->id;
+				
+				if ($new_tm != null) $result->newTime = $new_tm->id;
 				
 				return json_encode($result);
 				break;

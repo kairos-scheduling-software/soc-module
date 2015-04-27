@@ -371,13 +371,13 @@ $(function(){
 		
 		$('.id-' + id1).css({
 			opacity: 1,
-			backgroundColor: '#4D944D',
+			backgroundColor: '#DA4747',
 			boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
 		});
 		
 		$('.id-' + id2).css({
 			opacity: 1,
-			backgroundColor: '#4D944D',
+			backgroundColor: '#DA4747',
 			boxShadow: '2px 2px 4px #363636, 0 0 6px #363636'
 		});
 		

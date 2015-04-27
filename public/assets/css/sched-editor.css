@@ -581,4 +581,5 @@ ul.ui-autocomplete > li {
 
 .conflict-row:hover {
 	cursor: pointer;
+	background-color: #A1A1A1;
 }

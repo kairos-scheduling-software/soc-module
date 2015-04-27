@@ -306,7 +306,7 @@
 
 </script>
 
-<h1 id="sched-name" data-url="{{ URL::route('e-edit-schedule') }}">{{ $schedule->name }}
+<h1 id="sched-name" data-url="{{ URL::route('get-sched') }}">{{ $schedule->name }}
 	{{--<a href="#"><span id="edit-icon">{{FA::icon('edit')}}</span></a>--}}
 		<span id="sched-ok">{{ FA::icon('check')}} No conflicts in schedule.</span>
 		<span id="checking-sched">{{ FA::spin('spinner') }} Checking schedule...</span>
@@ -365,14 +365,6 @@
 		{{--</div>--}}
 	</div>
 </div>
-<div id="class-staging">
-	<?php $group_count = 1; ?>
-	@foreach($schedule->events as $class)
-		@include('editor/staged-class')
-		<?php $group_count++; ?>
-	@endforeach
-	<script>group_counter = {{ $group_count }};</script>
-</div>
 <div id="bottom-container">
 	<div id="drop-trash">
 		<img id="trash-img" src="https://cdn3.iconfinder.com/data/icons/flatforlinux/256/24-Empty%20Trash.png" width="100" height="100" class="trash-can">
@@ -387,7 +379,7 @@
 
 @section('right-column')
 
-<div id="edit-class-panel">
+<div id="edit-class-panel" data-url="{{ URL::route('e-edit-schedule') }}">
 	<div style="text-align: right">
 		<h1 style="margin-bottom: 0">
 			<a href="#" id="close-right-panel">&times;</a>
@@ -431,34 +423,16 @@
 			</h3>
 
 			<div class="form-group">
-				<table>
+				<table id="constraint-table">
 					<tr><th>Key:</th><th colspan="2">Value:</th></tr>
-					<tr>
+					<tr class="constraint-row">
 						<td>
-							<select class="form-control"><option>Avoid Overlap With</option></select>
+							<select class="form-control" name="constraint-key"><option>Avoid Overlap With</option></select>
 						</td>
 						<td>
-							<select class="form-control"><option>CS 4540-001</option></select>
+							<select class="form-control" name="constraint-val"><option>CS 4540-001</option></select>
 						</td>
-						<td>{{ FA::icon('trash') }}</td>
-					</tr>
-					<tr>
-						<td>
-							<select class="form-control"></select>
-						</td>
-						<td>
-							<select class="form-control"></select>
-						</td>
-						<td>{{ FA::icon('trash') }}</td>
-					</tr>
-					<tr>
-						<td>
-							<select class="form-control"></select>
-						</td>
-						<td>
-							<select class="form-control"></select>
-						</td>
-						<td>{{ FA::icon('trash') }}</td>
+						<td class="constraint-del">{{ FA::icon('trash') }}</td>
 					</tr>
 				</table>
 			</div>

@@ -7,6 +7,6 @@ class Ticket extends Eloquent
 	
 	public function event()
 	{
-		return $this->belongsTo('Event');
+		return $this->belongsTo('models\Event');
 	}
 }

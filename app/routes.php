@@ -185,6 +185,10 @@ Route::group(array('before'=> 'auth'), function()
     ));
 
     // Editor routes
+    Route::post('/get-schedule', array(
+        'as'    =>  'get-sched',
+        'uses'  =>  'ScheduleController@get_schedule'
+    ));
     Route::post('/edit-schedule', array(
         'as'    =>  'e-edit-schedule',
         'uses'  =>  'ScheduleController@e_edit_schedule'
@@ -263,7 +267,7 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  => 'ResourceController@add_professor'
     ));
     Route::post('/resources/remove-prof', array(
-        'as'    => 'remove-prof',
-        'uses'  => 'ResourceController@remove_professor'
+        'as'    => 'edit-prof',
+        'uses'  => 'ResourceController@edit_professor'
     ));
 });

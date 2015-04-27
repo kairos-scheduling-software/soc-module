@@ -47,7 +47,7 @@
 					{{ FA::icon('th'); }}
 					&nbsp;&nbsp;Rooms
 				</button>
-				<button class="btn btn-resource" onclick="window.location='{{ URL::route("room-manager") }}'">
+				<button class="btn btn-resource" onclick="window.location='{{ URL::route("prof-manager") }}'">
 					{{ FA::icon('user'); }}
 					&nbsp;&nbsp;Professors
 				</button>

@@ -10,8 +10,8 @@ class ResourceController extends BaseController
 	
 	public function load_prof_manager() {
 		// TODO: Replace with real code
-		return View::make('room-manager')->with([
-			'page_name'	=>	'Room Manager'
+		return View::make('prof-manager')->with([
+			'page_name'	=>	'Professor Manager'
 		]);
 	}
 	
@@ -140,9 +140,53 @@ class ResourceController extends BaseController
 		}
 	}
 	
-	public function get_professors() {}
+	public function get_professors() {
+		try {
+			$profs = Professor::orderBy('name', 'asc')->select('id', 'name', 'uid')->get();
+			return json_encode($profs);
+		} catch (Exception $e) {
+			return Response::json(['error' => 'Could not get professor list'], 500);
+		}
+	}
 	
-	public function add_professor() {}
+	public function add_professor() {
+		try {
+			$prof = new Professor;
+			$prof->name = Input::get('name');
+			$prof->uid = Input::get('uid', '');
+			
+			$prof->save();
+		} catch (Exception $e) {
+			return Response::json(['error' => 'Could not save new professor'], 500);
+		}
+	}
 	
-	public function remove_professor() {}
+	public function edit_professor() {
+		$id = Input::get('pk');
+		$field = Input::get('name');
+		$value = Input::get('value');
+		
+		try {
+			$prof = Professor::find($id);
+			try {
+				if ($field == 'name') {
+					$prof->name = $value;
+					$prof->save();
+				} elseif ($field == 'uid') {
+					$prof->uid = $value;
+					$prof->save();
+				} elseif ($field == 'remove') {
+					if ($value[0] == '1') {
+						$prof->delete();
+					}
+				} else {
+					return Response::json(['error' => 'Invalid field ' . $field], 500);
+				}
+			} catch (Exception $e) {
+				return Response::json(['error' => 'Could not update field ' . $field], 500);
+			}
+		} catch (Exception $e) {
+			return Response::json(['error' => 'Could not find professor ' . $id], 500);
+		}
+	}
 }

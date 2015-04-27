@@ -66,10 +66,14 @@ var dashboard3 = (function () {
      *  
      * @returns {undefined}
      */
-    function d3Zoomed() {
+    function d3Zoomed(d3Zoom) {
         // Remove the tip when zooming or dragging
         d3.select('.d3-tip').style('opacity', 0).style('pointer-events', 'none');
         container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+
+    function resetZoom() {
+
     }
 
     /**
@@ -83,6 +87,8 @@ var dashboard3 = (function () {
         var navbar_height = $('#custom_navbar').height() || 0;
         svgWidth = viewportSize.getWidth() - 200 - 1;
         svgHeight = viewportSize.getHeight() - navbar_height - 1;
+
+        d3.behavior.zoom().scale(7);
 
         //Make an SVG Container
         svg = d3.select(selector).append("svg")
@@ -157,7 +163,7 @@ var dashboard3 = (function () {
         });
         svg.call(tip);
 
-        // Dynamically resixe SVG when window is resized
+        // Dynamically resize SVG when window is resized
         window.onresize = function (event) {
             // Height of top navbar
             var navbar_height = $('#custom_navbar').height() || 0;
@@ -246,7 +252,7 @@ var dashboard3 = (function () {
 
         svg.selectAll('g').remove();
         container = svg.append("g");
-        container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
+        //container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
 
         data = [];
 
@@ -429,11 +435,11 @@ var dashboard3 = (function () {
             if (!isNull(gridColorsIndex[val.class_type])) {
                 val['cssClass'] += ' type-sel-' + gridColorsIndex[val.class_type];
             }
-            
+
             if (!isNull(mprof[val.mprof])) {
                 val['cssClass'] += ' prof-sel-' + mprof[val.mprof];
             }
-            
+
             //return  d.class_type.replace(/[^A-Z0-9]/g, '_') + ' ' + d.mprof.replace(/[^A-Z0-9]/g, '_')
             //console.log(val['cssClass']);
 
@@ -486,6 +492,19 @@ var dashboard3 = (function () {
         // The +0.1 makes it draw the very last bar. +1 causes a little bit of the axis to hang over
         var width = boxWidth * dayBoxes * numDays + 0.1;
         var height = (lastTimeOfDay - firstTimeOfDay) * boxHeight + 0.1;
+
+        // If this is the first time we have run, set the default zoom
+        //if (doInit) {
+            // If set to init, set zoom here
+            if (svgWidth < width) {
+                //console.log(svgWidth / (width + gridMargin.left + gridMargin.right + 40));
+                //console.log(svgHeight / (height + gridMargin.top + gridMargin.bottom + 40));
+                d3Zoom.scale(svgWidth / (width + gridMargin.left + gridMargin.right + 40));
+            }
+        //}
+
+        // do transform after zoom is set (needs to be outside of if stmt, need to run in all cases)
+        container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
 
         // X bars
         container.append("g")
@@ -665,7 +684,8 @@ var dashboard3 = (function () {
             .style("text-anchor", "middle")
             .style("fill-opacity", 0)
             .style("fill", "#000000")
-            .transition().duration(750) // transition effect
+            .transition().duration(500) // transition effect
+            .delay(500)
             .style("fill-opacity", 1);
 
         // Set block attributes
@@ -678,13 +698,12 @@ var dashboard3 = (function () {
                 return 'cls_id_' + d.id;
             })
             .style("fill-opacity", 0)
+            //.attr("x", 0)
             .attr("x", function (d) {
                 return d.x;
                 //return d.x + (boxWidth / 2);
             })
-            .attr("y", function (d) {
-                return d.y + 50;
-            })
+            .attr("y", 0)
             .attr("width", function (d) {
                 if (isDiff) {
                     if (d['diff'] != 'e') {
@@ -799,6 +818,13 @@ var dashboard3 = (function () {
             })
             .style("stroke-opacity", 0)
             .transition().duration(750)
+            //.attr("x", function (d) {
+            //    return d.x;
+            //    //return d.x + (boxWidth / 2);
+            //})
+            .attr("y", function (d) {
+                return d.y + 50;
+            })
             .style("fill-opacity", 0.3)
             .style("fill", function (d) {
                 return d.color;
@@ -808,6 +834,73 @@ var dashboard3 = (function () {
             })
             .style("stroke-opacity", 1)
             .attr("stroke-width", 0.3);
+
+        // Don't draw class types for diff
+        var legendLength;
+        var legendColors = [];
+        var legendDesc = [];
+
+        if (isDiff) {
+            legendLength = 3;
+
+            legendColors.push("green");
+            legendDesc.push("ADDED");
+
+            legendColors.push("red");
+            legendDesc.push("REMOVED");
+
+            legendColors.push("gray");
+            legendDesc.push("SAME");
+        } else {
+            legendLength = class_types.length;
+
+            $.each(class_types, function (i, val) {
+                legendColors.push(getGridColor(val));
+                legendDesc.push(val);
+            });
+        }
+
+        container.selectAll(".legend")
+            .data(d3.range(0, legendLength))
+            .enter()
+            .append('rect')
+            .attr("x", 0)  // space legend
+            .attr("y", height + 65)
+            .attr("width", 15)    // style the legend
+            .attr("height", 10)    // style the legend
+            .style("stroke-width", 0.3)
+            .style("stroke-opacity", 0)
+            .style("fill-opacity", 0)
+            .style("fill", function (d) { // Add the colours dynamically
+                return legendColors[d];
+            })
+            .transition().duration(750)
+            .attr("x", function (d, i) {
+                return (i * 130);
+            })  // space legend
+            .style("fill-opacity", 0.3)
+            .style("stroke", function (d) {
+                return "#000000";
+            })
+            .style("stroke-opacity", 1);
+
+        container.selectAll(".legend")
+            .data(d3.range(0, legendLength))
+            .enter()
+            .append('text')
+            .attr("x", function (d, i) {
+                return (i * 130) + 20;
+            })  // space legend
+            .attr("y", height + 65 + 8)
+            .attr("font-size", 10)
+            .text(function (d) {
+                return legendDesc[d];
+            })
+            .style("fill-opacity", 0)
+            .transition().duration(500)
+            .delay(500)
+            .style("fill-opacity", 1)
+            ;
 
         function minutesToNumber(minutes) {
             return ((1.666) * minutes) / 100; // 100/60 = 1.666
@@ -927,6 +1020,7 @@ var dashboard3 = (function () {
         if (!isNull(sched)) {
             spin.spin();
             body.append(spin.el);
+            setTimeout(stopSpinner, 30000);
         }
 
         var schType = 2;
@@ -1027,6 +1121,10 @@ var dashboard3 = (function () {
         $('#class-type-fg').show();
         $('#sched-lbl').html('Schedule');
     }
+    
+    function stopSpinner() {
+        spin.stop();
+    }
 
     /**
      * Render the object
@@ -1074,6 +1172,7 @@ var dashboard3 = (function () {
 
         spin.spin();
         body.append(spin.el);
+        setTimeout(stopSpinner, 30000);
 
         $('select').multiselect({
             maxHeight: 175,
@@ -1134,6 +1233,7 @@ var dashboard3 = (function () {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("Request Error: " + textStatus + "; " + errorThrown);
+                spin.stop();
             }
         });
 

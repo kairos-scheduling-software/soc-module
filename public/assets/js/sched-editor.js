@@ -197,123 +197,123 @@ $(function(){
 		//cursorAt: { bottom: 25, left: 0 },
 		//cursor: "url(" + cursor_img + "), auto",
 		cursorAt: { bottom: 0, left: 20 },
-      	helper: function( event ) 
-      	{
-		return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
-    	},
-    	start: function(event, ui)
-    	{
-    		var dragged_block = $(this);
-    		
-    		if (dragged_block.hasClass('one-fifty'))
-    			setup_drop_zones(50, 1);
-    		else if (dragged_block.hasClass('one-eighty'))
-    			setup_drop_zones(80, 1);
-    		else if (dragged_block.hasClass('two-fifty'))
-    			setup_drop_zones(50, 2);
-    		else if (dragged_block.hasClass('two-eighty'))
-    			setup_drop_zones(80, 2);
-    		else if (dragged_block.hasClass('three-fifty'))
-    			setup_drop_zones(50, 3);
-    		else if (dragged_block.hasClass('three-eighty'))
-    			setup_drop_zones(80, 3);
+	  	helper: function( event ) 
+	  	{
+			return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+		},
+		start: function(event, ui)
+		{
+			var dragged_block = $(this);
+			
+			if (dragged_block.hasClass('one-fifty'))
+				setup_drop_zones(50, 1);
+			else if (dragged_block.hasClass('one-eighty'))
+				setup_drop_zones(80, 1);
+			else if (dragged_block.hasClass('two-fifty'))
+				setup_drop_zones(50, 2);
+			else if (dragged_block.hasClass('two-eighty'))
+				setup_drop_zones(80, 2);
+			else if (dragged_block.hasClass('three-fifty'))
+				setup_drop_zones(50, 3);
+			else if (dragged_block.hasClass('three-eighty'))
+				setup_drop_zones(80, 3);
 
-    		$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+			$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
 
-    		$('#sched-container').css('opacity', 0.5);
+			$('#sched-container').css('opacity', 0.5);
 
-    		$('.drop-zone').droppable({
-		    	hoverClass: "time-block-hover",
-		    	activeClass: "time-block-active",
-		    	drop: function(event, ui) {
+			$('.drop-zone').droppable({
+				hoverClass: "time-block-hover",
+				activeClass: "time-block-active",
+				drop: function(event, ui) {
 					if ($('#new-class-form').length > 0) {
 						update_drop_zone();
 						return;
 					}
-		    		
-		    		var time_id = $(this).data('time');
-		    		var blocks = update_drop_zone(time_id);
-		    		
-		    		var params = [];
-		    		params["col"] = $(this).data('col_index');
-		    		params["days"] = ('' + $(this).data('days')).split('|');
-		    		params["start"] = $(this).attr('data-start');
-		    		params["time_string"] = parse_time(params['start']);
-		    		params["length"] = $(this).data('length');
 					
-		    		var content = get_popover_content(params);
+					var time_id = $(this).data('time');
+					var blocks = update_drop_zone(time_id);
+					
+					var params = [];
+					params["col"] = $(this).data('col_index');
+					params["days"] = ('' + $(this).data('days')).split('|');
+					params["start"] = $(this).attr('data-start');
+					params["time_string"] = parse_time(params['start']);
+					params["length"] = $(this).data('length');
+					
+					var content = get_popover_content(params);
 
-		    		// Show popover
-		    		var pos = parseFloat($(this).css('top')) + $(this).height()/2;
-		    		var el = $(this);
+					// Show popover
+					var pos = parseFloat($(this).css('top')) + $(this).height()/2;
+					var el = $(this);
 
-		    		$(this).popover({
-		    			trigger: "manual",
-		    			html: true,
-		    			content: content
-		    		}).on('shown.bs.popover', function() {
-		    			if(parseInt($('.popover').css('top')) < 0)
-	    				{
-	    					$('.popover').css('top', 0);
-	    					$('.arrow').css('top', pos + 'px');
-	    				}
-	    				
-	    				$('#new-class-form').data('block', blocks);
-	    				
-	    				$('#cancel-add-class').click(function() {
-	    					el.popover('destroy');
-	    					blocks.remove();
-	    				});
+					$(this).popover({
+						trigger: "manual",
+						html: true,
+						content: content
+					}).on('shown.bs.popover', function() {
+						if(parseInt($('.popover').css('top')) < 0)
+						{
+							$('.popover').css('top', 0);
+							$('.arrow').css('top', pos + 'px');
+						}
+						
+						$('#new-class-form').data('block', blocks);
+						
+						$('#cancel-add-class').click(function() {
+							el.popover('destroy');
+							blocks.remove();
+						});
 
-		    		}).popover('show');
-		    	},
-		    	over: function(event, ui) {
-		    		var time_id = $(this).data('time');
-		    		$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
-		    	},
-		    	out: function(event, ui) {
-		    		var time_id = $(this).data('time');
-		    		$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
-		    	}
-		    });
-    	},
-    	stop: function(event, ui)
-    	{
-    		$('.drop-zone').remove();
-    		$('#sched-container').css('opacity', 1);
-    	},
-    	revert: 'invalid'
-    });    
+					}).popover('show');
+				},
+				over: function(event, ui) {
+					var time_id = $(this).data('time');
+					$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
+				},
+				out: function(event, ui) {
+					var time_id = $(this).data('time');
+					$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
+				}
+			});
+		},
+		stop: function(event, ui)
+		{
+			$('.drop-zone').remove();
+			$('#sched-container').css('opacity', 1);
+		},
+		revert: 'invalid'
+	});    
 
-    $('.trash-can').droppable({
-    	hoverClass: "trash-hover"
-    });
+	$('.trash-can').droppable({
+		hoverClass: "trash-hover"
+	});
 
-    $('#cust-start-time').timepicker({
-    	minuteStep: 5,
-    	showInputs: false,
-    	disableFocus: true
-    }).on('show.timepicker', function(e) {
-    	$('i.icon-chevron-up').addClass('fa fa-chevron-up');
-    	$('i.icon-chevron-down').addClass('fa fa-chevron-down');
-    });
+	$('#cust-start-time').timepicker({
+		minuteStep: 5,
+		showInputs: false,
+		disableFocus: true
+	}).on('show.timepicker', function(e) {
+		$('i.icon-chevron-up').addClass('fa fa-chevron-up');
+		$('i.icon-chevron-down').addClass('fa fa-chevron-down');
+	});
 
-    $('#cust-end-time').timepicker({
-    	minuteStep: 5,
-    	showInputs: false,
-    	disableFocus: true
-    }).on('show.timepicker', function(e) {
-    	$('i.icon-chevron-up').addClass('fa fa-chevron-up');
-    	$('i.icon-chevron-down').addClass('fa fa-chevron-down');
-    });
+	$('#cust-end-time').timepicker({
+		minuteStep: 5,
+		showInputs: false,
+		disableFocus: true
+	}).on('show.timepicker', function(e) {
+		$('i.icon-chevron-up').addClass('fa fa-chevron-up');
+		$('i.icon-chevron-down').addClass('fa fa-chevron-down');
+	});
 
-    $('#start-time-clock').click(function(e) {
-    	$('#cust-start-time').timepicker('showWidget');
-    });
+	$('#start-time-clock').click(function(e) {
+		$('#cust-start-time').timepicker('showWidget');
+	});
 
-    $('#end-time-clock').click(function(e) {
-    	$('#cust-end-time').timepicker('showWidget');
-    });
+	$('#end-time-clock').click(function(e) {
+		$('#cust-end-time').timepicker('showWidget');
+	});
 
 	// Listen for 'ctrl + f' and override the browser's default search
 	$(window).keydown(function(e) {
@@ -514,18 +514,23 @@ function resize_all()
 
 	$('.fifty-min-blk').css('height', (10 * five_min_height));
 	$('.eighty-min-blk').css('height', (16 * five_min_height));
+	
+	$.each(['mon', 'tue', 'wed', 'thu', 'fri'], function(i, day) {
+		$('#' + day + '-col').css('width', col_counts[day] * (time_block_w + 2) + 'px');
+	});
+	$('#outer-container').css('width', (total_cols() * (time_block_w + 2) + 60) + 'px');
 
 	$('#left-side-bar').css('height', ($(window).height() - 40) + 'px');
 
-	$('.class-name-container').each(function() {
-		var course = $(this);
-		var div = course.closest('div.scheduled-class');
-		var p = div.height();
-		p = (p - course.outerHeight(true)) / 4;
-
-		if(p >= 7)
-		div.css("padding-top", p + 'px');
-	});
+	//~ $('.class-name-container').each(function() {
+		//~ var course = $(this);
+		//~ var div = course.closest('div.scheduled-class');
+		//~ var p = div.height();
+		//~ p = (p - course.outerHeight(true)) / 4;
+//~ 
+		//~ if(p >= 7)
+		//~ div.css("padding-top", p + 'px');
+	//~ });
 }
 
 function parse_days(json_days)
@@ -655,50 +660,49 @@ function update_scheduled_class_draggables(sched_classes)
 		scroll: false,
 		stack: '#sched-container',
 		cursorAt: { bottom: 0, left: 20 },
-      	helper: function( event ) 
-      	{
+	  	helper: function( event ) 
+	  	{
 		return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
-    	},
-    	start: function(event, ui)
-    	{
+		},
+		start: function(event, ui)
+		{
 			var class_data = get_class_info($(this));
-    		//var time_id = $(this).data('time');
-    		//var class_id = $(this).data('id');
-    		var old_blocks = get_class(class_data['class_id']);
+			//var time_id = $(this).data('time');
+			//var class_id = $(this).data('id');
+			var old_blocks = get_class(class_data['class_id']);
 
-    		var dragged_block = $(this);
-    		var length = dragged_block.data('length');
-    		var days = parse_days(dragged_block.data('days'));
-    		var drop_height = (length / 5) * five_min_height;
-    		//var class_html = dragged_block.html();
+			var dragged_block = $(this);
+			var length = dragged_block.data('length');
+			var days = parse_days(dragged_block.data('days'));
+			var drop_height = (length / 5) * five_min_height;
+			//var class_html = dragged_block.html();
 
-    		setup_drop_zones(length, days.length);
-    		
-    		$(".drop-zone").droppable({
+			setup_drop_zones(length, days.length);
+			
+			$(".drop-zone").droppable({
 				hoverClass: "time-block-hover",
-		    	activeClass: "time-block-active",
-		    	drop: function(event, ui)
-		    	{
-		    		// Hide the old blocks
-		    		var new_time_id = $(this).data('time');
-		    		if (new_time_id == class_data['time_id']) {
+				activeClass: "time-block-active",
+				drop: function(event, ui)
+				{
+					// Hide the old blocks
+					var new_time_id = $(this).data('time');
+					if (new_time_id == class_data['time_id']) {
 						$('.drop-zone').remove();
 						return;
 					}
 					
 					old_blocks.hide();
 					
-		    		var new_blocks = update_drop_zone(new_time_id);
+					var new_blocks = update_drop_zone(new_time_id);
 					update_class_info(new_blocks, class_data);
-		    		
-		    		$('.class-name-container').each(function() {
-						var course = $(this);
-						var div = course.closest('div.scheduled-class');
-						var p = div.height();
-						p = (p - course.outerHeight(true)) / 4;
-
-						if(p >= 7) div.css("padding-top", p + 'px');
-					});
+					
+					//~ $('.class-name-container').each(function() {
+						//~ var course = $(this);
+						//~ var div = course.closest('div.scheduled-class');
+						//~ var p = div.height();
+						//~ p = (p - course.outerHeight(true)) / 4;
+						//~ if(p >= 7) div.css("padding-top", p + 'px');
+					//~ });
 					
 					var edit_class_data = Object.create(null);
 					edit_class_data['sched_id'] = sched_id;
@@ -736,30 +740,30 @@ function update_scheduled_class_draggables(sched_classes)
 							old_blocks.show();
 						}
 					});
-		    	},
-		    	over: function(event, ui)
-		    	{
-		    		var time_id = $(this).data('time');
-		    		$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
-		    	},
-		    	out: function(event, ui) {
-		    		var time_id = $(this).data('time');
-		    		$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
-		    	}
-    		});
+				},
+				over: function(event, ui)
+				{
+					var time_id = $(this).data('time');
+					$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
+				},
+				out: function(event, ui) {
+					var time_id = $(this).data('time');
+					$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
+				}
+			});
 
-    		// Setup the trash drop zone
-    		$('#trash-img').droppable({
-    			hoverClass: "trash-hover",
-		    	drop: function(event, ui) {
-		    		var confirmed = confirm("Are you sure you want to delete this class from the schedule?");
-		    		if(confirmed)
-		    		{
-		    			// TODO: update column matrix
-		    			// TODO: send ajax to delete class
-		    			old_blocks.hide();
+			// Setup the trash drop zone
+			$('#trash-img').droppable({
+				hoverClass: "trash-hover",
+				drop: function(event, ui) {
+					var confirmed = confirm("Are you sure you want to delete this class from the schedule?");
+					if(confirmed)
+					{
+						// TODO: update column matrix
+						// TODO: send ajax to delete class
+						old_blocks.hide();
 
-		    			$.ajax({
+						$.ajax({
 							url: $('#edit-class-panel').data('url'),
 							type: "POST",
 							data: {sched_id: sched_id, mode: 'remove-class', id:class_data['class_id']},
@@ -802,17 +806,17 @@ function update_scheduled_class_draggables(sched_classes)
 								$('#sched-ok').show();
 							}
 						});
-		    		}
-		    	}
-    		});
+					}
+				}
+			});
 
-    		// TODO: set up other drop zones
-    	},
-    	stop: function(event, ui)
-    	{
-    		$('.drop-zone').remove();
-    	},
-    	revert: 'invalid'
+			// TODO: set up other drop zones
+		},
+		stop: function(event, ui)
+		{
+			$('.drop-zone').remove();
+		},
+		revert: 'invalid'
 	});
 }
 
@@ -1144,24 +1148,24 @@ function add_matrix_col(day)
 	switch(day)
 	{
 		case 'mon':
-			$('#mon-col').css('width', (num_cols * time_block_w) + 'px');
+			$('#mon-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 		case 'tue':
-			$('#tue-col').css('width', (num_cols * time_block_w) + 'px');
+			$('#tue-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 		case 'wed':
-			$('#wed-col').css('width', (num_cols * time_block_w) + 'px');
+			$('#wed-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 		case 'thu':
-			$('#thu-col').css('width', (num_cols * time_block_w) + 'px');
+			$('#thu-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 		case 'fri':
-			$('#fri-col').css('width', (num_cols * time_block_w) + 'px');
+			$('#fri-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 	}
 
 	col_counts[day] = num_cols;
-	$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+	$('#outer-container').css('width', (total_cols() * (time_block_w + 2) + 60) + 'px');
 }
 
 function edit_class(course, success, fail)
@@ -1410,6 +1414,7 @@ function fetch_schedule(sched_id) {
 			console.log(json_data);
 			var events = json_data['events'];
 			$.each(events, function(i, ev) {
+				if (ev['etime']['length'] != 50 && ev['etime']['length'] != 80) return;
 				var days = parse_days(ev['etime']['days']);
 				$.each(days, function(i, day) {
 					var ddd = day.substring(1, 4);

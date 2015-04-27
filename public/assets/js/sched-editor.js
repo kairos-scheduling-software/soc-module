@@ -60,7 +60,7 @@ $(function(){
 				$('#checking-sched').show();
 			},
 			success: 	function(new_data, textStatus, jqXHR) {
-				$('#checking-sched').hide();
+				//$('#checking-sched').hide();
 				var json_data = JSON.parse(new_data);
 				
 				blocks.removeClass('new-block');
@@ -74,17 +74,18 @@ $(function(){
 				// Set-up draggable for the new blocks
 				update_scheduled_class_draggables(blocks);
 				
-				if (json_data['wasFailure'])
-				{
-					console.log('was failure: true');
-					$('#sched-bad').show();
-					$('#conflict-section').show();
-				}
-				else
-				{
-					console.log('was failure: false');
-					$('#sched-ok').show();
-				}
+				handle_class_conflicts(json_data);
+				//~ if (json_data['wasFailure'])
+				//~ {
+					//~ console.log('was failure: true');
+					//~ $('#sched-bad').show();
+					//~ $('#conflict-section').show();
+				//~ }
+				//~ else
+				//~ {
+					//~ console.log('was failure: false');
+					//~ $('#sched-ok').show();
+				//~ }
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				console.log(JSON.stringify(jqXHR));
@@ -133,26 +134,27 @@ $(function(){
 				$('#checking-sched').show();
 			},
 			success: 	function(data, textStatus, jqXHR) {
-				$('#checking-sched').hide();
+				//$('#checking-sched').hide();
 				var json_data;
 				if (data != '') json_data = JSON.parse(data);
 				else json_data = Object.create(null);
-				console.log(json_data);
+				
 				var blocks = get_class(class_data['class_id']);
 				update_class_info(blocks, class_data);
 				//blocks.click();
 				
-				if (json_data['wasFailure'])
-				{
-					console.log('was failure: true');
-					$('#sched-bad').show();
-					$('#conflict-section').show();
-				}
-				else
-				{
-					console.log('was failure: false');
-					$('#sched-ok').show();
-				}
+				handle_class_conflicts(json_data);
+				//~ if (json_data['wasFailure'])
+				//~ {
+					//~ console.log('was failure: true');
+					//~ $('#sched-bad').show();
+					//~ $('#conflict-section').show();
+				//~ }
+				//~ else
+				//~ {
+					//~ console.log('was failure: false');
+					//~ $('#sched-ok').show();
+				//~ }
 			},
 			error: 		function(jqXHR, textStatus, errorThrown) {
 				console.log(JSON.stringify(jqXHR));
@@ -412,6 +414,7 @@ $(function(){
 			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
 			right_panel_open = true;
 		}
+		$('#main-container').css('margin-right', ($('#right-side-bar').outerWidth() + 50) + 'px');
 	});
 	
 	$('#add-const-btn').click(function(e) {
@@ -434,6 +437,7 @@ $(function(){
 		e.preventDefault();
 
 		$('#right-side-bar').hide('slide', {direction: 'right', duration: 200});
+		$('#main-container').css('margin-right', '');
 		right_panel_open = false;
 	});
 });
@@ -720,10 +724,10 @@ function update_scheduled_class_draggables(sched_classes)
 							$('#sched-ok').hide();
 						},
 						success: function(data, textStatus, jqXHR) {
-							$('#checking-sched').hide();
-							$('#sched-ok').show();
+							//$('#checking-sched').hide();
+							//$('#sched-ok').show();
 							var json_data = JSON.parse(data);
-							console.log(json_data);
+							
 							update_column_matrix(old_blocks, "empty");
 							update_column_matrix(new_blocks, "busy");
 							
@@ -731,6 +735,8 @@ function update_scheduled_class_draggables(sched_classes)
 							new_blocks.removeClass('new-block');
 							
 							update_scheduled_class_draggables(new_blocks);
+							
+							handle_class_conflicts(json_data);
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$('#checking-sched').hide();
@@ -777,22 +783,24 @@ function update_scheduled_class_draggables(sched_classes)
 								delete course_list[old_blocks.first().text().trim()];
 								old_blocks.remove();
 								
-								$('#checking-sched').hide();
+								//$('#checking-sched').hide();
 								var json_data = JSON.parse(data);
-								$('#checking-sched').hide();
-								if (json_data['wasFailure'] === 'false')
-								{
-									//$('#sched-bad').show();
-									//$('#conflict-section').show();
-									$('#conflict-section').hide();
-									$('#sched-ok').show();
-								}
-								else
-								{
-									$('#checking-sched').hide();
-									$('#sched-ok').show();
-									$('#conflict-section').hide();
-								}				
+								
+								handle_class_conflicts(json_data);
+								//~ $('#checking-sched').hide();
+								//~ if (json_data['wasFailure'] === 'false')
+								//~ {
+									//~ //$('#sched-bad').show();
+									//~ //$('#conflict-section').show();
+									//~ $('#conflict-section').hide();
+									//~ $('#sched-ok').show();
+								//~ }
+								//~ else
+								//~ {
+									//~ $('#checking-sched').hide();
+									//~ $('#sched-ok').show();
+									//~ $('#conflict-section').hide();
+								//~ }
 							},
 							error: function(jqXHR, textStatus, errorThrown) {
 								/*
@@ -1400,4 +1408,56 @@ function add_constraint_row(key, value) {
 	constraint_el.find('.form-control[name="constraint-key"]').val(key);
 	constraint_el.find('.form-control[name="constraint-val"]').val(value);
 	$('#constraint-table').append(constraint_el);
+}
+
+function handle_class_conflicts(json_data) {
+	$('#checking-sched').hide();
+	console.log(json_data);
+	if (json_data['error'] != undefined || json_data['Error'] != undefined) {
+		$('#sched-ok').hide();
+		$('#sched-bad').show();
+		return;
+	}
+	
+	if (json_data['wasFailure'] == true) {
+		$('#sched-ok').hide();
+		$('#sched-bad').show();
+		$('#conflict-section').show();
+		
+		var conflicts = Object.create(null);
+		
+		if (json_data['EVENTS'] == undefined) return;
+		
+		$.each(json_data['EVENTS'], function(i, ev) {
+			if (ev['conflictsWith'] == undefined) return;
+			$.each(ev['conflictsWith'], function(i, other_id) {
+				var a, b;
+				if (ev['id'] < other_id) {
+					a = ev['id'];
+					b = other_id;
+				}else {
+					a = other_id;
+					b = ev['id'];
+				}
+				if (conflicts[a] == undefined) conflicts[a] = Object.create(null);
+				conflicts[a][b] = true;
+			});
+		});
+		
+		var el = $('#conflict-list');
+		el.children('div').remove();
+		var html = '';
+		$.each(conflicts, function(id, list) {
+			var e1 = $('.id-' + id).first().text().trim();
+			$.each(list, function(other, _) {
+				var e2 = $('.id-' + other).first().text().trim();
+				html += '<div><b>' + e1 + '</b> conflicts with <b>' + e2 + '</b></div>';
+			});
+		});
+		el.html(html);
+	} else {
+		$('#conflict-section').hide();
+		$('#sched-bad').hide();
+		$('#sched-ok').show();
+	}
 }

@@ -242,7 +242,7 @@
 						</a>
 					</h4>
 				</div>
-				<div id="collapse-seven" class="panel-collapse collapse">
+				<div id="conflict-list" class="panel-collapse collapse">
 					<div class="panel-body">
 						<b>CS 9000</b> conflicts with <b>CS 1400-008</b>
 					</div>

@@ -361,6 +361,7 @@ ul.ui-autocomplete > li {
 	word-wrap: break-word;
 	text-shadow: 0.5px 0.5px 1px black;
 	line-height: 1;
+	width: 40px;
 }
 
 .scheduled-class:hover {

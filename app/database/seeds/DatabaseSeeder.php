@@ -30,6 +30,7 @@ class TableSeeder extends Seeder
 			array(
 				'username' => 'admin',
 				'email' => 'foo@bar.com',
+				'is_admin' => true,
 				'first' => 'admin',
 				'last' => 'admin',
 				'password' => Hash::make('admin'),

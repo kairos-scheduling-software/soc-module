@@ -132,6 +132,15 @@
         <link href="{{URL::asset('assets/css/bootstrap-editable.css')}}" rel="stylesheet">
         <link href="{{URL::asset('assets/css/room-manager.css')}}" rel="stylesheet">
     @endif
+    @if($page_name == 'Professor Manager')
+        <!--Professor manager script-->
+        <script src="{{URL::asset('assets/js/bootstrap-editable.min.js')}}"></script>
+        <script src="{{URL::asset('assets/js/prof-manager.js')}}"></script>
+        
+        <!--Professor manager css-->
+        <link href="{{URL::asset('assets/css/bootstrap-editable.css')}}" rel="stylesheet">
+        <link href="{{URL::asset('assets/css/prof-manager.css')}}" rel="stylesheet">
+    @endif
 
     <script src="{{ URL::asset('assets/js/main.js') }}"></script>
     <script src="{{ URL::asset('assets/js/dashboard.js') }}"></script>

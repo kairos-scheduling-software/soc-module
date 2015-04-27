@@ -5,7 +5,7 @@ var day_columns = [];
 var blocks_to_update = [];
 var sched_id;
 var col_counts = [];
-var course_list = [];
+var course_list = Object.create(null);
 var temp_indices = [];
 var right_panel_open = false;
 
@@ -38,7 +38,7 @@ $(function(){
 
 		blocks.popover('destroy');
 		
-		var url = $('#sched-name').data('url');
+		var url = $('#edit-class-panel').data('url');
 		var data = {
 			sched_id: sched_id,
 			mode: 'add-class',
@@ -66,6 +66,7 @@ $(function(){
 				blocks.removeClass('new-block');
 				data['class_id'] = json_data['newId'];
 				update_class_info(blocks, data);
+				course_list[data['class_name']] = data['class_id'];
 				
 				// Update the matrix
 				update_column_matrix(blocks, "busy");
@@ -99,6 +100,16 @@ $(function(){
 	$('body').on('submit', '#edit-panel-form', function(e) {
 		e.preventDefault();
 		var form = $(this);
+		
+		var constraints = [];
+		$.each(form.find('.constraint-row'), function(i, con_row) {
+			var key =$(con_row).find('.form-control[name="constraint-key"]').val();
+			var val = $(con_row).find('.form-control[name="constraint-val"]').val();
+			if (key != '' && val != '') {
+				constraints.push({key: key, value: val});
+			}
+		});
+		
 		var class_data = {
 			sched_id: sched_id,
 			mode: 'edit-class',
@@ -107,11 +118,13 @@ $(function(){
 			enroll: form.find('.form-control[name="enroll"]').val(),
 			prof_id: form.find('.form-control[name="prof"]').val(),
 			room_id: form.find('.form-control[name="room"]').val(),
-			grp_id: form.find('.form-control[name="room_group"]').val()
+			grp_id: form.find('.form-control[name="room_group"]').val(),
+			constraints: JSON.stringify(constraints)
 		};
+		
 		console.log(class_data);
 		$.ajax({
-			url: $('#sched-name').data('url'),
+			url: $('#edit-class-panel').data('url'),
 			type: 'post',
 			data: class_data,
 			beforeSend: function() {
@@ -150,9 +163,10 @@ $(function(){
 		});
 		return true;
 	});
-	
 	resize_all();
-	load_schedule();
+	fetch_schedule(sched_id);
+	//load_schedule();
+	
 
 	$('.panel-collapse').on('show.bs.collapse', function() {
 		$(this).closest('div.panel').find('span.accordion-open').show();
@@ -378,6 +392,12 @@ $(function(){
 		grp_select.val(class_data['grp_id']).trigger('change');
 		room_select.val(class_data['room_id']);
 		
+		$('#constraint-table .constraint-row').remove();
+		$.each(scheduled_class.data('constraints'), function(i, con) {
+			add_constraint_row(con['key'], con['value']);
+		});
+		add_constraint_row('', '');
+		
 		form.find('input[name="class_id"]').val(class_data['class_id']);
 
 		if(!right_panel_open)
@@ -392,6 +412,16 @@ $(function(){
 			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
 			right_panel_open = true;
 		}
+	});
+	
+	$('#add-const-btn').click(function(e) {
+		e.preventDefault();
+		add_constraint_row('', '');
+	});
+	
+	$('body').on('click', '.constraint-del', function(e) {
+		e.preventDefault();
+		$(this).parent().remove();
 	});
 	
 	$('#cancel-edit-panel').click(function(e) {
@@ -677,7 +707,7 @@ function update_scheduled_class_draggables(sched_classes)
 					edit_class_data['time_id'] = new_time_id;
 
 					$.ajax({
-						url: $('#sched-name').data('url'),
+						url: $('#edit-class-panel').data('url'),
 						type: 'post',
 						data: edit_class_data,
 						beforeSend: function() {
@@ -730,7 +760,7 @@ function update_scheduled_class_draggables(sched_classes)
 		    			old_blocks.hide();
 
 		    			$.ajax({
-							url: $('#sched-name').data('url'),
+							url: $('#edit-class-panel').data('url'),
 							type: "POST",
 							data: {sched_id: sched_id, mode: 'remove-class', id:class_data['class_id']},
 							beforeSend: function() {
@@ -740,6 +770,7 @@ function update_scheduled_class_draggables(sched_classes)
 							},
 							success: function(data, textStatus, jqXHR) {
 								update_column_matrix(old_blocks, "empty");
+								delete course_list[old_blocks.first().text().trim()];
 								old_blocks.remove();
 								
 								$('#checking-sched').hide();
@@ -924,7 +955,7 @@ function parse_time(time_string)
 function load_schedule()
 {
 	// Move the staged classes to their appropriate place in the grid
-	$('#class-staging > div.scheduled-class').each(function() {
+	$('.scheduled-class').each(function() {
 		var course = $(this);
 		var start = course.data('start');
 		var day = course.data('ddd');
@@ -933,8 +964,9 @@ function load_schedule()
 
 		var course_name = course.text().trim();
 
-		if (course_list.indexOf(course_name) < 0)
-			course_list.push(course_name);
+		//if (course_list.indexOf(course_name) < 0)
+		//	course_list.push(course_name);
+		course_list[course_name] = course.data('id');
 
 		//console.log("{left: " + offsets["left"] + ", top: " + offsets["top"]);
 
@@ -945,17 +977,17 @@ function load_schedule()
 
 		course.data('col_index', (offsets["left"]/time_block_w) + 1);
 
-		$('#' + day + '-col').append(course);
+		//$('#' + day + '-col').append(course);
 		
 		update_column_matrix(course, "busy");
 	});
 
 	update_scheduled_class_draggables($('.scheduled-class'));
 
-	course_list.sort();
+	//course_list.sort();
 	
 	$('#class-search').autocomplete({
-		source: course_list,
+		source: Object.getOwnPropertyNames(course_list).sort(),
 		open: function(event, ui) {
 			$('#class-search').keydown(function(e) {
 				var value = $(this).val();
@@ -979,7 +1011,7 @@ function load_schedule()
 							return false;
 						}
 					});
-
+					
 					if (valid_name)
 					{
 						$('.scheduled-class').each(function() {
@@ -1011,7 +1043,8 @@ function load_schedule()
 			});
 
 		},
-		select: function(event, ui) {
+		select: function(event, ui) 
+		{
 
 			var value = ui.item.label;
 			
@@ -1035,11 +1068,13 @@ function load_schedule()
 						});
 					}
 					else
+					{
 						$(this).css({
 							opacity: 0.2,
 							backgroundColor: '#0099FF',
 							boxShadow: ''
 						});
+					}
 				});
 			}
 		}
@@ -1331,18 +1366,23 @@ function get_class_info(block) {
 		enroll: block.data('enroll'),
 		prof_id: block.data('prof_id'),
 		room_id: block.data('room_id'),
-		grp_id: block.data('grp_id')
+		grp_id: block.data('grp_id'),
+		constraints: block.data('constraints')
 	};
 	return data;
 }
 
 function update_class_info(new_blocks, data) {
 	new_blocks.data('id', data['class_id']);
+	new_blocks.addClass('id-' + data['class_id']);
 	new_blocks.html(data['class_name']);
 	new_blocks.data('enroll', data['enroll']);
 	new_blocks.data('prof_id', data['prof_id']);
 	new_blocks.data('room_id', data['room_id']);
 	new_blocks.data('grp_id', data['grp_id']);
+	var constraints = data['constraints'];
+	if (typeof constraints == 'string') constraints = JSON.parse(constraints);
+	new_blocks.data('constraints', constraints);
 }
 
 function update_drop_zone(time_id) {
@@ -1357,4 +1397,67 @@ function update_drop_zone(time_id) {
 	$('.drop-zone').remove();
 	
 	return blocks;
+}
+
+function fetch_schedule(sched_id) {
+	var url = $('#sched-name').data('url');
+	$.ajax({
+		url: url,
+		type: 'post',
+		data: {sched_id: sched_id},
+		success: function(data, textStatus, jqXHR) {
+			var json_data = JSON.parse(data);
+			console.log(json_data);
+			var events = json_data['events'];
+			$.each(events, function(i, ev) {
+				var days = parse_days(ev['etime']['days']);
+				$.each(days, function(i, day) {
+					var ddd = day.substring(1, 4);
+					var constraints = ev['constraints'];
+					if (constraints == null) constraints = [];
+					var el = jQuery('<div></div>', {
+						text: ev['name'],
+						'class': 'scheduled-class id-' + ev['id'] + (ev['etime']['length'] == 80 ? ' eighty-min-blk' : ' fifty-min-blk'),
+						'data-id': ev['id'],
+						'data-time': ev['etime_id'],
+						'data-days': ev['etime']['days'],
+						'data-ddd': ddd,
+						'data-start': ev['etime']['starttm'],
+						'data-length': ev['etime']['length'],
+						'data-room_id': (ev['room_id'] != null ? ev['room_id'] : -1),
+						'data-grp_id': (ev['room_group_id'] != null ? ev['room_group_id'] : -1),
+						'data-enroll': ev['enroll_cap'],
+						'data-prof_id': ev['professor']
+					});
+					el.data('constraints', constraints);
+					$(day).append(el);
+				});
+			});
+			load_schedule();
+			resize_all();
+		}
+	});
+}
+
+function add_constraint_row(key, value) {
+	var constraint_html = '<tr class="constraint-row">';
+	constraint_html += '<td><select class="form-control" name="constraint-key">';
+	constraint_html += '<option value="" selected></option>';
+	constraint_html += '<option value="<">Must be Before</option>';
+	constraint_html += '<option value=">">Must be After</option>';
+	constraint_html += '<option value="=">Same Time As</option>';
+	constraint_html += '</select></td>';
+	constraint_html += '<td><select class="form-control" name="constraint-val">';
+	constraint_html += '<option value="" selected></option>';
+	$.each(course_list, function(crs_name, crs_id) {
+		constraint_html += '<option value="' + crs_id + '">' + crs_name + '</option>';
+	});
+	constraint_html += '</select></td>';
+	constraint_html += '<td class="constraint-del fa fa-trash"></td></tr>';
+	
+	var constraint_el = jQuery(constraint_html);
+	
+	constraint_el.find('.form-control[name="constraint-key"]').val(key);
+	constraint_el.find('.form-control[name="constraint-val"]').val(value);
+	$('#constraint-table').append(constraint_el);
 }

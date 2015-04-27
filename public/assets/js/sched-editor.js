@@ -345,24 +345,6 @@ $(function(){
 	$('body').on('click', '.scheduled-class', function(e) {
 		e.preventDefault();
 
-		if(!right_panel_open)
-		{
-			if(panel_is_open)
-			{
-				$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
-				$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
-				panel_is_open = false;
-			}
-
-			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
-			right_panel_open = true;
-
-			// TODO: Get content from data attributes of clicked class
-		}
-		else
-		{
-
-		}
 		var form = $('#edit-panel-form');
 		form.find('input[name="class_id"]').val('');
 		
@@ -417,6 +399,19 @@ $(function(){
 		add_constraint_row('', '');
 		
 		form.find('input[name="class_id"]').val(class_data['class_id']);
+
+		if(!right_panel_open)
+		{
+			if(panel_is_open)
+			{
+				$('#toggle-container').animate({marginLeft: 0}, {duration: 200}); 
+				$.panelslider.close(function() { $('#toggle-toolbox').html('<i class="fa fa-chevron-right"></i>'); });
+				panel_is_open = false;
+			}
+
+			$('#right-side-bar').show('slide', {direction: 'right', duration: 200});
+			right_panel_open = true;
+		}
 	});
 	
 	$('#add-const-btn').click(function(e) {
@@ -429,7 +424,8 @@ $(function(){
 		$(this).parent().remove();
 	});
 	
-	$('#cancel-edit-panel').click(function() {
+	$('#cancel-edit-panel').click(function(e) {
+		e.preventDefault();
 		$('#edit-panel-form').find('.form-control').val('');
 		$('#close-right-panel').click();
 	});
@@ -776,7 +772,6 @@ function update_scheduled_class_draggables(sched_classes)
 								update_column_matrix(old_blocks, "empty");
 								delete course_list[old_blocks.first().text().trim()];
 								old_blocks.remove();
-								
 								
 								$('#checking-sched').hide();
 								var json_data = JSON.parse(data);

@@ -7,18 +7,39 @@ class VisController extends \BaseController {
      *
      * @return Response
      */
-    public function index()
+    public function index($id0 = -1)
     {
-
+        $sql = "";
+        if(Auth::check()) {
+            $authId = Auth::id();
 $sql = <<<SQL
 select
     s.id, s.`name`, s.year, s.semester
 from schedules s
-where s.final = true
-    order by s.year desc, s.semester;
+join schedule_user u
+    on(s.id = u.schedule_id)
+where 
+    s.final = true
+    and u.user_id = $authId
+order by s.year desc, s.semester;
 SQL;
-
+        } else if ($id0 >= 0) {
+$sql = <<<SQL
+select
+    s.id, s.`name`, s.year, s.semester
+from schedules s
+where 
+    s.final = true
+    and s.id = $id0
+order by s.year desc, s.semester;
+SQL;
+        }
+        
+        if($sql != "") {
             $results = DB::select($sql, array());
+        } else {
+            $results = '[{"id":-1,"name":"None","year":"","semester":""}]';
+        }
             return $results;
     }
     
@@ -98,7 +119,7 @@ from
         et.`length`,
         et.days,
         e.name,
-        e.class_type,
+        upper(e.class_type) as class_type,
         e.title,
         group_concat(concat(e.name, ' (', e.title, ')') ORDER BY e.name, e.title SEPARATOR '^') as meets_with,
         r.`name` as room,
@@ -154,7 +175,7 @@ from
             e1.id,
             e1.etime_id,
             e1.name,
-            e1.class_type,
+            upper(e1.class_type) as class_type,
             e1.title,
             e1.room_id,
             e1.professor,
@@ -165,7 +186,7 @@ from
             (
                 e1.etime_id = e2.etime_id 
                 and e1.name = e2.name 
-                and e1.class_type = e2.class_type
+                and upper(e1.class_type) = upper(e2.class_type)
                 and e1.room_id = e2.room_id
                 and e2.schedule_id = $id2
             )
@@ -195,7 +216,7 @@ from
             e1.id,
             e1.etime_id,
             e1.name,
-            e1.class_type,
+            upper(e1.class_type) as class_type,
             e1.title,
             e1.room_id,
             e1.professor,
@@ -206,7 +227,7 @@ from
             (
                 e1.etime_id = e2.etime_id 
                 and e1.name = e2.name 
-                and e1.class_type = e2.class_type
+                and upper(e1.class_type) = upper(e2.class_type)
                 and e1.room_id = e2.room_id
                 and e2.schedule_id = $id0
             )

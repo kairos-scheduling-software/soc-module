@@ -499,8 +499,8 @@ var dashboard3 = (function () {
         } else {
             d3Zoom.scale(1);
         }
-        
-        d3Zoom.translate([0,0]);
+
+        d3Zoom.translate([0, 0]);
 
         // do transform after zoom is set (needs to be outside of if stmt, need to run in all cases)
         container.attr('transform', 'translate(' + d3Zoom.translate() + ') scale(' + d3Zoom.scale() + ')');
@@ -822,7 +822,8 @@ var dashboard3 = (function () {
             //    //return d.x + (boxWidth / 2);
             //})
             .attr("y", function (d) {
-                return d.y + 50;
+                return topHeightLimit(d.y + 50, d.height);
+                //return d.y + 50;
             })
             .style("fill-opacity", 0.3)
             .style("fill", function (d) {
@@ -907,7 +908,7 @@ var dashboard3 = (function () {
                 .attr("x", 0)  // space legend
                 .attr("y", height + 65 + 32)
                 .attr("font-size", 10)
-                .text("Schedule URL: " + document.location.protocol + "//"+ window.location.hostname + window.location.pathname + "?id=" + currentSchedId + '&dash=3')
+                .text("Schedule URL: " + document.location.protocol + "//" + window.location.hostname + window.location.pathname + "?id=" + currentSchedId + '&dash=3')
                 .style("fill-opacity", 0)
                 .transition().duration(500)
                 .delay(500)
@@ -949,6 +950,14 @@ var dashboard3 = (function () {
         }
 
         function bottomHeightLimit(blockY, blockHeight) {
+            /*
+            if (blockY < 50) {
+                var nby = blockY + 50;
+                console.log(blockY + "," + blockHeight);
+                return ((50 - blockY) + blockHeight); // Class is out of the range
+            }
+            */
+
             if (blockY > height) {
                 return 0;
             } else if (blockY + blockHeight > height) {
@@ -958,13 +967,10 @@ var dashboard3 = (function () {
         }
 
         function topHeightLimit(blockY, blockHeight) {
-            if (blockY < 0) {
-                if (blockHeight + blockY > 0) {
-                    return blockHeight + blockY; // set y to zero and calc new block height
-                }
-                return 0; // Class is out of the range
-            }
-            return blockHeight;
+            //if (blockY < 50) {
+            //    return 50; // Class is out of the range
+            //}
+            return blockY;
         }
 
         function brArray(a) {
@@ -1198,10 +1204,11 @@ var dashboard3 = (function () {
         });
 
         var nocache = new Date().getTime();
+        var listUrl = isNull(sched) ? '/list?cache=' : '/list/' + sched + '?cache=';
 
         $.ajax({
             dataType: "json",
-            url: vis_url + '/list?cache=' + nocache,
+            url: vis_url + listUrl + nocache,
             success: function (data) {
                 var result = '';
 

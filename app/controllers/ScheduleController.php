@@ -514,21 +514,25 @@ class ScheduleController extends BaseController {
 
 				foreach ($scheduleToCopy->events as $event) 
 				{
-					$room = Room::find($event->room_id);
+					$room_id = $event->room_id;
+					$room_group_id = $event->room_group_id;
 					$professor = Professor::find($event->professor);
-					$schedule->rooms()->sync([$room->id], false);
-					$schedule->rooms()->sync([$professor->id], false);
+					if ($room_id != null) $schedule->rooms()->sync([$room_id], false);
+					$schedule->professors()->sync([$professor->id], false);
 
 					$eventToCopy = models\Event::firstOrCreate(
                  	array(
                     	'name' => $event->name,
                     	'professor' => $event->professor,
                     	'schedule_id' => $schedule->id,
-                    	'room_id' => $room->id,
+                    	'room_id' => $room_id,
+                    	'room_group_id' => $room_group_id,
                     	'class_type' => $event->class_type,
                     	'title' => $event->title,
                     	'etime_id' => $event->etime_id
             		));
+            		
+            		$schedule->events()->save($eventToCopy);
 
             		foreach ($event->constraints as $constraint) 
             		{
@@ -539,13 +543,16 @@ class ScheduleController extends BaseController {
                     		'name' => $eventToFindFromScheduleToCopy->name,
                     		'professor' => $eventToFindFromScheduleToCopy->professor,
                     		'schedule_id' => $schedule->id,
-                    		'room_id' => $room->id,
+                    		'room_id' => $eventToFindFromScheduleToCopy->room_id,
+                    		'room_group_id' => $eventToFindFromScheduleToCopy->room_group_id,
                     		'class_type' => $eventToFindFromScheduleToCopy->class_type,
                     		'title' => $eventToFindFromScheduleToCopy->title,
                     		'etime_id' => $eventToFindFromScheduleToCopy->etime_id
             			));
+            			
+            			$schedule->events()->save($constraintEventToCopy);
 
-            			$constraint = Constraint::make(
+            			$constraint = Constraint::create(
             			array(
             				'key' => $constraint->key,
             				'value' => $constraintEventToCopy->id,
@@ -557,14 +564,20 @@ class ScheduleController extends BaseController {
 			catch(Exception $e)
 			{
 				$schedule->delete();
-				return Response::json(['error' => 'Could not create schedule at this time'], 500);
+				$result = new StdClass;
+				$result->error = 'Could not populate schedule fields';
+				$result->message = $e->getMessage();
+				return Response::json($result, 500);
 			}
 
 			return URL::route('dashboard');
 		}
-		else
-			return Response::json(['error' => 'Could not create schedule at this time'], 500);
-
+		else {
+			$result = new StdClass;
+			$result->error = 'Could not create schedule at this time';
+			$result->message = $e->getMessage();
+			return Response::json($result, 500);
+		}
 	}
 
 	public function e_edit_schedule() {
@@ -582,7 +595,22 @@ class ScheduleController extends BaseController {
 		$mode = Input::get('mode');
 		switch ($mode) {
 			case 'add-class':
-				$time_id = Input::get('time_id');
+				$time_id = Input::get('time_id', null);
+				
+				$new_tm = null;
+				if ($time_id == null) {
+					$days = Input::get('days');
+					$start_tm = Input::get('start');
+					$length = Input::get('length');
+					$new_tm = Etime::firstOrCreate(array(
+						'days' => $days,
+						'starttm' => $start_tm,
+						'length' => $length
+					));
+					$new_tm->save();
+					$time_id = $new_tm->id;
+				}
+				
 				$enroll = Input::get('enroll');
 				$room_id = Input::get('room_id');
 				$grp_id = Input::get('grp_id');
@@ -613,6 +641,8 @@ class ScheduleController extends BaseController {
 
 				$result = $this->api_check_sched($schedule->id);
 				$result->newId = $class->id;
+				
+				if ($new_tm != null) $result->newTime = $new_tm->id;
 				
 				return json_encode($result);
 				break;

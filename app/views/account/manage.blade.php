@@ -19,7 +19,7 @@
 				</button>
 			</form>
 		</h3>
-		<img class="img-circle" width="200" id="avatar" src="{{ Auth::user()->avatar ? 
+		<img class="img-circle avatar" width="200" src="{{ Auth::user()->avatar ? 
 												  URL::asset('profile_pics/' . Auth::user()->avatar) : 
 												  URL::asset('assets/images/default_user_pic.png') }}" />
 		<div id="update-image-container">

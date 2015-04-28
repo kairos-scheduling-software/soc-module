@@ -119,7 +119,9 @@ $(function() {
 				setTimeout(function() {
 					$('#updating-pic').hide();
 					$('#updated-pic').css('display', 'inline');
-					$('#avatar').attr('src', data);
+					$('.avatar').each(function() {
+						$(this).attr('src', data);
+					});
 				}, 700);
 
 				setTimeout(function() {

@@ -39,7 +39,11 @@
 			<li>
 				@if(Auth::check())
 					<a href="#manage-account"  id="manage-account-nav-link" data-toggle="dropdown" class="dropdown-toggle">
-						{{ FA::icon('user') . ' Welcome, ' . Auth::user()->first . '!' }}
+						{{-- FA::icon('user') . ' Welcome, ' . Auth::user()->first . '!' --}}
+						<img class="img-circle" width="40" id="avatar" src="{{ Auth::user()->avatar ? 
+												  URL::asset('profile_pics/' . Auth::user()->avatar) : 
+												  URL::asset('assets/images/default_user_pic.png') }}" />
+						&nbsp;Welcome, {{Auth::user()->first . '!'}}
 						<b class="caret"></b>
 					</a>
 					<ul class="dropdown-menu">

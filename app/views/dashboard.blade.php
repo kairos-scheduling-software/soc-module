@@ -51,6 +51,10 @@
 					{{ FA::icon('user'); }}
 					&nbsp;&nbsp;Professors
 				</button>
+				<button class="btn btn-resource" onclick="window.location='{{ URL::route("time-manager") }}'">
+					{{ FA::icon('clock'); }}
+					&nbsp;&nbsp;Time blocks
+				</button>
 			</p>
 		</div>
 		@endif

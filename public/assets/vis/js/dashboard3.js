@@ -634,14 +634,18 @@ var dashboard3 = (function () {
                 return d.x;
             })
             .attr("y", function (d) {
-                return d.y;
+                var val = getBlockYVals(d.y + 50, d.height);
+                return val.y;
+                //return d.y;
             })
             .attr("width", function (d) {
                 return boxWidth;
             })
             .attr("height", function (d) {
                 // don't let bars hang off bottom of screen
-                return bottomHeightLimit(d.y, d.height);
+                //return bottomHeightLimit(d.y, d.height);
+                var val = getBlockYVals(d.y + 50, d.height);
+                return val.h;
             })
             .attr("class", function (d) {
                 return d.cssClass;
@@ -651,15 +655,18 @@ var dashboard3 = (function () {
         var gText = blocks
             .append("g")
             .attr("transform", function (d) {
+                var val = getBlockYVals(d.y + 50, d.height);
                 // rotate room labels
-                return "translate(" + d.x + "," + (d.y + 50) + ") rotate(90,0,0)";
+                return "translate(" + d.x + "," + (val.y) + ") rotate(90,0,0)";
             })
             .attr("class", function (d) {
                 return "clText";
             })
             .append("text")
             .attr("x", function (d) {
-                return (d.height * 0.5);
+                var val = getBlockYVals(d.y, d.height);
+                //return val.y;
+                return (val.h * 0.5);
             })
             .attr("y", function (d) {
                 if (isDiff) {
@@ -712,7 +719,9 @@ var dashboard3 = (function () {
                 return boxWidth;
             })
             .attr("height", function (d) {
-                return bottomHeightLimit(d.y, d.height);
+                var val = getBlockYVals(d.y, d.height);
+                return val.h;
+                //return bottomHeightLimit(d.y, d.height);
             })
             .attr("rx", 3) // set the x corner curve radius
             .attr("ry", 3) // set the y corner curve radius
@@ -822,7 +831,9 @@ var dashboard3 = (function () {
             //    //return d.x + (boxWidth / 2);
             //})
             .attr("y", function (d) {
-                return topHeightLimit(d.y + 50, d.height);
+                var val = getBlockYVals(d.y + 50, d.height);
+                return val.y;
+                //return topHeightLimit(d.y + 50, d.height);
                 //return d.y + 50;
             })
             .style("fill-opacity", 0.3)
@@ -951,12 +962,12 @@ var dashboard3 = (function () {
 
         function bottomHeightLimit(blockY, blockHeight) {
             /*
-            if (blockY < 50) {
-                var nby = blockY + 50;
-                console.log(blockY + "," + blockHeight);
-                return ((50 - blockY) + blockHeight); // Class is out of the range
-            }
-            */
+             if (blockY < 50) {
+             var nby = blockY + 50;
+             console.log(blockY + "," + blockHeight);
+             return ((50 - blockY) + blockHeight); // Class is out of the range
+             }
+             */
 
             if (blockY > height) {
                 return 0;
@@ -971,6 +982,43 @@ var dashboard3 = (function () {
             //    return 50; // Class is out of the range
             //}
             return blockY;
+        }
+
+        function getBlockYVals(y, h) {
+            var ny, nh;
+            // if y goes off the top of the chart, make it start at the top
+            if (y < 50) {
+                ny = 50; // Set to top
+            } else if (y > height) {
+                ny = height; // Set to bottom
+            } else {
+                ny = y; // value is okay
+            }
+            nh = h;
+
+            // if y has been changed, make the same changes to the height
+            if (ny != y) {
+                var diff = 0;
+                // y has been modified, need to adjust the height of the block
+                if (y <= 0) {
+                    diff = (y * -1) + 50;
+                } else {
+                    diff = (50 - y);
+                }
+
+                nh = h - diff;
+            } else {
+                nh = h;
+            }
+          
+            // Adjust height
+            if (y > height) {
+                nh = 0;
+            } else if (y + h > height) {
+                nh = height - ny;
+            }
+
+            return {y: ny, h: nh};
         }
 
         function brArray(a) {

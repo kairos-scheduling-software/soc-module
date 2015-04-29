@@ -68,6 +68,10 @@ html, body {
 	}
 }
 
+li .img-circle {
+	border: solid 1px white;
+}
+
 #login-modal {
 	background-color: #CCCCCC;
 	color: #003366;
@@ -1221,3 +1225,6 @@ td.prog-label {
     width: 100%;
 }
 
+#large-avatar {
+	box-shadow: 0 0 15px black;
+}

@@ -19,8 +19,7 @@ from schedules s
 join schedule_user u
     on(s.id = u.schedule_id)
 where 
-    s.final = true
-    and u.user_id = $authId
+    u.user_id = $authId
 order by s.year desc, s.semester;
 SQL;
         } else if ($id0 >= 0) {
@@ -29,8 +28,7 @@ select
     s.id, s.`name`, s.year, s.semester
 from schedules s
 where 
-    s.final = true
-    and s.id = $id0
+    s.id = $id0
 order by s.year desc, s.semester;
 SQL;
         }

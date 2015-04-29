@@ -53,7 +53,7 @@
 				</button>
 				<button class="btn btn-resource" onclick="window.location='{{ URL::route("time-manager") }}'"
 				style="margin-top: 4px;">
-					{{ FA::icon('clock'); }}
+					{{ FA::icon('clock-o'); }}
 					&nbsp;&nbsp;Time blocks
 				</button>
 			</p>

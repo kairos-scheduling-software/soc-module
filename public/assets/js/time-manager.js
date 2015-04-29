@@ -204,11 +204,11 @@ function populate_time_list(times) {
 		html += '<hr/>';
 		html += '<i class="time-del row-cell editable editable-click fa fa-trash"></i>';
 		html += '<div class="time-start row-cell editable editable-click">';
-		html += rm['starttm'] + '</div>';
+		html += parse_time(rm['starttm']) + '</div>';
 		html += '<div class="time-length row-cell editable editable-click">';
 		html += rm['length'] + '</div>';
 		html += '<div class="time-days row-cell editable editable-click">';
-		html += rm['days'] + '</div>';
+		html += parse_days(rm['days']) + '</div>';
 		html += '</div>';
 	});
 	
@@ -254,4 +254,32 @@ function populate_time_list(times) {
 	});
 	
 	$('#time-list-edit').editable('option', 'value', ids.toString());
+}
+
+function parse_days(json_days)
+{
+	json_days = '' + json_days;
+	var days = [];
+	
+	if (json_days.indexOf("1") >= 0)
+		days.push("Mon");
+	if (json_days.indexOf("2") >= 0)
+		days.push("Tue");
+	if (json_days.indexOf("3") >= 0)
+		days.push("Wed");
+	if (json_days.indexOf("4") >= 0)
+		days.push("Thu");
+	if (json_days.indexOf("5") >= 0)
+		days.push("Fri");
+
+	return days.join(', ');
+}
+
+function parse_time(time_str) {
+	var hour = parseInt(time_str.substring(0, 2));
+	var min = parseInt(time_str.substring(2));
+	var pm = false;
+	if (hour >= 12) pm = true;
+	if (hour >= 13) hour -= 12;
+	return '' + hour + ':' + min + (pm ? ' PM' : ' AM');
 }

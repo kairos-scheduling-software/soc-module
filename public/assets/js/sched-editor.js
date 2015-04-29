@@ -1647,6 +1647,7 @@ function fetch_time_blocks() {
 		success: function(data, textStatus, jqXHR) {
 			var json_data = JSON.parse(data);
 			$.each(json_data, function(i, block) {
+				if (block['starttm'] <= '0730') return;
 				var new_block = {};
 				new_block["id"] = block["id"];
 				new_block["days"] = parse_days(block["days"]);

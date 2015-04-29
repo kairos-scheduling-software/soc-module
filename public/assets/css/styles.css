@@ -1225,3 +1225,6 @@ td.prog-label {
     width: 100%;
 }
 
+#large-avatar {
+	box-shadow: 0 0 15px black;
+}

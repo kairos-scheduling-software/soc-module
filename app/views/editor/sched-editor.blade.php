@@ -8,7 +8,7 @@
 		cursor: url('{{ URL::asset("assets/images/drag-cursor-sm.png") }}'), auto;
 	}
 </style>
-<div id="toolbox">
+<div id="toolbox" data-url="{{ URL::route('time-list') }}">
 	<h1>{{ FA::icon('wrench') }}&nbsp;&nbsp;Toolbox</h1>
 	<h3><span class="plus-icon">{{ FA::icon('plus') }}</span> Add Classes:</h3>
 	<div class="panel-group" id="accordion">
@@ -229,7 +229,7 @@
 			</div>
 		</div>
 		{{-- End accordion section --}}
-
+		
 		<div id="conflict-section">
 			<h3><span class="warning-icon">{{ FA::icon('warning') }}</span> Schedule Conflicts:</h3>
 			{{-- Begin accordion section --}}
@@ -404,29 +404,42 @@
 					<label for="edit-panel-class-name">Class Name:</label>
 					<input type="text" class="form-control" name="class_name" id="edit-panel-class-name" required>
 				</div>
-
+				
+<!--
 				<div class="form-group">
-					<label for="edit-panel-prof-select">Professor:</label><br>
+					<label for="time">Time block:</label><br>
+					<select class="form-control" name="time">
+					</select>
+				</div>
+-->
+				
+				<div class="form-group">
+					<label for="prof">Professor:</label><br>
 					<select class="form-control" name="prof">
 					</select>
 				</div>
-
+				
 				<div class="form-group">
-					<label for="edit-panel-roomgroup-select">Max Capacity:</label><br>
+					<label for="enroll" >Max Capacity:</label><br>
 					<input type="text" class="form-control" name="enroll">
 				</div>
 
-				<div class="form-group">
-					<label for="edit-panel-roomgroup-select">Room Group:</label><br>
+				<div class="form-group" style="width:46%; display:inline-block;">
+					<label for="room_group">Room Group:</label><br>
 					<select class="form-control" name="room_group" data-url="{{ URL::route('room-group-list') }}">
 					</select>
 				</div>
 
-				<div class="form-group">
-					<label for="edit-panel-room-select">Room:</label><br>
+				<div class="form-group" style="width:46%; display:inline-block;">
+					<label for="room">Room:</label><br>
 					<select class="form-control" name="room" data-url="{{ URL::route('room-list') }}">
 					</select>
 				</div>
+<!--
+				<label class="checkbox-inline" style="font-weight: bold;">
+					<input type="checkbox" value="" style="transform: scale(1.5); -webkit-transform: scale(1.5);">Final room
+				</label>
+-->
 			</div>
 
 			<hr>

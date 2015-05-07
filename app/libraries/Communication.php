@@ -94,7 +94,7 @@ class Communication
 
             //start moving on to the spaces
 
-    		if ($event->is_rm_final == true) {
+    		if ($event->is_rm_final == true && $event->room_id != null) {
                 $temp->spaceId = $event->room_id;
             } else {
                 $rm_grp_id = $event->room_group_id;

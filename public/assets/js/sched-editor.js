@@ -173,6 +173,7 @@ $(function(){
 		return true;
 	});
 	resize_all();
+	fetch_time_blocks();
 	fetch_schedule(sched_id);
 	//load_schedule();
 	
@@ -201,98 +202,6 @@ $(function(){
 	}).mouseleave(function(e) {
 		$(this).removeClass('cursor-link');
 	});
-
-	$('.draggable').draggable({
-		//cursorAt: { bottom: 25, left: 0 },
-		//cursor: "url(" + cursor_img + "), auto",
-		cursorAt: { bottom: 0, left: 20 },
-	  	helper: function( event ) 
-	  	{
-			return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
-		},
-		start: function(event, ui)
-		{
-			var dragged_block = $(this);
-			
-			if (dragged_block.hasClass('one-fifty'))
-				setup_drop_zones(50, 1);
-			else if (dragged_block.hasClass('one-eighty'))
-				setup_drop_zones(80, 1);
-			else if (dragged_block.hasClass('two-fifty'))
-				setup_drop_zones(50, 2);
-			else if (dragged_block.hasClass('two-eighty'))
-				setup_drop_zones(80, 2);
-			else if (dragged_block.hasClass('three-fifty'))
-				setup_drop_zones(50, 3);
-			else if (dragged_block.hasClass('three-eighty'))
-				setup_drop_zones(80, 3);
-
-			$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
-
-			$('#sched-container').css('opacity', 0.5);
-
-			$('.drop-zone').droppable({
-				hoverClass: "time-block-hover",
-				activeClass: "time-block-active",
-				drop: function(event, ui) {
-					if ($('#new-class-form').length > 0) {
-						update_drop_zone();
-						return;
-					}
-					
-					var time_id = $(this).data('time');
-					var blocks = update_drop_zone(time_id);
-					
-					var params = [];
-					params["col"] = $(this).data('col_index');
-					params["days"] = '' + $(this).data('days');
-					params["start"] = $(this).attr('data-start');
-					params["start_time"] = params['start'];
-					params["length"] = $(this).data('length');
-					
-					var content = get_popover_content(params);
-
-					// Show popover
-					var pos = parseFloat($(this).css('top')) + $(this).height()/2;
-					var el = $(this);
-
-					$(this).popover({
-						trigger: "manual",
-						html: true,
-						content: content
-					}).on('shown.bs.popover', function() {
-						if(parseInt($('.popover').css('top')) < 0)
-						{
-							$('.popover').css('top', 0);
-							$('.arrow').css('top', pos + 'px');
-						}
-						
-						$('#new-class-form').data('block', blocks);
-						
-						$('#cancel-add-class').click(function() {
-							el.popover('destroy');
-							blocks.remove();
-						});
-
-					}).popover('show');
-				},
-				over: function(event, ui) {
-					var time_id = $(this).data('time');
-					$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
-				},
-				out: function(event, ui) {
-					var time_id = $(this).data('time');
-					$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
-				}
-			});
-		},
-		stop: function(event, ui)
-		{
-			$('.drop-zone').remove();
-			$('#sched-container').css('opacity', 1);
-		},
-		revert: 'invalid'
-	});    
 
 	$('.trash-can').droppable({
 		hoverClass: "trash-hover"
@@ -334,6 +243,7 @@ $(function(){
 			//console.log($(box).prop('checked'));
 		});
 		var days = parse_days(days_arr);
+		if (days.length == 0) return;
 		var start_str = $('#cust-start-time').val();
 		var end_str = $('#cust-end-time').val();
 		
@@ -379,7 +289,6 @@ $(function(){
 			
 			var el = jQuery('<div></div>', {
 				//text: ev['name'],
-				//'class': 'scheduled-class id-' + ev['id'] + (ev['etime']['length'] == 80 ? ' eighty-min-blk' : ' fifty-min-blk'),
 				'class': 'scheduled-class',
 				//'data-id': ev['id'],
 				//'data-time': ev['etime_id'],
@@ -1004,9 +913,12 @@ function update_scheduled_class_draggables(sched_classes)
 
 function setup_drop_zones(length, days_count)
 {
-	var nums = ['zero', 'one', 'two', 'three', 'four', 'five'];
-	var key = '' + nums[days_count] + '-' + (length == 50 ? 'fifty' : 'eighty');
-	$.each(all_blocks[key], function(i, block){
+	//~ var nums = ['zero', 'one', 'two', 'three', 'four', 'five'];
+	//~ var key = '' + nums[days_count] + '-' + (length == 50 ? 'fifty' : 'eighty');
+	//~ $.each(all_blocks[key], function(i, block){
+	var blocks = all_blocks[days_count][length];
+	if (blocks === undefined) return;
+	$.each(blocks, function(i, block){
 		$.each(block["days"], function(j, day) {
 			var html_block = "<div class='drop-zone'";
 			html_block += " data-time='" + block["id"] + "' ";
@@ -1140,8 +1052,38 @@ function parse_time(time_string)
 }
 
 
-function load_schedule()
+function load_schedule(data)
 {
+	var json_data = JSON.parse(data);
+	console.log(json_data);
+	var events = json_data['events'];
+	$.each(events, function(i, ev) {
+		//if (ev['etime']['length'] != 50 && ev['etime']['length'] != 80) return;
+		var days = parse_days(ev['etime']['days']);
+		$.each(days, function(i, day) {
+			var ddd = day.substring(1, 4);
+			var constraints = ev['constraints'];
+			if (constraints == null) constraints = [];
+			var el = jQuery('<div></div>', {
+				text: ev['name'],
+				'class': 'scheduled-class id-' + ev['id'],
+				'data-id': ev['id'],
+				'data-time': ev['etime_id'],
+				'data-days': ev['etime']['days'],
+				'data-ddd': ddd,
+				'data-start': ev['etime']['starttm'],
+				'data-length': ev['etime']['length'],
+				'data-room_id': (ev['room_id'] != null ? ev['room_id'] : -1),
+				'data-grp_id': (ev['room_group_id'] != null ? ev['room_group_id'] : -1),
+				'data-enroll': ev['enroll_cap'],
+				'data-prof_id': ev['professor']
+			});
+			el.data('constraints', constraints);
+			el.css('height', (el.data('length') / 5) * five_min_height);
+			$(day).append(el);
+		});
+	});
+	
 	// Move the staged classes to their appropriate place in the grid
 	$('.scheduled-class').each(function() {
 		var course = $(this);
@@ -1175,6 +1117,7 @@ function load_schedule()
 	//course_list.sort();
 	
 	refresh_autocomplete();
+	resize_all();
 
 	console.log('Total columns: ' + total_cols());
 }
@@ -1237,19 +1180,11 @@ function add_matrix_col(day)
 	switch(day)
 	{
 		case 'mon':
-			$('#mon-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
 		case 'tue':
-			$('#tue-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
 		case 'wed':
-			$('#wed-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
 		case 'thu':
-			$('#thu-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
-			break;
 		case 'fri':
-			$('#fri-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
+			$('#' + day + '-col').css('width', (num_cols * (time_block_w + 2)) + 'px');
 			break;
 	}
 
@@ -1606,37 +1541,7 @@ function fetch_schedule(sched_id) {
 		type: 'post',
 		data: {sched_id: sched_id},
 		success: function(data, textStatus, jqXHR) {
-			var json_data = JSON.parse(data);
-			console.log(json_data);
-			var events = json_data['events'];
-			$.each(events, function(i, ev) {
-				if (ev['etime']['length'] != 50 && ev['etime']['length'] != 80) return;
-				var days = parse_days(ev['etime']['days']);
-				$.each(days, function(i, day) {
-					var ddd = day.substring(1, 4);
-					var constraints = ev['constraints'];
-					if (constraints == null) constraints = [];
-					var el = jQuery('<div></div>', {
-						text: ev['name'],
-						'class': 'scheduled-class id-' + ev['id'] + (ev['etime']['length'] == 80 ? ' eighty-min-blk' : ' fifty-min-blk'),
-						'data-id': ev['id'],
-						'data-time': ev['etime_id'],
-						'data-days': ev['etime']['days'],
-						'data-ddd': ddd,
-						'data-start': ev['etime']['starttm'],
-						'data-length': ev['etime']['length'],
-						'data-room_id': (ev['room_id'] != null ? ev['room_id'] : -1),
-						'data-grp_id': (ev['room_group_id'] != null ? ev['room_group_id'] : -1),
-						'data-enroll': ev['enroll_cap'],
-						'data-prof_id': ev['professor']
-					});
-					el.data('constraints', constraints);
-					el.css('height', (el.data('length') / 5) * five_min_height);
-					$(day).append(el);
-				});
-			});
-			load_schedule();
-			resize_all();
+			load_schedule(data);
 		}
 	});
 }
@@ -1731,4 +1636,148 @@ function handle_class_conflicts(json_data) {
 		$('#sched-bad').hide();
 		$('#sched-ok').show();
 	}
+}
+
+function fetch_time_blocks() {
+	var url = $('#toolbox').data('url');
+	
+	$.ajax({
+		url: url,
+		type: 'post',
+		success: function(data, textStatus, jqXHR) {
+			var json_data = JSON.parse(data);
+			$.each(json_data, function(i, block) {
+				if (block['starttm'] <= '0730') return;
+				var new_block = {};
+				new_block["id"] = block["id"];
+				new_block["days"] = parse_days(block["days"]);
+				new_block["offset"] = get_vertical_offset(block["starttm"]);
+				new_block["start"] = block["starttm"];
+				new_block["etime"] = block;
+				new_block["length"] = block["length"];
+				
+				var days_count = new_block["days"].length;
+				var length = block['length'];
+				var list = all_blocks[days_count];
+				if (list == undefined) {
+					list = all_blocks[days_count] = Object.create(null);
+				}
+				if (list[length] == undefined) {
+					list[length] = [];
+				}
+				list = list[length];
+
+				list.push(new_block);
+			});
+			
+			nums = ['zero', 'one', 'two', 'three'];
+			for (var i = 1; i <= 3; i++) {
+				var table = $('#collapse-' + nums[i]).find('table');
+				table.children().remove();
+				var list = [];
+				$.each(all_blocks[i], function(length, _) {
+					list.push(length);
+				});
+				list.sort(function(a,b) {
+					a = parseInt(a);
+					b = parseInt(b);
+					return a>b ? 1 : (a<b ? -1 : 0);
+				});
+				var head = '<tr>', content = '<tr>';
+				$.each(list, function(_, length) {
+					head += '<td>' + length + ' min:</td>';
+					content += '<td><div class="draggable" data-length="' + length + '" ';
+					content += 'data-days="' + i + '" ';
+					content += 'style="background-color: orange; width: 40px; ';
+					content += 'height: ' + (length/5) * five_min_height + 'px;"></div></td>';
+				});
+				head += '</tr>';
+				content += '</tr>';
+				table.append(head + content);
+			}
+			
+			$('.draggable').draggable({
+				//cursorAt: { bottom: 25, left: 0 },
+				//cursor: "url(" + cursor_img + "), auto",
+				cursorAt: { bottom: 0, left: 20 },
+				helper: function( event ) 
+				{
+					return $( "<i class='fa fa-plus-circle' id='drag-helper'></i>" );
+				},
+				start: function(event, ui)
+				{
+					var dragged_block = $(this);
+					
+					var length = dragged_block.data('length');
+					var days_count = dragged_block.data('days');
+					setup_drop_zones(length, days_count);
+
+					$('#outer-container').css('width', (total_cols() * (time_block_w + 2)) + 'px');
+
+					$('#sched-container').css('opacity', 0.5);
+
+					$('.drop-zone').droppable({
+						hoverClass: "time-block-hover",
+						activeClass: "time-block-active",
+						drop: function(event, ui) {
+							if ($('#new-class-form').length > 0) {
+								update_drop_zone();
+								return;
+							}
+							
+							var time_id = $(this).data('time');
+							var blocks = update_drop_zone(time_id);
+							
+							var params = [];
+							params["col"] = $(this).data('col_index');
+							params["days"] = '' + $(this).data('days');
+							params["start"] = $(this).attr('data-start');
+							params["start_time"] = params['start'];
+							params["length"] = $(this).data('length');
+							
+							var content = get_popover_content(params);
+
+							// Show popover
+							var pos = parseFloat($(this).css('top')) + $(this).height()/2;
+							var el = $(this);
+
+							$(this).popover({
+								trigger: "manual",
+								html: true,
+								content: content
+							}).on('shown.bs.popover', function() {
+								if(parseInt($('.popover').css('top')) < 0)
+								{
+									$('.popover').css('top', 0);
+									$('.arrow').css('top', pos + 'px');
+								}
+								
+								$('#new-class-form').data('block', blocks);
+								
+								$('#cancel-add-class').click(function() {
+									el.popover('destroy');
+									blocks.remove();
+								});
+
+							}).popover('show');
+						},
+						over: function(event, ui) {
+							var time_id = $(this).data('time');
+							$(".drop-zone[data-time=" + time_id + "]").addClass('time-block-hover');
+						},
+						out: function(event, ui) {
+							var time_id = $(this).data('time');
+							$(".drop-zone[data-time=" + time_id + "]").removeClass('time-block-hover');
+						}
+					});
+				},
+				stop: function(event, ui)
+				{
+					$('.drop-zone').remove();
+					$('#sched-container').css('opacity', 1);
+				},
+				revert: 'invalid'
+			});
+		}
+	});
 }

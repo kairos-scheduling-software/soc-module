@@ -1,0 +1,118 @@
+.btn-time-admin {
+	margin: 5px;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.content-header .editable-checklist {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+#time-list-edit {
+	text-decoration: none;
+	border-bottom: none;
+	margin: 10px;
+	vertical-align: bottom;
+}
+
+#time-list-edit:hover {
+	background-color: #66A1CC;
+}
+
+#new-time-form {
+	display: none;
+}
+
+#new-time-form .new-time-label {
+	width: 45%;
+	display: inline-block;
+	font-size: 14pt;
+	font-weight: bold;
+	margin: 5px;
+}
+
+#new-time-form .new-time-content {
+	width: 45%;
+	display: inline-block;
+}
+
+#new-time-form .new-time-btn {
+	width: 45%;
+	margin: 20px 5px;
+}
+
+.time-group-row.selected {
+	background-color: #E39445;
+}
+
+.col-header {
+	font-size: 14pt;
+	font-weight: bold;
+	display:inline-block;
+}
+
+.row-content:hover {
+	background-color: #E38445;
+}
+
+.row-cell {
+	margin: 10px 5px;
+	display: inline-block;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.row-cell:hover {
+	cursor: pointer;
+}
+
+.time-group-name {
+	width: 85%;
+	font-size: 14pt;
+	font-weight: bold;
+}
+
+.time-group-del {
+	width: 15px;
+	font-size: 14pt;
+	font-weight: bold;
+	visibility: hidden;
+}
+
+.time-group-row:hover .time-group-del {
+	visibility: visible;
+}
+
+#time-list .time-start {
+	width: 25%;
+}
+
+#time-list .time-length {
+	width: 25%;
+}
+
+#time-list .time-days {
+	width: 40%;
+}
+
+#time-list hr {
+	padding: 0;
+	margin: 0;
+	border-width: 2px;
+	border-color: #666666;
+}
+
+#time-list .time-del {
+	width: 15px;
+	margin: 10px 5px;
+	visibility: hidden;
+}
+
+#time-list .time-list-row:hover .time-del {
+	visibility: visible;
+}

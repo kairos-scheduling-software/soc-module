@@ -229,11 +229,21 @@ Route::group(array('before'=> 'auth'), function()
     ));
     // End
     
-    // Resources route
+    // Resources manager
     Route::get('/resources/rooms', array(
         'as'    => 'room-manager',
         'uses'  => 'ResourceController@load_room_manager'
     ));
+    Route::get('/resources/professors', array(
+        'as'    => 'prof-manager',
+        'uses'  => 'ResourceController@load_prof_manager'
+    ));
+    Route::get('/resources/times', array(
+        'as'    => 'time-manager',
+        'uses'  => 'ResourceController@load_time_manager'
+    ));
+        
+    // Resources route
     Route::post('/resources/get-rooms', array(
         'as'    => 'room-list',
         'uses'  => 'ResourceController@get_rooms'
@@ -259,10 +269,6 @@ Route::group(array('before'=> 'auth'), function()
         'uses'  => 'ResourceController@edit_room_group'
     ));
     
-    Route::get('/resources/professors', array(
-        'as'    => 'prof-manager',
-        'uses'  => 'ResourceController@load_prof_manager'
-    ));
     Route::post('/resources/get-profs', array(
         'as'    => 'prof-list',
         'uses'  => 'ResourceController@get_professors'
@@ -274,5 +280,34 @@ Route::group(array('before'=> 'auth'), function()
     Route::post('/resources/remove-prof', array(
         'as'    => 'edit-prof',
         'uses'  => 'ResourceController@edit_professor'
+    ));
+    
+    Route::post('/resources/get-times', array(
+        'as'    => 'time-list',
+        'uses'  => 'ResourceController@get_times'
+    ));
+    Route::post('/resources/get-time-groups', array(
+        'as'    => 'time-group-list',
+        'uses'  => 'ResourceController@get_time_groups'
+    ));
+    Route::post('/resources/import-times', array(
+        'as'    => 'import-times',
+        'uses'  => 'ResourceController@import_times'
+    ));
+    Route::post('/resources/add-time', array(
+        'as'    => 'add-time',
+        'uses'  => 'ResourceController@add_time'
+    ));
+    Route::post('/resources/add-time-group', array(
+        'as'    => 'add-time-group',
+        'uses'  => 'ResourceController@add_time_group'
+    ));
+    Route::post('/resources/remove-time', array(
+        'as'    => 'edit-time',
+        'uses'  => 'ResourceController@archive_time'
+    ));
+    Route::post('/resources/edit-time-group', array(
+        'as'    => 'edit-time-group',
+        'uses'  => 'ResourceController@edit_time_group'
     ));
 });

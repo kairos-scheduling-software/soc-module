@@ -357,6 +357,7 @@ class ScheduleController extends BaseController {
 		try {
 			try {
 				$result = Communication::sendCheck($schedule);
+				return $result;
 				if(property_exists($result, 'Error')) {
 					return $result;
 				}

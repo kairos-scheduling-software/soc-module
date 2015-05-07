@@ -315,7 +315,10 @@
 <h1 id="sched-name" data-url="{{ URL::route('get-sched') }}">{{ $schedule->name }}
 	{{--<a href="#"><span id="edit-icon">{{FA::icon('edit')}}</span></a>--}}
 		<span id="sched-ok">{{ FA::icon('check')}} No conflicts in schedule.</span>
+		{{--
 		<span id="checking-sched">{{ FA::spin('spinner') }} Checking schedule...</span>
+		--}}
+		<span id="checking-sched"><img src="{{ URL::asset('assets/images/loading.gif') }}" width="20"/> Checking schedule...</span>
 		<span id="sched-bad">{{ FA::icon('warning') }} 
 			<a id="view-conflicts" href="#">Conflicts in schedule!  Click to view.</a>
 		</span>

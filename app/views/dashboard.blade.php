@@ -103,7 +103,7 @@
 		{{--
 		<h2>LOADING&nbsp;{{ FA::spin('spinner') }}</h2>
 		--}}
-		<h2><img src="{{ URL::asset('assets/images/loading.gif') }}" width="20"/>&nbsp;Loading...</h2>
+		<h2><img src="{{ URL::asset('assets/images/loading.gif') }}" width="40"/>&nbsp;Loading...</h2>
 	</div>
 	<div id="ajax-admin-target"></div>
 	@stop
